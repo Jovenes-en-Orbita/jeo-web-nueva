@@ -1,0 +1,127 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Stat {
+  id    String @id @default(uuid())
+  value String
+  label String
+  order Int    @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("stats")
+}
+
+model NewsArticle {
+  id              String  @id @default(uuid())
+  title           String
+  summary         String
+  imageUrl        String? @map("image_url")
+  date            DateTime
+  readTimeMinutes Int      @map("read_time_minutes")
+  slug            String   @unique
+  content         String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("news_articles")
+}
+
+model UniverseTab {
+  id          String  @id @default(uuid())
+  label       String
+  slug        String  @unique
+  description String?
+  imageUrl    String? @map("image_url")
+  order       Int     @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("universe_tabs")
+}
+
+model Planet {
+  id          String  @id @default(uuid())
+  name        String  @unique
+  imageUrl    String? @map("image_url")
+  order       Int     @default(0)
+  description String?
+  slug        String  @unique
+
+  moons Moon[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("planets")
+}
+
+model Moon {
+  id          String  @id @default(uuid())
+  name        String
+  imageUrl    String? @map("image_url")
+  order       Int     @default(0)
+  description String?
+  slug        String  @unique
+
+  planet   Planet @relation(fields: [planetId], references: [id])
+  planetId String @map("planet_id")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("moons")
+}
+
+model Constellation {
+  id          String  @id @default(uuid())
+  name        String
+  description String?
+  imageUrl    String? @map("image_url")
+  slug        String  @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("constellations")
+}
+
+model GalleryImage {
+  id       String  @id @default(uuid())
+  url      String?
+  alt      String
+  caption  String?
+  featured Boolean @default(false)
+  order    Int     @default(0)
+
+  collection   GalleryCollection @relation(fields: [collectionId], references: [id])
+  collectionId String            @map("collection_id")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("gallery_images")
+}
+
+model GalleryCollection {
+  id                 String  @id @default(uuid())
+  title              String
+  description        String
+  rotationFrequency  String  @default("semanal") @map("rotation_frequency")
+
+  images GalleryImage[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("gallery_collections")
+}

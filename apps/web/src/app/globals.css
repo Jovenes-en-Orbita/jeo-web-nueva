@@ -1,0 +1,144 @@
+@import "tailwindcss";
+
+/* ══════════════════════════════════════════════
+   JEO Design System — CSS Custom Properties
+   Faithfully ported from wireframe_jeo.html
+   ══════════════════════════════════════════════ */
+
+@theme {
+  --color-navy: #0B1B33;
+  --color-navy-2: #122548;
+  --color-white: #FFFFFF;
+  --color-black: #111111;
+  --color-yellow: #FFC72C;
+  --color-red: #E4002B;
+  --color-line: #D9D9D9;
+  --color-ph: #C7CBD1;
+  --color-ph-ink: #7A828C;
+  --color-ink: #111111;
+  --color-ink-2: #4B4F56;
+
+  --font-barlow: 'Barlow Condensed', Arial, sans-serif;
+  --font-inter: 'Inter', Arial, sans-serif;
+}
+
+/* ── Base Reset ── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--color-white);
+  color: var(--color-ink);
+  font-family: var(--font-inter);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+.display {
+  font-family: var(--font-barlow);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* ── Layout ── */
+.wrap {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+/* ── Placeholder (for TODO images) ── */
+.ph {
+  background: var(--color-ph);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-ph-ink);
+  font-family: var(--font-inter);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  overflow: hidden;
+}
+
+.ph::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    transparent 47%,
+    rgba(255, 255, 255, 0.35) 50%,
+    transparent 53%
+  );
+}
+
+.ph span {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 0 12px;
+}
+
+/* ── Animations ── */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out both;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out both;
+}
+
+/* ── Section Block ── */
+section.block {
+  padding: 64px 0;
+  border-bottom: 1px solid var(--color-line);
+}
+
+section.block.alt {
+  background: #F7F8FA;
+}
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .wrap {
+    padding: 0 20px;
+  }
+}
