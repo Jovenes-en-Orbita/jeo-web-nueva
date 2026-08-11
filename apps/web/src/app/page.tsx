@@ -1,4 +1,3 @@
-import { UtilityStrip } from '@/components/features/UtilityStrip';
 import { Navbar } from '@/components/features/Navbar';
 import { Hero } from '@/components/features/Hero';
 import { StatsStrip } from '@/components/features/StatsStrip';
@@ -18,7 +17,6 @@ import { Footer } from '@/components/features/Footer';
 export default function Home() {
   return (
     <>
-      <UtilityStrip />
       <Navbar />
       <main>
         <Hero />

@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { Logo } from '@/components/ui/Logo';
 
 /**
  * Footer matching the wireframe's footer.
@@ -12,12 +13,9 @@ export function Footer() {
       <div className="wrap grid grid-cols-[1.3fr_1fr_1fr_1fr] gap-10 pt-[52px] pb-10 max-[900px]:grid-cols-2">
         {/* Brand */}
         <div>
-          <div className="w-11 h-11 rounded-full border-[2.5px] border-white flex items-center justify-center text-white font-[var(--font-montserrat)] font-bold text-base mb-3.5">
-            JEO
+          <div className="mb-3.5">
+            <Logo size={48} showText={true} />
           </div>
-          <h3 className="text-[20px] text-white font-[var(--font-montserrat)] font-bold uppercase tracking-[0.02em] mb-2.5">
-            Jóvenes en Órbita
-          </h3>
           <p className="text-[12.5px] text-[#B9BEC6] leading-relaxed max-w-[260px] mb-[18px]">
             Divulgación científica espacial hecha por y para jóvenes, con foco
             en el ecosistema espacial argentino.

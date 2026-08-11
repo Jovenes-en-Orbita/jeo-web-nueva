@@ -64,7 +64,7 @@ Solo los componentes que necesitan interactividad del navegador:
 
 ## Design System & Estándares Visuales
 
-Los tokens de diseño están definidos en `globals.css` y `styles/gradient.css`:
+Los tokens de diseño están definidos en `globals.css`:
 
 ```css
 /* Colores principales */
@@ -81,7 +81,7 @@ Los tokens de diseño están definidos en `globals.css` y `styles/gradient.css`:
 --font-poppins: 'Poppins';        /* Cuerpo de texto y UI */
 ```
 
-Las fuentes se cargan vía `next/font/google` para optimización automática. Toda la plataforma cuenta con un gradiente de fondo espacial estándar configurado en `src/styles/gradient.css`.
+Las fuentes se cargan vía `next/font/google` para optimización automática.
 
 
 ## Cliente HTTP

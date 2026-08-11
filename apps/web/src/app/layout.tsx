@@ -45,17 +45,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es" className={`${montserrat.variable} ${poppins.variable}`}>
-      <body suppressHydrationWarning className="min-h-screen text-[var(--color-ink)] bg-white">
-        <div className="gradient-bg min-h-screen">
-          <div className="base" />
-          <div className="treatment" />
-          <div className="glow" />
-          <div className="particles" />
-          <div className="vignette" />
-          <div className="noise" />
-          <div className="relative z-10">{children}</div>
-        </div>
-      </body>
+      <body suppressHydrationWarning>{children}</body>
     </html>
   );
 }
