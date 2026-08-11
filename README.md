@@ -10,7 +10,7 @@
   <img src="https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white" alt="PostgreSQL" />
   <img src="https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript&logoColor=white" alt="TypeScript" />
   <img src="https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?logo=tailwindcss&logoColor=white" alt="Tailwind CSS" />
-  <img src="https://img.shields.io/badge/Docker-ready-2496ED?logo=docker&logoColor=white" alt="Docker" />
+  <img src="https://img.shields.io/badge/Docker-disabled%20(TODO)-gray?logo=docker&logoColor=white" alt="Docker (Deshabilitado - TODO)" />
 </p>
 
 ---
@@ -44,8 +44,8 @@ jeo-monorepo/
 
 - [Node.js](https://nodejs.org/) ≥ 20
 - [pnpm](https://pnpm.io/) ≥ 9 (`corepack enable && corepack prepare pnpm@9.15.4 --activate`)
-- [PostgreSQL](https://www.postgresql.org/) 16 (o usar Docker)
-- [Docker](https://www.docker.com/) y Docker Compose (opcional)
+- [PostgreSQL](https://www.postgresql.org/) 16 (o PostgreSQL local)
+- [Docker](https://www.docker.com/) y Docker Compose *(Pospuesto / TODO)*
 
 ### Opción A: Desarrollo Local
 
@@ -75,15 +75,14 @@ pnpm dev
 
 > **💡 Tip:** El frontend funciona **sin el backend** gracias al sistema de fallback data integrado. Podés correr solo `pnpm --filter @jeo/web dev` para trabajar en la UI.
 
-### Opción B: Docker Compose
+### Opción B: Docker Compose *(Pospuesto / TODO)*
 
-```bash
-# Levantar todo (PostgreSQL + API + Web)
-docker compose up --build
-
-# Solo la base de datos (para dev local)
-docker compose up db
-```
+> **📌 Nota:** La integración con Docker está deshabilitada temporalmente (TODO: Re-implementar Docker Compose en el futuro).
+> 
+> ```bash
+> # TODO: Descomentar services en docker-compose.yml antes de ejecutar:
+> # docker compose up --build
+> ```
 
 ## 📜 Scripts Disponibles
 
@@ -147,13 +146,13 @@ Todos los endpoints están bajo el prefijo `/api` y devuelven el formato estanda
 | `GET` | `/api/gallery` | Todas las colecciones |
 | `GET` | `/api/gallery/featured` | Colección destacada |
 
-## 🐳 Docker
+## 🐳 Docker *(Pospuesto / TODO)*
 
-El proyecto incluye configuración Docker lista para producción:
+> **⚠️ Estado:** La configuración de Docker está deshabilitada temporalmente (archivos comentados con notas `TODO`).
 
-- **`apps/api/Dockerfile`** — Multi-stage build optimizado para NestJS con Prisma
-- **`apps/web/Dockerfile`** — Multi-stage build con Next.js `standalone` output
-- **`docker-compose.yml`** — Orquesta 3 servicios con healthchecks y red compartida
+- **`apps/api/Dockerfile`** — *(TODO)* Multi-stage build para NestJS con Prisma
+- **`apps/web/Dockerfile`** — *(TODO)* Multi-stage build con Next.js `standalone` output
+- **`docker-compose.yml`** — *(TODO)* Orquestación de servicios PostgreSQL, API y Web
 
 ### Variables de Entorno
 
@@ -205,7 +204,7 @@ El frontend implementa fielmente todas las secciones del wireframe original:
 | **Base de datos** | PostgreSQL 16 |
 | **Validación** | class-validator, class-transformer |
 | **Monorepo** | pnpm workspaces, Turborepo |
-| **Containerización** | Docker, Docker Compose |
+| **Containerización** | Docker, Docker Compose *(Pospuesto / TODO)* |
 | **Fonts** | Barlow Condensed, Inter (via `next/font/google`) |
 
 ## 📄 Licencia

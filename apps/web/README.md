@@ -141,11 +141,13 @@ El diseño incluye breakpoints responsive (≤ 900px) que adaptan:
 - News cards: divider vertical → horizontal
 - Footer: 4 cols → 2 cols
 
-## Docker
+## Docker *(Pospuesto / TODO)*
+
+> **📌 Nota:** Desimplementado temporalmente. Ver `apps/web/Dockerfile` para los comentarios `TODO` de reactivación.
 
 ```dockerfile
-# Multi-stage build con output: 'standalone'
-# Produce un servidor Node.js autocontenido (~50 MB)
+# TODO: Re-implementar Dockerfile con output: 'standalone'
 ```
 
 Puerto expuesto: `3000`
+

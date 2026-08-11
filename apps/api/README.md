@@ -120,11 +120,13 @@ Los DTOs usan `class-validator` con `ValidationPipe` global configurado con:
 - `forbidNonWhitelisted: true` — Rechaza propiedades desconocidas
 - `transform: true` — Transforma automáticamente tipos primitivos
 
-## Docker
+## Docker *(Pospuesto / TODO)*
+
+> **📌 Nota:** Desimplementado temporalmente. Ver `apps/api/Dockerfile` para los comentarios `TODO` de reactivación.
 
 ```dockerfile
-# Multi-stage build (3 stages)
-# deps → build (con prisma generate) → production (node:20-alpine)
+# TODO: Re-implementar Dockerfile (Multi-stage build)
 ```
 
 Puerto expuesto: `3001`
+
