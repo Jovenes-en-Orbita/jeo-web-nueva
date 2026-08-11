@@ -21,7 +21,7 @@ export function Footer() {
             en el ecosistema espacial argentino.
           </p>
           <Link
-            href="#"
+            href="/unite"
             className="inline-flex items-center gap-1.5 font-[var(--font-montserrat)] font-semibold text-[13px] uppercase tracking-[0.05em] text-[var(--color-yellow)] border-b-2 border-[var(--color-yellow)] pb-0.5 hover:text-white hover:border-white transition-colors"
           >
             Unite a nosotros →
@@ -33,19 +33,19 @@ export function Footer() {
           <h4 className="text-[12px] tracking-[0.1em] text-[#8A8F98] mb-4 font-semibold uppercase font-[var(--font-poppins)]">
             Explorá
           </h4>
-          <Link href="#u" className="block text-[13px] text-[#DEE1E6] mb-[11px] hover:underline">
+          <Link href="/universo" className="block text-[13px] text-[#DEE1E6] mb-[11px] hover:underline">
             El Universo
           </Link>
-          <Link href="#ss" className="block text-[13px] text-[#DEE1E6] mb-[11px] hover:underline">
+          <Link href="/sistema-solar" className="block text-[13px] text-[#DEE1E6] mb-[11px] hover:underline">
             Sistema Solar
           </Link>
-          <Link href="#const" className="block text-[13px] text-[#DEE1E6] mb-[11px] hover:underline">
+          <Link href="/constelaciones" className="block text-[13px] text-[#DEE1E6] mb-[11px] hover:underline">
             Constelaciones
           </Link>
-          <Link href="#news" className="block text-[13px] text-[#DEE1E6] mb-[11px] hover:underline">
+          <Link href="/noticias" className="block text-[13px] text-[#DEE1E6] mb-[11px] hover:underline">
             Noticias Espaciales
           </Link>
-          <Link href="#frag" className="block text-[13px] text-[#DEE1E6] mb-[11px] hover:underline">
+          <Link href="/galeria" className="block text-[13px] text-[#DEE1E6] mb-[11px] hover:underline">
             Fragmentos de Memoria
           </Link>
         </div>
@@ -55,16 +55,16 @@ export function Footer() {
           <h4 className="text-[12px] tracking-[0.1em] text-[#8A8F98] mb-4 font-semibold uppercase font-[var(--font-poppins)]">
             Organización
           </h4>
-          <Link href="#" className="block text-[13px] text-[#DEE1E6] mb-[11px] hover:underline">
+          <Link href="/nosotros" className="block text-[13px] text-[#DEE1E6] mb-[11px] hover:underline">
             Acerca de Jóvenes en Órbita
           </Link>
-          <Link href="#" className="block text-[13px] text-[#DEE1E6] mb-[11px] hover:underline">
+          <Link href="/ecosistema" className="block text-[13px] text-[#DEE1E6] mb-[11px] hover:underline">
             Ecosistema Espacial Argentino
           </Link>
-          <Link href="#" className="block text-[13px] text-[#DEE1E6] mb-[11px] hover:underline">
+          <Link href="/libros" className="block text-[13px] text-[#DEE1E6] mb-[11px] hover:underline">
             Recursos de aprendizaje
           </Link>
-          <Link href="#" className="block text-[13px] text-[#DEE1E6] mb-[11px] hover:underline">
+          <Link href="/newsletter" className="block text-[13px] text-[#DEE1E6] mb-[11px] hover:underline">
             Newsletter
           </Link>
         </div>
@@ -74,7 +74,7 @@ export function Footer() {
           <h4 className="text-[12px] tracking-[0.1em] text-[#8A8F98] mb-4 font-semibold uppercase font-[var(--font-poppins)]">
             Contacto
           </h4>
-          <Link href="#" className="block text-[13px] text-[#DEE1E6] mb-[11px] hover:underline">
+          <Link href="/redes" className="block text-[13px] text-[#DEE1E6] mb-[11px] hover:underline">
             Contacta con JEO
           </Link>
           {/* Social icons */}
