@@ -15,11 +15,11 @@ export function Navbar() {
         <div className="flex items-center gap-4">
           <Link
             href="#"
-            className="text-white font-[var(--font-barlow)] font-semibold text-[15px] uppercase tracking-[0.05em] hover:text-[var(--color-yellow)] transition-colors"
+            className="text-white font-[var(--font-montserrat)] font-semibold text-[15px] uppercase tracking-[0.05em] hover:text-[var(--color-yellow)] transition-colors"
           >
             Hogar
           </Link>
-          <span className="text-white font-[var(--font-barlow)] font-semibold text-[15px] uppercase tracking-[0.05em] whitespace-nowrap">
+          <span className="text-white font-[var(--font-montserrat)] font-semibold text-[15px] uppercase tracking-[0.05em] whitespace-nowrap">
             Explora
           </span>
           <div className="flex items-center gap-2 bg-white/[0.08] border border-white/25 rounded-[3px] px-2.5 py-1.5 min-w-[180px]">
@@ -45,10 +45,10 @@ export function Navbar() {
 
         {/* Center: Logo */}
         <div className="flex flex-col items-center gap-1 justify-self-center">
-          <div className="w-11 h-11 rounded-full border-[2.5px] border-white flex items-center justify-center text-white font-[var(--font-barlow)] font-bold text-base">
+          <div className="w-11 h-11 rounded-full border-[2.5px] border-white flex items-center justify-center text-white font-[var(--font-montserrat)] font-bold text-base">
             JEO
           </div>
-          <span className="text-white font-[var(--font-barlow)] font-bold text-[12px] tracking-[0.12em]">
+          <span className="text-white font-[var(--font-montserrat)] font-bold text-[12px] tracking-[0.12em]">
             Jóvenes en Órbita
           </span>
         </div>

@@ -62,22 +62,27 @@ Solo los componentes que necesitan interactividad del navegador:
 | `components/ui/` | Componentes genéricos reutilizables | `Button`, `Chip`, `Tag` |
 | `components/features/` | Secciones específicas del wireframe | `Hero`, `NewsSection`, `Footer` |
 
-## Design System
+## Design System & Estándares Visuales
 
-Los tokens de diseño están definidos en `globals.css` y mapean exactamente al wireframe original:
+Los tokens de diseño están definidos en `globals.css` y `styles/gradient.css`:
 
 ```css
 /* Colores principales */
---color-navy: #0B1B33;
---color-yellow: #FFC72C;
---color-red: #E4002B;
+--color-navy: #0B1B33;      /* Azul Marino Principal */
+--color-navy-2: #122548;    /* Azul Marino Secundario */
+--color-yellow: #FFC72C;    /* Amarillo Acento */
+--color-red: #E4002B;       /* Rojo Acento */
+--color-line: #D9D9D9;      /* Líneas y Separadores */
+--color-ink: #111111;       /* Texto Principal */
+--color-ink-2: #4B4F56;     /* Texto Secundario */
 
-/* Tipografía */
---font-barlow: 'Barlow Condensed';  /* Títulos */
---font-inter: 'Inter';              /* Cuerpo */
+/* Tipografía estándar */
+--font-montserrat: 'Montserrat';  /* Títulos y Encabezados */
+--font-poppins: 'Poppins';        /* Cuerpo de texto y UI */
 ```
 
-Las fuentes se cargan vía `next/font/google` para optimización automática.
+Las fuentes se cargan vía `next/font/google` para optimización automática. Toda la plataforma cuenta con un gradiente de fondo espacial estándar configurado en `src/styles/gradient.css`.
+
 
 ## Cliente HTTP
 

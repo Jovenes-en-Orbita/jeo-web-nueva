@@ -10,7 +10,7 @@ export function StatCard({
 }) {
   return (
     <div className="py-[26px] px-6 border-l border-[var(--color-line)] first:border-l-0">
-      <b className="block font-[var(--font-barlow)] text-[34px] text-[var(--color-navy)]">
+      <b className="block font-[var(--font-montserrat)] text-[34px] text-[var(--color-navy)]">
         {value}
       </b>
       <span className="text-[12px] text-[var(--color-ink-2)]">{label}</span>

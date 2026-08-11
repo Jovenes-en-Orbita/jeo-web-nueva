@@ -15,7 +15,7 @@ export function Button({
   return (
     <Link
       href={href}
-      className={`inline-flex items-center gap-1.5 font-[var(--font-barlow)] font-semibold text-sm tracking-[0.05em] uppercase text-[var(--color-navy)] border-b-2 border-[var(--color-red)] pb-[3px] whitespace-nowrap transition-all duration-200 hover:gap-3 ${className}`}
+      className={`inline-flex items-center gap-1.5 font-[var(--font-montserrat)] font-semibold text-sm tracking-[0.05em] uppercase text-[var(--color-navy)] border-b-2 border-[var(--color-red)] pb-[3px] whitespace-nowrap transition-all duration-200 hover:gap-3 ${className}`}
     >
       {children}
       <svg

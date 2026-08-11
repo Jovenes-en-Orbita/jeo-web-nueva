@@ -19,7 +19,7 @@ export async function GallerySection() {
             <span className="text-[12px] text-[var(--color-ink-2)] tracking-[0.04em] uppercase font-semibold block mb-1.5">
               Galería de fotos astronómicas
             </span>
-            <h2 className="text-[34px] text-[var(--color-navy)] font-[var(--font-barlow)] font-bold uppercase tracking-[0.02em]">
+            <h2 className="text-[34px] text-[var(--color-navy)] font-[var(--font-montserrat)] font-bold uppercase tracking-[0.02em]">
               Fragmentos de Memoria
             </h2>
           </div>

@@ -16,11 +16,11 @@ export function SectionHeader({
     <div className="flex justify-between items-end mb-8 gap-6 flex-wrap">
       <div>
         {eyebrow && (
-          <span className="font-[var(--font-barlow)] font-semibold text-[13px] text-[var(--color-red)] tracking-[0.14em] mb-1.5 block">
+          <span className="font-[var(--font-montserrat)] font-semibold text-[13px] text-[var(--color-red)] tracking-[0.14em] mb-1.5 block">
             {eyebrow}
           </span>
         )}
-        <h2 className="text-[34px] text-[var(--color-navy)] font-[var(--font-barlow)] font-bold uppercase tracking-[0.02em]">
+        <h2 className="text-[34px] text-[var(--color-navy)] font-[var(--font-montserrat)] font-bold uppercase tracking-[0.02em]">
           {title}
         </h2>
       </div>

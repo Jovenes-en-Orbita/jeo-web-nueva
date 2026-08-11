@@ -205,7 +205,7 @@ El frontend implementa fielmente todas las secciones del wireframe original:
 | **Validación** | class-validator, class-transformer |
 | **Monorepo** | pnpm workspaces, Turborepo |
 | **Containerización** | Docker, Docker Compose *(Pospuesto / TODO)* |
-| **Fonts** | Barlow Condensed, Inter (via `next/font/google`) |
+| **Fonts** | Montserrat, Poppins (via `next/font/google`) |
 
 ## 📄 Licencia
 

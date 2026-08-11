@@ -12,7 +12,7 @@ export function Chip({
   href?: string;
 }) {
   const baseClasses =
-    'font-[var(--font-barlow)] font-semibold text-[13px] tracking-[0.04em] uppercase px-3.5 py-[7px] transition-colors duration-200 cursor-pointer';
+    'font-[var(--font-montserrat)] font-semibold text-[13px] tracking-[0.04em] uppercase px-3.5 py-[7px] transition-colors duration-200 cursor-pointer';
 
   const variantClasses = filled
     ? 'bg-[var(--color-navy)] text-white border border-[var(--color-navy)] hover:bg-[var(--color-navy-2)]'

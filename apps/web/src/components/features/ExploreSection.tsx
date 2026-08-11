@@ -49,7 +49,7 @@ export function ExploreSection() {
               href={card.href}
               className="bg-white py-[30px] px-[26px] group transition-colors duration-200 hover:bg-[#F2F4F7]"
             >
-              <span className="font-[var(--font-barlow)] text-[13px] font-semibold text-[var(--color-red)] tracking-[0.1em]">
+              <span className="font-[var(--font-montserrat)] text-[13px] font-semibold text-[var(--color-red)] tracking-[0.1em]">
                 {card.num}
               </span>
               <h3 className="text-[20px] text-[var(--color-navy)] my-2 normal-case group-hover:underline transition-all">

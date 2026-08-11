@@ -35,7 +35,7 @@ export function Dropdown({
   return (
     <div
       ref={ref}
-      className="relative text-white font-[var(--font-barlow)] font-semibold text-[15px] uppercase tracking-[0.05em] flex items-center gap-1 cursor-default group"
+      className="relative text-white font-[var(--font-montserrat)] font-semibold text-[15px] uppercase tracking-[0.05em] flex items-center gap-1 cursor-default group"
       onMouseEnter={() => setOpen(true)}
       onMouseLeave={() => setOpen(false)}
     >
@@ -73,7 +73,7 @@ export function Dropdown({
           <Link
             key={item.href + i}
             href={item.href}
-            className={`block px-4 py-2.5 font-[var(--font-inter)] text-[13px] font-medium normal-case tracking-normal transition-colors duration-150 hover:bg-[#F2F4F7] hover:underline ${
+            className={`block px-4 py-2.5 font-[var(--font-poppins)] text-[13px] font-medium normal-case tracking-normal transition-colors duration-150 hover:bg-[#F2F4F7] hover:underline ${
               i < items.length - 1 ? 'border-b border-[var(--color-line)]' : ''
             }`}
           >

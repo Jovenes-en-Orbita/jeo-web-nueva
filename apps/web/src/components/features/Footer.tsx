@@ -12,10 +12,10 @@ export function Footer() {
       <div className="wrap grid grid-cols-[1.3fr_1fr_1fr_1fr] gap-10 pt-[52px] pb-10 max-[900px]:grid-cols-2">
         {/* Brand */}
         <div>
-          <div className="w-11 h-11 rounded-full border-[2.5px] border-white flex items-center justify-center text-white font-[var(--font-barlow)] font-bold text-base mb-3.5">
+          <div className="w-11 h-11 rounded-full border-[2.5px] border-white flex items-center justify-center text-white font-[var(--font-montserrat)] font-bold text-base mb-3.5">
             JEO
           </div>
-          <h3 className="text-[20px] text-white font-[var(--font-barlow)] font-bold uppercase tracking-[0.02em] mb-2.5">
+          <h3 className="text-[20px] text-white font-[var(--font-montserrat)] font-bold uppercase tracking-[0.02em] mb-2.5">
             Jóvenes en Órbita
           </h3>
           <p className="text-[12.5px] text-[#B9BEC6] leading-relaxed max-w-[260px] mb-[18px]">
@@ -24,7 +24,7 @@ export function Footer() {
           </p>
           <Link
             href="#"
-            className="inline-flex items-center gap-1.5 font-[var(--font-barlow)] font-semibold text-[13px] uppercase tracking-[0.05em] text-[var(--color-yellow)] border-b-2 border-[var(--color-yellow)] pb-0.5 hover:text-white hover:border-white transition-colors"
+            className="inline-flex items-center gap-1.5 font-[var(--font-montserrat)] font-semibold text-[13px] uppercase tracking-[0.05em] text-[var(--color-yellow)] border-b-2 border-[var(--color-yellow)] pb-0.5 hover:text-white hover:border-white transition-colors"
           >
             Unite a nosotros →
           </Link>
@@ -32,7 +32,7 @@ export function Footer() {
 
         {/* Explorá */}
         <div>
-          <h4 className="text-[12px] tracking-[0.1em] text-[#8A8F98] mb-4 font-semibold uppercase font-[var(--font-inter)]">
+          <h4 className="text-[12px] tracking-[0.1em] text-[#8A8F98] mb-4 font-semibold uppercase font-[var(--font-poppins)]">
             Explorá
           </h4>
           <Link href="#u" className="block text-[13px] text-[#DEE1E6] mb-[11px] hover:underline">
@@ -54,7 +54,7 @@ export function Footer() {
 
         {/* Organización */}
         <div>
-          <h4 className="text-[12px] tracking-[0.1em] text-[#8A8F98] mb-4 font-semibold uppercase font-[var(--font-inter)]">
+          <h4 className="text-[12px] tracking-[0.1em] text-[#8A8F98] mb-4 font-semibold uppercase font-[var(--font-poppins)]">
             Organización
           </h4>
           <Link href="#" className="block text-[13px] text-[#DEE1E6] mb-[11px] hover:underline">
@@ -73,7 +73,7 @@ export function Footer() {
 
         {/* Contacto */}
         <div>
-          <h4 className="text-[12px] tracking-[0.1em] text-[#8A8F98] mb-4 font-semibold uppercase font-[var(--font-inter)]">
+          <h4 className="text-[12px] tracking-[0.1em] text-[#8A8F98] mb-4 font-semibold uppercase font-[var(--font-poppins)]">
             Contacto
           </h4>
           <Link href="#" className="block text-[13px] text-[#DEE1E6] mb-[11px] hover:underline">

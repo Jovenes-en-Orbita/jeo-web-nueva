@@ -1,8 +1,9 @@
 @import "tailwindcss";
+@import "../styles/gradient.css";
 
 /* ══════════════════════════════════════════════
    JEO Design System — CSS Custom Properties
-   Faithfully ported from wireframe_jeo.html
+   Faithfully ported & standardized
    ══════════════════════════════════════════════ */
 
 @theme {
@@ -18,8 +19,14 @@
   --color-ink: #111111;
   --color-ink-2: #4B4F56;
 
-  --font-barlow: 'Barlow Condensed', Arial, sans-serif;
-  --font-inter: 'Inter', Arial, sans-serif;
+  --font-montserrat: 'Montserrat', sans-serif;
+  --font-poppins: 'Poppins', sans-serif;
+
+  /* Aliases para compatibilidad */
+  --font-heading: var(--font-montserrat);
+  --font-body: var(--font-poppins);
+  --font-barlow: var(--font-montserrat);
+  --font-inter: var(--font-poppins);
 }
 
 /* ── Base Reset ── */
@@ -38,7 +45,7 @@ body {
 body {
   background: var(--color-white);
   color: var(--color-ink);
-  font-family: var(--font-inter);
+  font-family: var(--font-poppins);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -47,7 +54,7 @@ h1,
 h2,
 h3,
 .display {
-  font-family: var(--font-barlow);
+  font-family: var(--font-montserrat);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.02em;

@@ -14,10 +14,10 @@ export function Hero() {
         style={{ height: 460 }}
       />
       <div className="absolute left-0 bottom-0 bg-[var(--color-navy)] text-white p-[28px_40px_30px] max-w-[560px] animate-fade-in-up">
-        <span className="text-[var(--color-yellow)] font-[var(--font-barlow)] font-semibold text-[13px] tracking-[0.14em] mb-2 block">
+        <span className="text-[var(--color-yellow)] font-[var(--font-montserrat)] font-semibold text-[13px] tracking-[0.14em] mb-2 block">
           Divulgación científica espacial
         </span>
-        <h1 className="font-[var(--font-barlow)] font-bold text-[40px] leading-none mb-2.5 uppercase tracking-[0.02em]">
+        <h1 className="font-[var(--font-montserrat)] font-bold text-[40px] leading-none mb-2.5 uppercase tracking-[0.02em]">
           Jóvenes en Órbita
         </h1>
         <p className="text-sm leading-relaxed text-[#D6DCE6] m-0">
