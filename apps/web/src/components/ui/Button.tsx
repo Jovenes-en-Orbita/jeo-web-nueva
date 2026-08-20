@@ -1,21 +1,34 @@
 import Link from 'next/link';
 
 /**
- * CTA button matching the wireframe style: text with arrow → and red bottom border.
+ * CTA button with theme support (light / dark) for clear legibility on dark space backgrounds.
  */
 export function Button({
   children,
   href = '#',
+  variant = 'default',
   className = '',
 }: {
   children: React.ReactNode;
   href?: string;
+  variant?: 'default' | 'gold' | 'light';
   className?: string;
 }) {
+  let textColor = 'text-[var(--color-navy)]';
+  let borderColor = 'border-[var(--color-red)]';
+
+  if (variant === 'gold') {
+    textColor = 'text-[#FFC72C] hover:text-white';
+    borderColor = 'border-[#FFC72C]';
+  } else if (variant === 'light') {
+    textColor = 'text-white hover:text-[#FFC72C]';
+    borderColor = 'border-[#FFC72C]';
+  }
+
   return (
     <Link
       href={href}
-      className={`inline-flex items-center gap-1.5 font-[var(--font-montserrat)] font-semibold text-sm tracking-[0.05em] uppercase text-[var(--color-navy)] border-b-2 border-[var(--color-red)] pb-[3px] whitespace-nowrap transition-all duration-200 hover:gap-3 ${className}`}
+      className={`inline-flex items-center gap-1.5 font-[var(--font-montserrat)] font-bold text-sm tracking-[0.05em] uppercase border-b-2 pb-[3px] whitespace-nowrap transition-all duration-200 hover:gap-3 ${textColor} ${borderColor} ${className}`}
     >
       {children}
       <svg

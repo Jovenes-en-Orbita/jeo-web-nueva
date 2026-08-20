@@ -11,6 +11,7 @@ import { HorizontalLayout } from '@/components/features/HorizontalLayout';
 
 /**
  * JEO Home Page — Horizontal scroll navigation using mouse wheel.
+ * Each slide spans the exact viewport height and centers its section content without extra bottom gaps.
  */
 export default function Home() {
   return (
@@ -25,32 +26,32 @@ export default function Home() {
           </div>
 
           {/* Section 2: Sistema Solar */}
-          <div className="min-h-full">
+          <div className="h-full overflow-y-auto bg-[#080d1a]">
             <SolarSystemSection />
           </div>
 
           {/* Section 3: Constelaciones */}
-          <div className="min-h-full">
+          <div className="h-full overflow-y-auto bg-[#060a17]">
             <ConstellationsSection />
           </div>
 
           {/* Section 4: Noticias */}
-          <div className="min-h-full">
+          <div className="h-full overflow-y-auto bg-[#080d1a]">
             <NewsSection />
           </div>
 
           {/* Section 5: Galería */}
-          <div className="min-h-full">
+          <div className="h-full overflow-y-auto bg-[#060a17]">
             <GallerySection />
           </div>
 
           {/* Section 6: Explorá */}
-          <div className="min-h-full">
+          <div className="h-full overflow-y-auto bg-[#080d1a]">
             <ExploreSection />
           </div>
 
           {/* Section 7: Footer */}
-          <div className="min-h-full">
+          <div className="h-full overflow-y-auto bg-[#0b111e]">
             <Footer />
           </div>
         </HorizontalLayout>
