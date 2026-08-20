@@ -13,54 +13,61 @@ const cards: ExploreCard[] = [
   {
     num: '01',
     title: 'Conoce a JEO',
-    description: 'Acerca de Jóvenes en Órbita: quiénes somos y nuestra misión.',
-    href: '/about',
+    description: 'Acerca de Jóvenes en Órbita: quiénes somos y nuestra misión de divulgación.',
+    href: '/nosotros',
   },
   {
     num: '02',
     title: 'Ecosistema Espacial Argentino',
-    description: 'Organizaciones, iniciativas y actores del sector espacial en Argentina.',
+    description: 'Organizaciones, iniciativas y actores clave del sector aeroespacial en Argentina.',
     href: '/ecosistema',
   },
   {
     num: '03',
     title: 'Recursos de aprendizaje',
-    description: 'Libros electrónicos y material para seguir aprendiendo.',
+    description: 'Libros electrónicos, newsletters y material didáctico para seguir aprendiendo.',
     subLink: 'Libros electrónicos',
-    href: '/recursos',
+    href: '/libros',
   },
 ];
 
 /**
- * Section 06: Seguí explorando
- * Static content — 3 exploration cards in a grid with 1px gap dividers.
- * Matches wireframe's .explore-grid + .explore-card layout.
+ * Section 06: Seguí explorando…
+ * High contrast dark theme cards with gold numbers & centered slide layout.
  */
 export function ExploreSection() {
   return (
-    <section className="block alt py-16 border-b border-[var(--color-line)] bg-[#F7F8FA]" id="explora-mas">
-      <div className="wrap">
-        <SectionHeader eyebrow="Sección 06" title="Seguí explorando…" />
+    <section className="block py-12 border-b border-white/10 bg-[#080d1a] min-h-full flex flex-col justify-center" id="explora-mas">
+      <div className="wrap w-full">
+        <SectionHeader title="Seguí explorando…" theme="dark" />
 
-        <div className="grid grid-cols-3 gap-px bg-[var(--color-line)] max-[900px]:grid-cols-1">
+        <div className="grid grid-cols-3 gap-6 max-[900px]:grid-cols-1 mt-2">
           {cards.map((card) => (
             <Link
               key={card.num}
               href={card.href}
-              className="bg-white py-[30px] px-[26px] group transition-colors duration-200 hover:bg-[#F2F4F7]"
+              className="bg-[#0d162a] border border-white/10 rounded-2xl p-7 group transition-all duration-300 hover:border-[var(--color-yellow)]/60 hover:-translate-y-1 flex flex-col justify-between"
             >
-              <span className="font-[var(--font-montserrat)] text-[13px] font-semibold text-[var(--color-red)] tracking-[0.1em]">
-                {card.num}
-              </span>
-              <h3 className="text-[20px] text-[var(--color-navy)] my-2 normal-case group-hover:underline transition-all">
-                {card.title}
-              </h3>
-              <p className="text-[12.5px] text-[var(--color-ink-2)] leading-[1.55] m-0 mb-3">
-                {card.description}
-              </p>
-              {card.subLink && (
-                <span className="text-[11px] text-[var(--color-ink-2)]">
+              <div>
+                <span className="font-[var(--font-montserrat)] text-[14px] font-bold text-[var(--color-yellow)] tracking-[0.14em] block mb-2">
+                  {card.num}
+                </span>
+                <h3 className="text-[21px] font-bold text-white mb-3 normal-case group-hover:text-[var(--color-yellow)] transition-colors font-[var(--font-montserrat)]">
+                  {card.title}
+                </h3>
+                <p className="text-[13.5px] text-slate-300 leading-relaxed m-0 mb-4">
+                  {card.description}
+                </p>
+              </div>
+
+              {card.subLink ? (
+                <span className="text-[12px] font-semibold text-[var(--color-yellow)] group-hover:text-white transition-colors pt-3 border-t border-white/10">
                   ↳ {card.subLink}
+                </span>
+              ) : (
+                <span className="text-[12px] font-semibold text-[var(--color-yellow)] group-hover:text-white transition-colors pt-3 border-t border-white/10 flex items-center justify-between">
+                  <span>Saber más</span>
+                  <span>→</span>
                 </span>
               )}
             </Link>
