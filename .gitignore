@@ -32,3 +32,5 @@ yarn-error.log*
 
 # Prisma
 apps/api/prisma/*.db
+
+.vercel
