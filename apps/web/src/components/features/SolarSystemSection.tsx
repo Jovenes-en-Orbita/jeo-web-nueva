@@ -13,7 +13,7 @@ export async function SolarSystemSection() {
   return (
     <section className="block alt py-16 border-b border-[var(--color-line)] bg-[#F7F8FA]" id="ss">
       <div className="wrap">
-        <SectionHeader eyebrow="Sección 02" title="Sistema Solar" />
+        <SectionHeader title="Sistema Solar" />
 
         {/* 3D Solar System Simulation */}
         <div className="mb-[30px]">
