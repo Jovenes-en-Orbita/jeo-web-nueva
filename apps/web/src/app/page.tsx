@@ -14,12 +14,12 @@ import { HorizontalLayout } from '@/components/features/HorizontalLayout';
  */
 export default function Home() {
   return (
-    <div className="min-h-screen flex flex-col overflow-hidden bg-[var(--color-navy)]">
+    <div className="min-h-screen flex flex-col overflow-hidden bg-[#080d1a]">
       <Navbar />
       <main className="flex-1 relative">
         <HorizontalLayout>
           {/* Section 1: Hero & Stats */}
-          <div className="min-h-full">
+          <div className="h-full flex flex-col justify-between bg-[#080d1a]">
             <Hero />
             <StatsStrip />
           </div>
