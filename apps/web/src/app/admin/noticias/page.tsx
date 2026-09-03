@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAdminAuth } from '@/context/AdminAuthContext';
 import { getNews, adminCreateNews, adminUpdateNews, adminDeleteNews } from '@/lib/api';
+import { FreeImagePicker } from '@/components/ui/FreeImagePicker';
 import type { NewsArticle } from '@jeo/shared';
 import {
   FiPlus,
@@ -26,6 +27,7 @@ export default function AdminNoticiasPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [currentId, setCurrentId] = useState<string | null>(null);
+  const [isFreePickerOpen, setIsFreePickerOpen] = useState(false);
 
   // Form Fields
   const [title, setTitle] = useState('');
@@ -41,6 +43,7 @@ export default function AdminNoticiasPage() {
 
   const [formLoading, setFormLoading] = useState(false);
   const [formError, setFormError] = useState('');
+
 
   const loadArticles = async () => {
     setIsLoading(true);
@@ -375,7 +378,16 @@ export default function AdminNoticiasPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-slate-300 font-semibold mb-1">URL de Imagen Principal</label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-slate-300 font-semibold">URL de Imagen Principal</label>
+                    <button
+                      type="button"
+                      onClick={() => setIsFreePickerOpen(true)}
+                      className="text-[11px] text-cyan-400 hover:text-cyan-300 font-medium underline flex items-center gap-1"
+                    >
+                      🚀 Buscar Foto Gratis (NASA/Unsplash)
+                    </button>
+                  </div>
                   <input
                     type="text"
                     value={imageUrl}
@@ -386,16 +398,17 @@ export default function AdminNoticiasPage() {
                 </div>
 
                 <div>
-                  <label className="block text-slate-300 font-semibold mb-1">Pie de foto</label>
+                  <label className="block text-slate-300 font-semibold mb-1">Pie de foto / Créditos</label>
                   <input
                     type="text"
                     value={coverImageCaption}
                     onChange={(e) => setCoverImageCaption(e.target.value)}
-                    placeholder="Recreación artística del módulo..."
+                    placeholder="Foto por NASA / Recreación artística..."
                     className="w-full bg-[#060a17] border border-white/15 px-3.5 py-2.5 rounded-xl text-white outline-none focus:border-[var(--color-yellow)]"
                   />
                 </div>
               </div>
+
 
               {/* Content Tabs */}
               <div>
@@ -466,10 +479,26 @@ export default function AdminNoticiasPage() {
                   )}
                 </button>
               </div>
+
             </form>
           </div>
         </div>
       )}
+
+      {/* Free Image Picker Modal */}
+      {token && (
+        <FreeImagePicker
+          isOpen={isFreePickerOpen}
+          onClose={() => setIsFreePickerOpen(false)}
+          token={token}
+          defaultQuery="nebulosa"
+          onSelectImage={(url, caption) => {
+            setImageUrl(url);
+            if (caption) setCoverImageCaption(caption);
+          }}
+        />
+      )}
     </div>
   );
+
 }

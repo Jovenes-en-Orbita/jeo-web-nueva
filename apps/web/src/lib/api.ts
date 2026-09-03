@@ -369,6 +369,19 @@ export async function adminDeleteApplication(id: string, token: string) {
   });
 }
 
+export async function adminSearchFreeImages(query: string, token: string) {
+  const queryStr = query ? `?query=${encodeURIComponent(query)}` : '';
+  return fetchAuthApi<Array<{
+    id: string;
+    title: string;
+    url: string;
+    thumbnailUrl: string;
+    author: string;
+    authorUrl: string;
+    source: 'Unsplash' | 'NASA';
+  }>>(`/media/search${queryStr}`, token);
+}
+
 // ── Estadísticas Home (Admin) ──
 export async function adminUpdateStat(id: string, dto: UpdateStatDto, token: string): Promise<StatItem> {
   return fetchAuthApi<StatItem>(`/stats/${id}`, token, {
@@ -376,3 +389,4 @@ export async function adminUpdateStat(id: string, dto: UpdateStatDto, token: str
     body: JSON.stringify(dto),
   });
 }
+

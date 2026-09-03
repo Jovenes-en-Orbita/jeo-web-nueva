@@ -12,16 +12,21 @@ export class NewsController {
   constructor(private readonly newsService: NewsService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Obtener todas las noticias (con filtros opcionales de tag y búsqueda)' })
+  @ApiOperation({ summary: 'Obtener todas las noticias (con filtros opcionales de tag, búsqueda y paginación)' })
   @ApiQuery({ name: 'tag', required: false, type: String })
   @ApiQuery({ name: 'search', required: false, type: String })
-  @ApiResponse({ status: 200, description: 'Lista de noticias' })
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  @ApiResponse({ status: 200, description: 'Lista de noticias paginada o completa' })
   async findAll(
     @Query('tag') tag?: string,
     @Query('search') search?: string,
-  ): Promise<NewsArticle[]> {
-    return this.newsService.findAll(tag, search);
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
+  ) {
+    return this.newsService.findAll(tag, search, page, limit);
   }
+
 
   @Get(':slug')
   @ApiOperation({ summary: 'Obtener una noticia por su slug' })

@@ -2,6 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { NewsService } from './news.service';
 import { PrismaService } from '../../prisma/prisma.service';
 import { NotFoundException } from '@nestjs/common';
+import type { NewsArticle } from '@jeo/shared';
+
 
 describe('NewsService', () => {
   let service: NewsService;
@@ -38,6 +40,7 @@ describe('NewsService', () => {
 
   const mockPrismaService = {
     newsArticle: {
+      count: jest.fn().mockResolvedValue(2),
       findMany: jest.fn().mockResolvedValue(mockArticles),
       findUnique: jest.fn().mockImplementation(({ where: { slug } }) => {
         const found = mockArticles.find((a) => a.slug === slug);
@@ -45,6 +48,7 @@ describe('NewsService', () => {
       }),
     },
   };
+
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -67,13 +71,24 @@ describe('NewsService', () => {
 
   describe('findAll', () => {
     it('should return an array of mapped articles', async () => {
-      const result = await service.findAll();
+      const result = (await service.findAll()) as NewsArticle[];
       expect(result).toHaveLength(2);
       expect(result[0].slug).toBe('artemis-iii');
       expect(result[0].author).toBe('Equipo JEO');
       expect(result[0].tags).toContain('Luna');
     });
+
+    it('should return paginated result if page and limit provided', async () => {
+      const result = (await service.findAll(undefined, undefined, 1, 10)) as {
+        items: NewsArticle[];
+        total: number;
+        page: number;
+        totalPages: number;
+      };
+      expect(result.items).toBeDefined();
+    });
   });
+
 
   describe('findBySlug', () => {
     it('should return a single article by slug', async () => {

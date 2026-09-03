@@ -1,5 +1,6 @@
-import { Controller, Get, Patch, Param, Body, UseGuards } from '@nestjs/common';
+import { Controller, Get, Patch, Param, Body, UseGuards, UseInterceptors } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 import { StatsService } from './stats.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import type { StatItem, UpdateStatDto } from '@jeo/shared';
@@ -10,11 +11,13 @@ export class StatsController {
   constructor(private readonly statsService: StatsService) {}
 
   @Get()
+  @UseInterceptors(CacheInterceptor)
   @ApiOperation({ summary: 'Obtener métricas astronómicas destacadas' })
   @ApiResponse({ status: 200, description: 'Lista de métricas' })
   async findAll(): Promise<StatItem[]> {
     return this.statsService.findAll();
   }
+
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard)

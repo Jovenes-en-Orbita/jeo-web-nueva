@@ -8,7 +8,12 @@ import type { NewsArticle } from '@jeo/shared';
 export class NewsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findAll(tag?: string, search?: string): Promise<NewsArticle[]> {
+  async findAll(
+    tag?: string,
+    search?: string,
+    page?: number,
+    limit?: number,
+  ): Promise<{ items: NewsArticle[]; total: number; page: number; totalPages: number } | NewsArticle[]> {
     const where: any = {};
 
     if (tag && tag.trim() !== '' && tag !== 'Todas' && tag !== 'Todos') {
@@ -25,6 +30,28 @@ export class NewsService {
       ];
     }
 
+    const pageNum = page ? Math.max(1, Number(page)) : undefined;
+    const limitNum = limit ? Math.max(1, Number(limit)) : undefined;
+
+    if (pageNum && limitNum) {
+      const [total, articles] = await Promise.all([
+        this.prisma.newsArticle.count({ where }),
+        this.prisma.newsArticle.findMany({
+          where,
+          orderBy: { date: 'desc' },
+          skip: (pageNum - 1) * limitNum,
+          take: limitNum,
+        }),
+      ]);
+
+      return {
+        items: articles.map((a) => this.mapToDto(a)),
+        total,
+        page: pageNum,
+        totalPages: Math.ceil(total / limitNum) || 1,
+      };
+    }
+
     const articles = await this.prisma.newsArticle.findMany({
       where,
       orderBy: { date: 'desc' },
@@ -32,6 +59,7 @@ export class NewsService {
 
     return articles.map((a) => this.mapToDto(a));
   }
+
 
   async findBySlug(slug: string): Promise<NewsArticle> {
     const article = await this.prisma.newsArticle.findUnique({

@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { CacheModule } from '@nestjs/cache-manager';
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { AdminModule } from './modules/admin/admin.module';
@@ -15,10 +16,15 @@ import { GalleryModule } from './modules/gallery/gallery.module';
 import { MailModule } from './modules/mail/mail.module';
 import { NewsletterModule } from './modules/newsletter/newsletter.module';
 import { ApplicationsModule } from './modules/applications/applications.module';
+import { MediaModule } from './modules/media/media.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    CacheModule.register({
+      isGlobal: true,
+      ttl: 300000, // 5 minutos de caché por defecto
+    }),
     ThrottlerModule.forRoot([{
       ttl: 60000,
       limit: 60,
@@ -36,6 +42,7 @@ import { ApplicationsModule } from './modules/applications/applications.module';
     GalleryModule,
     NewsletterModule,
     ApplicationsModule,
+    MediaModule,
   ],
   providers: [
     {
@@ -45,4 +52,5 @@ import { ApplicationsModule } from './modules/applications/applications.module';
   ],
 })
 export class AppModule {}
+
 
