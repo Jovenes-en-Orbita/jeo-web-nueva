@@ -1,5 +1,6 @@
 import { Controller, Post, Get, Delete, Param, Body, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { NewsletterService } from './newsletter.service';
 import { SubscribeNewsletterDto } from './dto/subscribe-newsletter.dto';
 import { NewsletterBroadcastDto } from './dto/newsletter-broadcast.dto';
@@ -12,6 +13,7 @@ export class NewsletterController {
   constructor(private readonly newsletterService: NewsletterService) {}
 
   @Post('subscribe')
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @ApiOperation({ summary: 'Suscribir un correo al newsletter semanal' })
   @ApiResponse({ status: 201, description: 'Suscripción exitosa' })
   @ApiResponse({ status: 409, description: 'Correo ya suscrito' })
@@ -20,6 +22,7 @@ export class NewsletterController {
   ): Promise<NewsletterSubscriberResponse> {
     return this.newsletterService.subscribe(subscribeNewsletterDto);
   }
+
 
   @Get('subscribers')
   @UseGuards(JwtAuthGuard)

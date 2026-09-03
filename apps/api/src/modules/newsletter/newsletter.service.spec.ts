@@ -1,39 +1,35 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { ConflictException, NotFoundException } from '@nestjs/common';
 import { NewsletterService } from './newsletter.service';
 import { PrismaService } from '../../prisma/prisma.service';
 import { MailService } from '../mail/mail.service';
-import { ConflictException } from '@nestjs/common';
 
 describe('NewsletterService', () => {
   let service: NewsletterService;
-
-  const mockPrismaService = {
-    newsletterSubscriber: {
-      findUnique: jest.fn(),
-      create: jest.fn(),
-      update: jest.fn(),
-      findMany: jest.fn(),
-    },
-  };
-
-  const mockMailService = {
-    sendNewsletterWelcome: jest.fn().mockResolvedValue(true),
-  };
+  let prisma: { newsletterSubscriber: any };
+  let mailService: { sendNewsletterWelcome: jest.Mock; sendBroadcastEmail: jest.Mock };
 
   beforeEach(async () => {
-    jest.clearAllMocks();
+    prisma = {
+      newsletterSubscriber: {
+        findUnique: jest.fn(),
+        create: jest.fn(),
+        update: jest.fn(),
+        findMany: jest.fn(),
+        delete: jest.fn(),
+      },
+    };
+
+    mailService = {
+      sendNewsletterWelcome: jest.fn().mockResolvedValue(true),
+      sendBroadcastEmail: jest.fn().mockResolvedValue({ sentCount: 1, errors: 0 }),
+    };
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         NewsletterService,
-        {
-          provide: PrismaService,
-          useValue: mockPrismaService,
-        },
-        {
-          provide: MailService,
-          useValue: mockMailService,
-        },
+        { provide: PrismaService, useValue: prisma },
+        { provide: MailService, useValue: mailService },
       ],
     }).compile();
 
@@ -45,29 +41,55 @@ describe('NewsletterService', () => {
   });
 
   describe('subscribe', () => {
-    it('should successfully subscribe a new email', async () => {
-      mockPrismaService.newsletterSubscriber.findUnique.mockResolvedValue(null);
-      mockPrismaService.newsletterSubscriber.create.mockResolvedValue({
+    it('should create a new subscriber if email does not exist', async () => {
+      const dto = { email: 'nuevo@orbita.com' };
+      const now = new Date();
+      prisma.newsletterSubscriber.findUnique.mockResolvedValue(null);
+      prisma.newsletterSubscriber.create.mockResolvedValue({
         id: 'sub-123',
-        email: 'astronomo@ejemplo.com',
+        email: 'nuevo@orbita.com',
         active: true,
-        createdAt: new Date('2024-01-01'),
+        createdAt: now,
       });
 
-      const result = await service.subscribe({ email: 'astronomo@ejemplo.com' });
-      expect(result.email).toBe('astronomo@ejemplo.com');
-      expect(result.active).toBe(true);
-      expect(mockPrismaService.newsletterSubscriber.create).toHaveBeenCalled();
+      const result = await service.subscribe(dto);
+
+      expect(prisma.newsletterSubscriber.findUnique).toHaveBeenCalledWith({
+        where: { email: 'nuevo@orbita.com' },
+      });
+      expect(prisma.newsletterSubscriber.create).toHaveBeenCalledWith({
+        data: { email: 'nuevo@orbita.com', active: true },
+      });
+      expect(result.id).toBe('sub-123');
+      expect(result.email).toBe('nuevo@orbita.com');
+      expect(mailService.sendNewsletterWelcome).toHaveBeenCalledWith('nuevo@orbita.com');
     });
 
-    it('should throw ConflictException if already active subscriber', async () => {
-      mockPrismaService.newsletterSubscriber.findUnique.mockResolvedValue({
-        id: 'sub-123',
-        email: 'astronomo@ejemplo.com',
+    it('should throw ConflictException if subscriber is already active', async () => {
+      const dto = { email: 'existente@orbita.com' };
+      prisma.newsletterSubscriber.findUnique.mockResolvedValue({
+        id: 'sub-456',
+        email: 'existente@orbita.com',
         active: true,
       });
 
-      await expect(service.subscribe({ email: 'astronomo@ejemplo.com' })).rejects.toThrow(ConflictException);
+      await expect(service.subscribe(dto)).rejects.toThrow(ConflictException);
+    });
+  });
+
+  describe('delete', () => {
+    it('should delete existing subscriber', async () => {
+      prisma.newsletterSubscriber.findUnique.mockResolvedValue({ id: 'sub-1' });
+      prisma.newsletterSubscriber.delete.mockResolvedValue({ id: 'sub-1' });
+
+      const result = await service.delete('sub-1');
+      expect(result.success).toBe(true);
+    });
+
+    it('should throw NotFoundException if subscriber does not exist', async () => {
+      prisma.newsletterSubscriber.findUnique.mockResolvedValue(null);
+
+      await expect(service.delete('sub-99')).rejects.toThrow(NotFoundException);
     });
   });
 });

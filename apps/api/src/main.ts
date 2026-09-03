@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import helmet from 'helmet';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
@@ -11,8 +12,12 @@ async function bootstrap() {
 
   const configService = app.get(ConfigService);
 
+  // Helmet - Cabeceras de seguridad HTTP
+  app.use(helmet());
+
   // Global prefix
   app.setGlobalPrefix('api');
+
 
   // CORS
   app.enableCors({
