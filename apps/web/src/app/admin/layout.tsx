@@ -29,7 +29,7 @@ const NAV_ITEMS = [
   { label: 'Galería', href: '/admin/galeria', icon: FiImage },
   { label: 'Newsletter', href: '/admin/newsletter', icon: FiMail },
   { label: 'Postulaciones', href: '/admin/postulaciones', icon: FiUsers },
-  { label: 'Estadísticas', href: '/admin/estadisticas', icon: FiTrendingUp },
+  // { label: 'Estadísticas', href: '/admin/estadisticas', icon: FiTrendingUp },
 ];
 
 function AdminShell({ children }: { children: React.ReactNode }) {
