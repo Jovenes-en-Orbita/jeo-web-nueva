@@ -54,13 +54,15 @@ export default async function NoticiaDetailPage({ params }: ArticlePageProps) {
   });
 
   const imageSrc =
-    article.imageUrl && article.imageUrl.startsWith('/')
+    article.imageUrl && article.imageUrl.trim() !== ''
       ? article.imageUrl
       : slug === 'artemis-iii'
       ? '/assets/artemis.svg'
       : slug === 'exoplaneta-habitable'
       ? '/assets/exoplanet.svg'
-      : '/assets/starship.svg';
+      : slug === 'spacex-starship'
+      ? '/assets/starship.svg'
+      : '/assets/hero-cosmos.svg';
 
   return (
     <div className="min-h-screen flex flex-col bg-[#060a17] text-white">

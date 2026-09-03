@@ -45,8 +45,11 @@ export function NewsFeed({ initialArticles }: NewsFeedProps) {
     });
   };
 
-  const getArticleImage = (slug: string) => {
-    switch (slug) {
+  const getArticleImage = (article: NewsArticle) => {
+    if (article.imageUrl && article.imageUrl.trim() !== '') {
+      return article.imageUrl;
+    }
+    switch (article.slug) {
       case 'artemis-iii':
         return '/assets/artemis.svg';
       case 'exoplaneta-habitable':
@@ -120,7 +123,7 @@ export function NewsFeed({ initialArticles }: NewsFeedProps) {
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
                 <div className="lg:col-span-7 relative h-[280px] sm:h-[360px] w-full bg-[#060a17] overflow-hidden">
                   <Image
-                    src={getArticleImage(featuredArticle.slug)}
+                    src={getArticleImage(featuredArticle)}
                     alt={featuredArticle.title}
                     fill
                     className="object-cover transition-transform duration-700 group-hover:scale-105"
@@ -169,7 +172,7 @@ export function NewsFeed({ initialArticles }: NewsFeedProps) {
                   <div>
                     <div className="relative w-full h-[200px] mb-5 rounded-xl overflow-hidden bg-[#090d1a]">
                       <Image
-                        src={getArticleImage(article.slug)}
+                        src={getArticleImage(article)}
                         alt={article.title}
                         fill
                         className="object-cover transition-transform duration-500 group-hover:scale-105"

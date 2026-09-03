@@ -20,8 +20,11 @@ export async function NewsSection() {
     });
   };
 
-  const getArticleImage = (slug: string) => {
-    switch (slug) {
+  const getArticleImage = (article: { slug: string; imageUrl?: string | null }) => {
+    if (article.imageUrl && article.imageUrl.trim() !== '') {
+      return article.imageUrl;
+    }
+    switch (article.slug) {
       case 'artemis-iii':
         return '/assets/artemis.svg';
       case 'exoplaneta-habitable':
@@ -55,7 +58,7 @@ export async function NewsSection() {
               <div>
                 <div className="relative w-full h-[180px] mb-4 rounded-xl overflow-hidden bg-[#090d1a] border border-white/5">
                   <Image
-                    src={getArticleImage(article.slug)}
+                    src={getArticleImage(article)}
                     alt={article.title}
                     fill
                     className="object-cover transition-transform duration-500 group-hover:scale-105"

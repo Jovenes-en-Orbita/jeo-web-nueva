@@ -55,7 +55,7 @@ export function GalleryViewer({ initialFeatured, collections }: GalleryViewerPro
   return (
     <div className="wrap max-w-6xl mx-auto px-4 py-8">
       {/* Header Info & Collection Switcher */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10 bg-[#0d162a] p-6 rounded-3xl border border-white/10">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 bg-[#0d162a] p-6 rounded-3xl border border-white/10">
         <div>
           <span className="text-xs uppercase tracking-widest text-[var(--color-yellow)] font-bold block mb-1">
             Colección Activa
@@ -63,24 +63,50 @@ export function GalleryViewer({ initialFeatured, collections }: GalleryViewerPro
           <h2 className="text-2xl font-bold text-white font-[var(--font-montserrat)]">
             {activeCollection.title}
           </h2>
-          <p className="text-xs text-slate-300 mt-1 max-w-xl">
-            {activeCollection.description}
-          </p>
+          {activeCollection.description && (
+            <p className="text-xs text-slate-300 mt-1 max-w-xl">
+              {activeCollection.description}
+            </p>
+          )}
         </div>
 
         <div className="flex items-center gap-3">
-          <span className="text-xs text-slate-400 bg-white/5 border border-white/10 px-3 py-1.5 rounded-full flex items-center gap-2">
+          <span className="text-xs text-slate-400 bg-white/5 border border-white/10 px-3.5 py-2 rounded-full flex items-center gap-2">
             <FiCamera className="text-[var(--color-yellow)]" />
-            <span>{images.length} fotografías en alta resolución</span>
+            <span>{images.length} fotografías</span>
           </span>
         </div>
       </div>
+
+      {/* Collection Switcher Pills */}
+      {collections.length > 1 && (
+        <div className="flex items-center gap-2 overflow-x-auto mb-8 pb-2 scrollbar-none">
+          {collections.map((col) => (
+            <button
+              key={col.id}
+              onClick={() => {
+                setSelectedCollectionId(col.id);
+                setActiveImageIndex(null);
+              }}
+              className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+                activeCollection.id === col.id
+                  ? 'bg-[var(--color-yellow)] text-[#060a17] shadow-lg shadow-amber-500/20'
+                  : 'bg-[#0d162a] text-slate-300 hover:bg-white/10 hover:text-white border border-white/10'
+              }`}
+            >
+              📷 {col.title} ({col.images?.length ?? 0})
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* Gallery Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {images.map((img, idx) => {
           const imageSrc =
-            img.url && img.url.startsWith('/') ? img.url : `/assets/gallery-${(idx % 6) + 1}.svg`;
+            img.url && img.url.trim() !== ''
+              ? img.url
+              : `/assets/gallery-${(idx % 6) + 1}.svg`;
 
           return (
             <div
@@ -163,7 +189,7 @@ export function GalleryViewer({ initialFeatured, collections }: GalleryViewerPro
             <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-2xl border border-white/10 bg-[#090d1a]">
               <Image
                 src={
-                  currentImage.url && currentImage.url.startsWith('/')
+                  currentImage.url && currentImage.url.trim() !== ''
                     ? currentImage.url
                     : `/assets/gallery-${((activeImageIndex ?? 0) % 6) + 1}.svg`
                 }
@@ -184,7 +210,7 @@ export function GalleryViewer({ initialFeatured, collections }: GalleryViewerPro
 
             <a
               href={
-                currentImage.url && currentImage.url.startsWith('/')
+                currentImage.url && currentImage.url.trim() !== ''
                   ? currentImage.url
                   : `/assets/gallery-${((activeImageIndex ?? 0) % 6) + 1}.svg`
               }

@@ -2,15 +2,22 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/Button';
 import { SectionHeader } from '@/components/ui/SectionHeader';
-import { getGalleryFeatured } from '@/lib/api';
-import { FiCamera } from 'react-icons/fi';
+import { getGalleryCollections, getGalleryFeatured } from '@/lib/api';
 
 /**
  * Section 05: Fragmentos de Memoria
  * High contrast dark theme + photo collage + link to full gallery.
  */
 export async function GallerySection() {
-  const collection = await getGalleryFeatured();
+  const [collections, featured] = await Promise.all([
+    getGalleryCollections().catch(() => []),
+    getGalleryFeatured().catch(() => null),
+  ]);
+
+  // Gather images across collections or fallback to featured
+  const allImages = collections.flatMap((c) => c.images);
+  const images = allImages.length > 0 ? allImages : (featured?.images ?? []);
+  const title = collections.length > 0 ? collections.map(c => c.title).join(' · ') : (featured?.title ?? 'Fragmentos de Memoria');
 
   return (
     <section className="block py-12 border-b border-white/10 bg-[#060a17] min-h-full flex flex-col justify-center" id="frag">
@@ -25,19 +32,15 @@ export async function GallerySection() {
           </div>
           <div className="text-[#FFC72C] hover:text-white">
             <Button href="/galeria" variant="gold">
-              Ver galería completa
+              Ver galería completa ({collections.length} álbumes)
             </Button>
           </div>
         </div>
 
         <div className="flex items-center justify-between gap-4 mb-5 flex-wrap">
           <p className="text-[14px] text-slate-200 leading-relaxed m-0 font-medium">
-            {collection.title}
+            {title}
           </p>
-          <span className="text-[12px] text-slate-400 bg-white/5 border border-white/10 px-3 py-1.5 rounded-full flex items-center gap-2">
-            <FiCamera className="w-3.5 h-3.5 text-[var(--color-yellow)]" />
-            <span>{collection.totalImages} imágenes · actualización semanal</span>
-          </span>
         </div>
 
         {/* Collage grid */}
@@ -48,16 +51,15 @@ export async function GallerySection() {
             gridTemplateRows: 'repeat(2, 160px)',
           }}
         >
-          {collection.images.map((img, i) => (
+          {images.map((img, i) => (
             <Link
               key={img.id || i}
               href="/galeria"
-              className={`group cursor-pointer overflow-hidden rounded-2xl border border-white/10 relative hover:border-[var(--color-yellow)]/60 transition-all duration-300 bg-[#090d1a] ${
-                i === 0 ? 'row-span-2 col-span-2' : ''
-              }`}
+              className={`group cursor-pointer overflow-hidden rounded-2xl border border-white/10 relative hover:border-[var(--color-yellow)]/60 transition-all duration-300 bg-[#090d1a] ${i === 0 ? 'row-span-2 col-span-2' : ''
+                }`}
             >
               <Image
-                src={img.url && img.url.startsWith('/') ? img.url : `/assets/gallery-${(i % 6) + 1}.svg`}
+                src={img.url && img.url.trim() !== '' ? img.url : `/assets/gallery-${(i % 6) + 1}.svg`}
                 alt={img.alt}
                 fill
                 className="object-cover transition-transform duration-500 group-hover:scale-105"

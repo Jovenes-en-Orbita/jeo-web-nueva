@@ -1,6 +1,5 @@
 import { Navbar } from '@/components/features/Navbar';
 import { Hero } from '@/components/features/Hero';
-import { StatsStrip } from '@/components/features/StatsStrip';
 import { SolarSystemSection } from '@/components/features/SolarSystemSection';
 import { ConstellationsSection } from '@/components/features/ConstellationsSection';
 import { NewsSection } from '@/components/features/NewsSection';
@@ -17,7 +16,6 @@ export default function Home() {
       <Navbar />
       <main className="flex-1 relative">
         <Hero />
-        <StatsStrip />
         {/* TODO: Sección Sistema Solar en desarrollo (Oculta temporalmente) */}
         {/* <SolarSystemSection /> */}
         {/* TODO: Sección Constelaciones en desarrollo (Oculta temporalmente) */}
