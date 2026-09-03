@@ -23,8 +23,9 @@ import {
 const NAV_ITEMS = [
   { label: 'Dashboard', href: '/admin', icon: FiGrid },
   { label: 'Noticias', href: '/admin/noticias', icon: FiFileText },
-  { label: 'Constelaciones', href: '/admin/constelaciones', icon: FiCompass },
-  { label: 'Sistema Solar', href: '/admin/sistema-solar', icon: FiSun },
+  // TODO: Secciones en desarrollo
+  // { label: 'Constelaciones', href: '/admin/constelaciones', icon: FiCompass },
+  // { label: 'Sistema Solar', href: '/admin/sistema-solar', icon: FiSun },
   { label: 'Galería', href: '/admin/galeria', icon: FiImage },
   { label: 'Newsletter', href: '/admin/newsletter', icon: FiMail },
   { label: 'Postulaciones', href: '/admin/postulaciones', icon: FiUsers },

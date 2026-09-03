@@ -18,8 +18,10 @@ export default function Home() {
       <main className="flex-1 relative">
         <Hero />
         <StatsStrip />
-        <SolarSystemSection />
-        <ConstellationsSection />
+        {/* TODO: Sección Sistema Solar en desarrollo (Oculta temporalmente) */}
+        {/* <SolarSystemSection /> */}
+        {/* TODO: Sección Constelaciones en desarrollo (Oculta temporalmente) */}
+        {/* <ConstellationsSection /> */}
         <NewsSection />
         <GallerySection />
         <ExploreSection />

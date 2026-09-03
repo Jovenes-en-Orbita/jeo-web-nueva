@@ -34,8 +34,9 @@ export function Navbar() {
               label="Cosmos"
               items={[
                 { label: 'El Universo', href: '/universo' },
-                { label: 'Sistema Solar', href: '/sistema-solar' },
-                { label: 'Constelaciones', href: '/constelaciones' },
+                // TODO: Sección en desarrollo
+                // { label: 'Sistema Solar', href: '/sistema-solar' },
+                // { label: 'Constelaciones', href: '/constelaciones' },
                 { label: 'Noticias Espaciales', href: '/noticias' },
                 { label: 'Fragmentos de Memoria', href: '/galeria' },
               ]}
@@ -79,8 +80,9 @@ export function Navbar() {
               </span>
               <div className="flex flex-col space-y-2 text-sm text-slate-300">
                 <Link href="/universo" onClick={() => setIsMobileMenuOpen(false)}>El Universo</Link>
-                <Link href="/sistema-solar" onClick={() => setIsMobileMenuOpen(false)}>Sistema Solar</Link>
-                <Link href="/constelaciones" onClick={() => setIsMobileMenuOpen(false)}>Constelaciones</Link>
+                {/* TODO: Secciones en desarrollo */}
+                {/* <Link href="/sistema-solar" onClick={() => setIsMobileMenuOpen(false)}>Sistema Solar</Link> */}
+                {/* <Link href="/constelaciones" onClick={() => setIsMobileMenuOpen(false)}>Constelaciones</Link> */}
                 <Link href="/noticias" onClick={() => setIsMobileMenuOpen(false)}>Noticias Espaciales</Link>
                 <Link href="/galeria" onClick={() => setIsMobileMenuOpen(false)}>Fragmentos de Memoria</Link>
               </div>

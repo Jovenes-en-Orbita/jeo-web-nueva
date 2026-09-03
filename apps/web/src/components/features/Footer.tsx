@@ -56,8 +56,9 @@ export function Footer() {
             <div className="flex flex-col space-y-2.5 font-[var(--font-poppins)]">
               {[
                 { label: 'El Universo', href: '/universo' },
-                { label: 'Sistema Solar', href: '/sistema-solar' },
-                { label: 'Constelaciones', href: '/constelaciones' },
+                // TODO: Secciones en desarrollo
+                // { label: 'Sistema Solar', href: '/sistema-solar' },
+                // { label: 'Constelaciones', href: '/constelaciones' },
                 { label: 'Noticias Espaciales', href: '/noticias' },
                 { label: 'Fragmentos de Memoria', href: '/galeria' },
               ].map((link) => (
