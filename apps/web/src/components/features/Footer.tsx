@@ -9,14 +9,16 @@ import {
   FaTiktok,
 } from 'react-icons/fa6';
 
+// TODO: Canales y redes sociales oficiales de Jóvenes en Órbita (actualizar URLs cuando se definan perfiles específicos)
 const socialLinks = [
-  { icon: FaInstagram, name: 'Instagram', href: 'https://instagram.com' },
-  { icon: FaXTwitter, name: 'X', href: 'https://x.com' },
+  { icon: FaInstagram, name: 'Instagram', href: 'https://instagram.com/jovenesenorbita' },
+  { icon: FaXTwitter, name: 'X', href: 'https://x.com/JEO_espacio' },
   { icon: FaWhatsapp, name: 'WhatsApp', href: 'https://whatsapp.com' },
   { icon: FaFacebookF, name: 'Facebook', href: 'https://facebook.com' },
   { icon: FaLinkedinIn, name: 'LinkedIn', href: 'https://linkedin.com' },
   { icon: FaTiktok, name: 'TikTok', href: 'https://tiktok.com' },
 ];
+
 
 /**
  * Footer component perfectly centered vertically inside its horizontal slide layout.

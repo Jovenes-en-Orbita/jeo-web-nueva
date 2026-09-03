@@ -1,13 +1,21 @@
 /**
- * Tag component with theme support for dark or light backgrounds.
+ * Tag component with theme support for dark, light, or gold accents.
  */
 export function Tag({
   children,
   variant = 'default',
 }: {
   children: React.ReactNode;
-  variant?: 'default' | 'dark';
+  variant?: 'default' | 'dark' | 'gold';
 }) {
+  if (variant === 'gold') {
+    return (
+      <span className="text-[11px] font-semibold text-[var(--color-yellow)] border border-[var(--color-yellow)]/40 bg-[var(--color-yellow)]/10 px-3 py-[5px] rounded-md transition-colors duration-200 hover:border-white hover:text-white">
+        {children}
+      </span>
+    );
+  }
+
   if (variant === 'dark') {
     return (
       <span className="text-[11px] font-semibold text-slate-200 border border-white/20 bg-white/5 px-3 py-[6px] rounded-md transition-colors duration-200 hover:border-[var(--color-yellow)] hover:text-[var(--color-yellow)]">

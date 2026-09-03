@@ -10,6 +10,9 @@ export interface NewsArticle {
   readTimeMinutes: number;
   slug: string;
   content?: string;
+  author?: string;
+  tags?: string[];
+  coverImageCaption?: string;
 }
 
 /**
@@ -21,5 +24,10 @@ export interface CreateNewsDto {
   imageUrl?: string;
   date: string;
   readTimeMinutes: number;
+  slug?: string;
   content?: string;
+  author?: string;
+  tags?: string[];
+  coverImageCaption?: string;
 }
+

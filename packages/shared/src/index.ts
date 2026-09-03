@@ -5,3 +5,7 @@ export * from './types/universe';
 export * from './types/solar-system';
 export * from './types/constellation';
 export * from './types/gallery';
+export * from './types/newsletter';
+export * from './types/application';
+export * from './types/auth';
+export * from './types/admin';

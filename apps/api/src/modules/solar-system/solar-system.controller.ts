@@ -1,31 +1,56 @@
-import { Controller, Get } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Controller, Get, Patch, Param, Body, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { SolarSystemService } from './solar-system.service';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import type { SolarSystemSection, Planet, Moon, UpdatePlanetDto, UpdateMoonDto } from '@jeo/shared';
 
-@ApiTags('Solar System')
+@ApiTags('solar-system')
 @Controller('solar-system')
 export class SolarSystemController {
   constructor(private readonly solarSystemService: SolarSystemService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Obtener información general de la sección Sistema Solar' })
-  @ApiResponse({ status: 200, description: 'Información general del sistema solar' })
-  getSection() {
+  @ApiOperation({ summary: 'Obtener datos de la sección del Sistema Solar' })
+  @ApiResponse({ status: 200, description: 'Datos del sistema solar' })
+  async getSection(): Promise<SolarSystemSection> {
     return this.solarSystemService.getSection();
   }
 
   @Get('planets')
-  @ApiOperation({ summary: 'Obtener el listado de planetas del sistema solar' })
-  @ApiResponse({ status: 200, description: 'Listado de planetas' })
-  getPlanets() {
+  @ApiOperation({ summary: 'Obtener lista de planetas' })
+  @ApiResponse({ status: 200, description: 'Lista de planetas' })
+  async getPlanets(): Promise<Planet[]> {
     return this.solarSystemService.getPlanets();
   }
 
   @Get('moons')
-  @ApiOperation({ summary: 'Obtener el listado de lunas principales' })
-  @ApiResponse({ status: 200, description: 'Listado de lunas' })
-  getMoons() {
+  @ApiOperation({ summary: 'Obtener lista de lunas principales' })
+  @ApiResponse({ status: 200, description: 'Lista de lunas' })
+  async getMoons(): Promise<Moon[]> {
     return this.solarSystemService.getMoons();
   }
-}
 
+  @Patch('planets/:id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Actualizar información de un planeta (Admin)' })
+  @ApiResponse({ status: 200, description: 'Planeta actualizado' })
+  async updatePlanet(
+    @Param('id') id: string,
+    @Body() updateDto: UpdatePlanetDto,
+  ): Promise<Planet> {
+    return this.solarSystemService.updatePlanet(id, updateDto);
+  }
+
+  @Patch('moons/:id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Actualizar información de una luna (Admin)' })
+  @ApiResponse({ status: 200, description: 'Luna actualizada' })
+  async updateMoon(
+    @Param('id') id: string,
+    @Body() updateDto: UpdateMoonDto,
+  ): Promise<Moon> {
+    return this.solarSystemService.updateMoon(id, updateDto);
+  }
+}

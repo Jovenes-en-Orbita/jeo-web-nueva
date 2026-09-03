@@ -1,4 +1,5 @@
-import { Placeholder } from '@/components/ui/Placeholder';
+import Link from 'next/link';
+import Image from 'next/image';
 import { Button } from '@/components/ui/Button';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { getGalleryFeatured } from '@/lib/api';
@@ -6,7 +7,7 @@ import { FiCamera } from 'react-icons/fi';
 
 /**
  * Section 05: Fragmentos de Memoria
- * High contrast dark theme + photo collage + vertical centering to eliminate bottom slide gap.
+ * High contrast dark theme + photo collage + link to full gallery.
  */
 export async function GallerySection() {
   const collection = await getGalleryFeatured();
@@ -48,23 +49,25 @@ export async function GallerySection() {
           }}
         >
           {collection.images.map((img, i) => (
-            <div
-              key={img.id}
-              className={`group cursor-pointer overflow-hidden rounded-2xl border border-white/10 relative hover:border-[var(--color-yellow)]/60 transition-all duration-300 ${
+            <Link
+              key={img.id || i}
+              href="/galeria"
+              className={`group cursor-pointer overflow-hidden rounded-2xl border border-white/10 relative hover:border-[var(--color-yellow)]/60 transition-all duration-300 bg-[#090d1a] ${
                 i === 0 ? 'row-span-2 col-span-2' : ''
               }`}
             >
-              <Placeholder
-                label={i === 0 ? 'Foto predominante' : undefined}
-                className="w-full h-full transition-transform duration-500 group-hover:scale-105"
-                style={{ fontSize: i > 0 ? 0 : undefined }}
+              <Image
+                src={img.url && img.url.startsWith('/') ? img.url : `/assets/gallery-${(i % 6) + 1}.svg`}
+                alt={img.alt}
+                fill
+                className="object-cover transition-transform duration-500 group-hover:scale-105"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
                 <span className="text-xs font-semibold text-white tracking-wide">
                   {img.alt || 'Ver fotografía'}
                 </span>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>

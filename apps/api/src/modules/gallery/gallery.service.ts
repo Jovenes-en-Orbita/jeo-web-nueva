@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
-import type { GalleryCollection } from '@jeo/shared';
+import type { GalleryCollection, CreateGalleryCollectionDto, CreateGalleryImageDto } from '@jeo/shared';
 
 @Injectable()
 export class GalleryService {
@@ -67,5 +67,57 @@ export class GalleryService {
         order: img.order,
       })),
     }));
+  }
+
+  async createCollection(dto: CreateGalleryCollectionDto): Promise<GalleryCollection> {
+    const created = await this.prisma.galleryCollection.create({
+      data: {
+        id: dto.id,
+        title: dto.title,
+        description: dto.description,
+        rotationFrequency: dto.rotationFrequency || 'semanal',
+      },
+      include: { images: true },
+    });
+
+    return {
+      id: created.id,
+      title: created.title,
+      description: created.description,
+      totalImages: 0,
+      rotationFrequency: created.rotationFrequency,
+      images: [],
+    };
+  }
+
+  async addImage(dto: CreateGalleryImageDto) {
+    const created = await this.prisma.galleryImage.create({
+      data: {
+        collectionId: dto.collectionId,
+        alt: dto.alt,
+        caption: dto.caption,
+        url: dto.url || '/assets/gallery-1.svg',
+        featured: dto.featured ?? false,
+        order: dto.order ?? 0,
+      },
+    });
+
+    return created;
+  }
+
+  async deleteImage(id: string) {
+    const existing = await this.prisma.galleryImage.findUnique({
+      where: { id },
+    });
+
+    if (!existing) {
+      throw new NotFoundException('Imagen no encontrada');
+    }
+
+    await this.prisma.galleryImage.delete({
+      where: { id },
+    });
+
+    return { success: true, message: 'Imagen eliminada correctamente' };
   }
 }

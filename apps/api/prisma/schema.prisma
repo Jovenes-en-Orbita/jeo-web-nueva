@@ -20,14 +20,17 @@ model Stat {
 }
 
 model NewsArticle {
-  id              String  @id @default(uuid())
-  title           String
-  summary         String
-  imageUrl        String? @map("image_url")
-  date            DateTime
-  readTimeMinutes Int      @map("read_time_minutes")
-  slug            String   @unique
-  content         String?
+  id                 String   @id @default(uuid())
+  title              String
+  summary            String
+  imageUrl           String?  @map("image_url")
+  date               DateTime
+  readTimeMinutes    Int      @map("read_time_minutes")
+  slug               String   @unique
+  content            String?
+  author             String?  @default("Equipo JEO")
+  tags               String[] @default([])
+  coverImageCaption  String?  @map("cover_image_caption")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -83,11 +86,18 @@ model Moon {
 }
 
 model Constellation {
-  id          String  @id @default(uuid())
-  name        String
-  description String?
-  imageUrl    String? @map("image_url")
-  slug        String  @unique
+  id            String  @id @default(uuid())
+  name          String
+  latinName     String? @map("latin_name")
+  season        String?
+  hemisphere    String?
+  description   String?
+  brightestStar String? @map("brightest_star")
+  funFact       String? @map("fun_fact")
+  starsCount    Int?    @map("stars_count")
+  bestMonth     String? @map("best_month")
+  imageUrl      String? @map("image_url")
+  slug          String  @unique
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -125,3 +135,44 @@ model GalleryCollection {
 
   @@map("gallery_collections")
 }
+
+model NewsletterSubscriber {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  active    Boolean  @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("newsletter_subscribers")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  name         String
+  role         String   @default("ADMIN") // SUPERADMIN, ADMIN, EDITOR
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("users")
+}
+
+model ApplicationSubmission {
+  id           String   @id @default(uuid())
+  fullName     String   @map("full_name")
+  email        String
+  area         String
+  message      String
+  portfolioUrl String?  @map("portfolio_url")
+  status       String   @default("PENDING") // PENDING, REVIEWED, ACCEPTED, REJECTED
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("application_submissions")
+}
+
+

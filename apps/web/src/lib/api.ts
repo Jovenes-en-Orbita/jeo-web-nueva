@@ -5,155 +5,374 @@ import type {
   UniverseSection,
   SolarSystemSection,
   ConstellationsSection,
+  Constellation,
   GalleryCollection,
+  SubscribeNewsletterDto,
+  NewsletterSubscriberResponse,
+  CreateApplicationDto,
+  ApplicationResponse,
+  LoginDto,
+  AuthResponse,
+  AdminUser,
+  AdminDashboardStats,
+  CreateConstellationDto,
+  UpdateConstellationDto,
+  UpdateNewsDto,
+  UpdatePlanetDto,
+  UpdateMoonDto,
+  CreateGalleryCollectionDto,
+  CreateGalleryImageDto,
+  UpdateStatDto,
+  NewsletterBroadcastDto,
 } from '@jeo/shared';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
 
 /**
- * Generic fetch wrapper that unwraps the ApiResponse envelope.
- * Falls back to mock data when the API is unreachable (dev without backend).
+ * Envoltorio principal para llamadas a la API de NestJS.
  */
-async function fetchApi<T>(endpoint: string): Promise<T> {
+async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> {
+  const res = await fetch(`${API_BASE}${endpoint}`, {
+    next: { revalidate: 30 },
+    ...options,
+  });
+
+  if (!res.ok) {
+    const errorText = await res.text().catch(() => res.statusText);
+    throw new Error(`API Error [${res.status}] ${endpoint}: ${errorText}`);
+  }
+
+  const json: ApiResponse<T> = await res.json();
+  return json.data;
+}
+
+/**
+ * Envoltorio para llamadas autenticadas con JWT.
+ */
+async function fetchAuthApi<T>(endpoint: string, token: string, options?: RequestInit): Promise<T> {
+  const res = await fetch(`${API_BASE}${endpoint}`, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+      ...(options?.headers || {}),
+    },
+  });
+
+  const json = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new Error(json.message || `Error en petición administrativa: ${res.status}`);
+  }
+
+  return (json.data !== undefined ? json.data : json) as T;
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// ── Métodos Públicos ──
+// ══════════════════════════════════════════════════════════════════════════════
+
+export async function getStats(): Promise<StatItem[]> {
   try {
-    const res = await fetch(`${API_BASE}${endpoint}`, {
-      next: { revalidate: 60 },
-    });
-
-    if (!res.ok) {
-      throw new Error(`API error: ${res.status}`);
-    }
-
-    const json: ApiResponse<T> = await res.json();
-    return json.data;
-  } catch {
-    console.warn(`⚠️ API unreachable for ${endpoint}, using fallback data`);
-    return getFallbackData<T>(endpoint);
+    return await fetchApi<StatItem[]>('/stats');
+  } catch (err) {
+    console.error('Error fetching /stats:', err);
+    return [];
   }
 }
 
-// ── Public API methods ──
+export async function getNews(tag?: string, search?: string): Promise<NewsArticle[]> {
+  try {
+    const params = new URLSearchParams();
+    if (tag && tag !== 'Todos' && tag !== 'Todas') params.append('tag', tag);
+    if (search && search.trim() !== '') params.append('search', search.trim());
 
-export async function getStats(): Promise<StatItem[]> {
-  return fetchApi<StatItem[]>('/stats');
+    const queryStr = params.toString() ? `?${params.toString()}` : '';
+    return await fetchApi<NewsArticle[]>(`/news${queryStr}`);
+  } catch (err) {
+    console.error('Error fetching /news:', err);
+    return [];
+  }
 }
 
-export async function getNews(): Promise<NewsArticle[]> {
-  return fetchApi<NewsArticle[]>('/news');
+export async function getNewsBySlug(slug: string): Promise<NewsArticle | null> {
+  try {
+    return await fetchApi<NewsArticle>(`/news/${slug}`);
+  } catch (err) {
+    console.error(`Error fetching /news/${slug}:`, err);
+    return null;
+  }
 }
 
 export async function getUniverse(): Promise<UniverseSection> {
-  return fetchApi<UniverseSection>('/universe');
+  try {
+    return await fetchApi<UniverseSection>('/universe');
+  } catch (err) {
+    console.error('Error fetching /universe:', err);
+    return {
+      title: 'El Universo',
+      description: 'Exploración de la estructura del cosmos y la astrofísica moderna.',
+      coverImageUrl: null,
+      tabs: [],
+    };
+  }
 }
 
 export async function getSolarSystem(): Promise<SolarSystemSection> {
-  return fetchApi<SolarSystemSection>('/solar-system');
+  try {
+    return await fetchApi<SolarSystemSection>('/solar-system');
+  } catch (err) {
+    console.error('Error fetching /solar-system:', err);
+    return {
+      coverImageUrl: null,
+      planets: [],
+      moons: [],
+    };
+  }
 }
 
 export async function getConstellations(): Promise<ConstellationsSection> {
-  return fetchApi<ConstellationsSection>('/constellations');
+  try {
+    return await fetchApi<ConstellationsSection>('/constellations');
+  } catch (err) {
+    console.error('Error fetching /constellations:', err);
+    return {
+      description: 'Guía astronómica de constelaciones y orientación nocturna.',
+      skyMapImageUrl: null,
+      resources: [],
+      constellations: [],
+    };
+  }
+}
+
+export async function getConstellationsCatalog(hemisphere?: string, season?: string): Promise<Constellation[]> {
+  try {
+    const params = new URLSearchParams();
+    if (hemisphere && hemisphere !== 'Todos') params.append('hemisphere', hemisphere);
+    if (season && season !== 'Todas') params.append('season', season);
+
+    const queryStr = params.toString() ? `?${params.toString()}` : '';
+    return await fetchApi<Constellation[]>(`/constellations/list${queryStr}`);
+  } catch (err) {
+    console.error('Error fetching /constellations/list:', err);
+    return [];
+  }
+}
+
+export async function getConstellationBySlug(slug: string): Promise<Constellation | null> {
+  try {
+    return await fetchApi<Constellation>(`/constellations/${slug}`);
+  } catch (err) {
+    console.error(`Error fetching /constellations/${slug}:`, err);
+    return null;
+  }
 }
 
 export async function getGalleryFeatured(): Promise<GalleryCollection> {
-  return fetchApi<GalleryCollection>('/gallery/featured');
+  try {
+    return await fetchApi<GalleryCollection>('/gallery/featured');
+  } catch (err) {
+    console.error('Error fetching /gallery/featured:', err);
+    return {
+      id: 'empty',
+      title: 'Fragmentos de Memoria',
+      description: 'Galería fotográfica de misiones espaciales y astrofotografía.',
+      totalImages: 0,
+      rotationFrequency: 'semanal',
+      images: [],
+    };
+  }
 }
 
-// ── Fallback mock data (when API is not running) ──
+export async function getGalleryCollections(): Promise<GalleryCollection[]> {
+  try {
+    return await fetchApi<GalleryCollection[]>('/gallery');
+  } catch (err) {
+    console.error('Error fetching /gallery:', err);
+    return [];
+  }
+}
 
-function getFallbackData<T>(endpoint: string): T {
-  const fallbacks: Record<string, unknown> = {
-    '/stats': [
-      { id: '1', value: '93 %', label: 'del universo aún no se comprende del todo', order: 1 },
-      { id: '2', value: '8', label: 'planetas en el sistema solar', order: 2 },
-      { id: '3', value: '88', label: 'constelaciones reconocidas oficialmente', order: 3 },
-      { id: '4', value: '+400', label: 'fotografías en Fragmentos de Memoria', order: 4 },
-    ],
-    '/news': [
-      {
-        id: '1',
-        title: 'Artemis III: El regreso a la Luna se acerca',
-        summary: 'La NASA confirma avances clave en la misión que llevará astronautas a la superficie lunar.',
-        imageUrl: null,
-        date: '2024-03-05T00:00:00.000Z',
-        readTimeMinutes: 6,
-        slug: 'artemis-iii',
-      },
-      {
-        id: '2',
-        title: 'Descubren exoplaneta con posible atmósfera habitable',
-        summary: 'El telescopio James Webb detectó señales de vapor de agua en la atmósfera de un exoplaneta.',
-        imageUrl: null,
-        date: '2024-02-02T00:00:00.000Z',
-        readTimeMinutes: 4,
-        slug: 'exoplaneta-habitable',
-      },
-      {
-        id: '3',
-        title: 'SpaceX logra captura de Starship con la torre',
-        summary: 'Un hito histórico en la historia de la ingeniería aeroespacial.',
-        imageUrl: null,
-        date: '2024-01-18T00:00:00.000Z',
-        readTimeMinutes: 3,
-        slug: 'spacex-starship',
-      },
-    ],
-    '/universe': {
-      title: 'El Universo',
-      description: 'Datos generales, origen del universo, composición (energía oscura, materia oscura, materia bariónica), estructuras del universo y una pestaña propia dedicada al espectro electromagnético.',
-      coverImageUrl: null,
-      tabs: [
-        { id: '1', label: 'Origen', slug: 'origen', order: 1 },
-        { id: '2', label: 'Composición', slug: 'composicion', order: 2 },
-        { id: '3', label: 'Estructuras', slug: 'estructuras', order: 3 },
-        { id: '4', label: 'La luz', slug: 'la-luz', order: 4 },
-        { id: '5', label: 'Ondas gravitacionales', slug: 'ondas-gravitacionales', order: 5 },
-      ],
-    },
-    '/solar-system': {
-      coverImageUrl: null,
-      planets: [
-        { id: '1', name: 'Mercurio', slug: 'mercurio', imageUrl: null, order: 1 },
-        { id: '2', name: 'Venus', slug: 'venus', imageUrl: null, order: 2 },
-        { id: '3', name: 'Tierra', slug: 'tierra', imageUrl: null, order: 3 },
-        { id: '4', name: 'Marte', slug: 'marte', imageUrl: null, order: 4 },
-        { id: '5', name: 'Júpiter', slug: 'jupiter', imageUrl: null, order: 5 },
-        { id: '6', name: 'Saturno', slug: 'saturno', imageUrl: null, order: 6 },
-        { id: '7', name: 'Urano', slug: 'urano', imageUrl: null, order: 7 },
-        { id: '8', name: 'Neptuno', slug: 'neptuno', imageUrl: null, order: 8 },
-      ],
-      moons: [
-        { id: '1', name: 'Ganímedes', slug: 'ganimedes', planetId: '5', imageUrl: null, order: 1 },
-        { id: '2', name: 'Titán', slug: 'titan', planetId: '6', imageUrl: null, order: 2 },
-        { id: '3', name: 'Calisto', slug: 'calisto', planetId: '5', imageUrl: null, order: 3 },
-        { id: '4', name: 'Ío', slug: 'io', planetId: '5', imageUrl: null, order: 4 },
-        { id: '5', name: 'Europa', slug: 'europa', planetId: '5', imageUrl: null, order: 5 },
-      ],
-    },
-    '/constellations': {
-      description: 'Explicación de cada constelación, mapa del cielo y materiales descargables.',
-      skyMapImageUrl: null,
-      resources: [
-        { id: '1', label: 'Plantillas descargables', type: 'template' },
-        { id: '2', label: 'Apps recomendadas', type: 'app' },
-        { id: '3', label: 'Material didáctico', type: 'didactic' },
-      ],
-      constellations: [],
-    },
-    '/gallery/featured': {
-      id: 'featured',
-      title: 'Sobrevuelo lunar de Artemis II',
-      description: 'Galería de fotos astronómicas',
-      totalImages: 80,
-      rotationFrequency: 'semanal',
-      images: Array.from({ length: 6 }, (_, i) => ({
-        id: String(i + 1),
-        url: null,
-        alt: `Foto astronómica ${i + 1}`,
-        featured: i === 0,
-        order: i + 1,
-      })),
-    },
-  };
+export async function subscribeNewsletter(dto: SubscribeNewsletterDto): Promise<NewsletterSubscriberResponse> {
+  const res = await fetch(`${API_BASE}/newsletter/subscribe`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(dto),
+  });
 
-  return (fallbacks[endpoint] ?? null) as T;
+  const json = await res.json();
+  if (!res.ok) {
+    throw new Error(json.message || 'Error al procesar la suscripción');
+  }
+  return json.data;
+}
+
+export async function submitApplication(dto: CreateApplicationDto): Promise<ApplicationResponse> {
+  const res = await fetch(`${API_BASE}/applications`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(dto),
+  });
+
+  const json = await res.json();
+  if (!res.ok) {
+    throw new Error(json.message || 'Error al enviar la postulación');
+  }
+  return json.data;
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// ── Métodos de la Intranet Administrativa (Autenticados con JWT) ──
+// ══════════════════════════════════════════════════════════════════════════════
+
+export async function adminLogin(credentials: LoginDto): Promise<AuthResponse> {
+  const res = await fetch(`${API_BASE}/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(credentials),
+  });
+
+  const json = await res.json();
+  if (!res.ok) {
+    throw new Error(json.message || 'Credenciales inválidas');
+  }
+  return json.data || json;
+}
+
+export async function adminGetMe(token: string): Promise<AdminUser> {
+  return fetchAuthApi<AdminUser>('/auth/me', token);
+}
+
+export async function adminGetDashboardStats(token: string): Promise<AdminDashboardStats> {
+  return fetchAuthApi<AdminDashboardStats>('/admin/dashboard-stats', token);
+}
+
+// ── Noticias (Admin) ──
+export async function adminCreateNews(dto: any, token: string): Promise<NewsArticle> {
+  return fetchAuthApi<NewsArticle>('/news', token, {
+    method: 'POST',
+    body: JSON.stringify(dto),
+  });
+}
+
+export async function adminUpdateNews(id: string, dto: UpdateNewsDto, token: string): Promise<NewsArticle> {
+  return fetchAuthApi<NewsArticle>(`/news/${id}`, token, {
+    method: 'PATCH',
+    body: JSON.stringify(dto),
+  });
+}
+
+export async function adminDeleteNews(id: string, token: string): Promise<{ success: boolean; message: string }> {
+  return fetchAuthApi<{ success: boolean; message: string }>(`/news/${id}`, token, {
+    method: 'DELETE',
+  });
+}
+
+// ── Constelaciones (Admin) ──
+export async function adminCreateConstellation(dto: CreateConstellationDto, token: string): Promise<Constellation> {
+  return fetchAuthApi<Constellation>('/constellations', token, {
+    method: 'POST',
+    body: JSON.stringify(dto),
+  });
+}
+
+export async function adminUpdateConstellation(id: string, dto: UpdateConstellationDto, token: string): Promise<Constellation> {
+  return fetchAuthApi<Constellation>(`/constellations/${id}`, token, {
+    method: 'PATCH',
+    body: JSON.stringify(dto),
+  });
+}
+
+export async function adminDeleteConstellation(id: string, token: string): Promise<{ success: boolean; message: string }> {
+  return fetchAuthApi<{ success: boolean; message: string }>(`/constellations/${id}`, token, {
+    method: 'DELETE',
+  });
+}
+
+// ── Sistema Solar (Admin) ──
+export async function adminUpdatePlanet(id: string, dto: UpdatePlanetDto, token: string) {
+  return fetchAuthApi(`/solar-system/planets/${id}`, token, {
+    method: 'PATCH',
+    body: JSON.stringify(dto),
+  });
+}
+
+export async function adminUpdateMoon(id: string, dto: UpdateMoonDto, token: string) {
+  return fetchAuthApi(`/solar-system/moons/${id}`, token, {
+    method: 'PATCH',
+    body: JSON.stringify(dto),
+  });
+}
+
+// ── Galería (Admin) ──
+export async function adminCreateGalleryCollection(dto: CreateGalleryCollectionDto, token: string) {
+  return fetchAuthApi('/gallery/collections', token, {
+    method: 'POST',
+    body: JSON.stringify(dto),
+  });
+}
+
+export async function adminAddGalleryImage(dto: CreateGalleryImageDto, token: string) {
+  return fetchAuthApi('/gallery/images', token, {
+    method: 'POST',
+    body: JSON.stringify(dto),
+  });
+}
+
+export async function adminDeleteGalleryImage(id: string, token: string) {
+  return fetchAuthApi(`/gallery/images/${id}`, token, {
+    method: 'DELETE',
+  });
+}
+
+// ── Newsletter & Broadcast (Admin) ──
+export async function adminGetSubscribers(token: string) {
+  return fetchAuthApi<Array<{ id: string; email: string; active: boolean; createdAt: string }>>('/newsletter/subscribers', token);
+}
+
+export async function adminDeleteSubscriber(id: string, token: string) {
+  return fetchAuthApi(`/newsletter/subscribers/${id}`, token, {
+    method: 'DELETE',
+  });
+}
+
+export async function adminSendNewsletterBroadcast(dto: NewsletterBroadcastDto, token: string) {
+  return fetchAuthApi<{ sentCount: number; errors: number; totalRecipients: number; message: string }>('/newsletter/broadcast', token, {
+    method: 'POST',
+    body: JSON.stringify(dto),
+  });
+}
+
+// ── Postulaciones (Admin) ──
+export async function adminGetApplications(token: string) {
+  return fetchAuthApi<Array<{
+    id: string;
+    fullName: string;
+    email: string;
+    area: string;
+    message: string;
+    portfolioUrl?: string;
+    status: 'PENDING' | 'REVIEWED' | 'ACCEPTED' | 'REJECTED';
+    createdAt: string;
+  }>>('/applications', token);
+}
+
+export async function adminUpdateApplicationStatus(id: string, status: string, token: string) {
+  return fetchAuthApi(`/applications/${id}/status`, token, {
+    method: 'PATCH',
+    body: JSON.stringify({ status }),
+  });
+}
+
+export async function adminDeleteApplication(id: string, token: string) {
+  return fetchAuthApi(`/applications/${id}`, token, {
+    method: 'DELETE',
+  });
+}
+
+// ── Estadísticas Home (Admin) ──
+export async function adminUpdateStat(id: string, dto: UpdateStatDto, token: string): Promise<StatItem> {
+  return fetchAuthApi<StatItem>(`/stats/${id}`, token, {
+    method: 'PATCH',
+    body: JSON.stringify(dto),
+  });
 }

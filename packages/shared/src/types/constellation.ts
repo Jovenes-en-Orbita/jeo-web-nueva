@@ -4,7 +4,14 @@
 export interface Constellation {
   id: string;
   name: string;
+  latinName?: string;
+  season?: 'Primavera' | 'Verano' | 'Otoño' | 'Invierno' | string;
+  hemisphere?: 'Norte' | 'Sur' | 'Ambos' | string;
   description?: string;
+  brightestStar?: string;
+  funFact?: string;
+  starsCount?: number;
+  bestMonth?: string;
   imageUrl: string | null;
   slug: string;
 }
@@ -28,3 +35,4 @@ export interface ConstellationsSection {
   resources: ConstellationResource[];
   constellations: Constellation[];
 }
+

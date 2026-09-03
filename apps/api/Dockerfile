@@ -1,52 +1,43 @@
-# ==============================================================================
-# TODO: RE-IMPLEMENTAR DOCKERFILE PARA API EN EL FUTURO
-# La containerización del backend NestJS está temporalmente desactivada.
-# Para reactivarla:
-# 1. Descomentar las instrucciones del Dockerfile multi-stage a continuación.
-# 2. Verificar compatibilidad con dependencias de Prisma y Node.js.
-# ==============================================================================
+# ── Stage 1: Build ──
+FROM node:20-alpine AS build
+RUN apk add --no-cache libc6-compat
+RUN corepack enable && corepack prepare pnpm@9.15.4 --activate
+WORKDIR /app
 
-# # ── Stage 1: Build ──
-# FROM node:20-alpine AS build
-# RUN apk add --no-cache libc6-compat
-# RUN corepack enable && corepack prepare pnpm@9.15.4 --activate
-# WORKDIR /app
-# 
-# COPY .npmrc package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json tsconfig.base.json ./
-# COPY apps/api/package.json ./apps/api/
-# COPY packages/shared/package.json ./packages/shared/
-# 
-# RUN pnpm install --frozen-lockfile
-# 
-# COPY packages/shared ./packages/shared
-# COPY apps/api ./apps/api
-# 
-# RUN cd apps/api && pnpm exec prisma generate
-# RUN cd apps/api && pnpm run build
-# 
-# # ── Stage 2: Production ──
-# FROM node:20-alpine AS production
-# RUN apk add --no-cache dumb-init
-# RUN corepack enable && corepack prepare pnpm@9.15.4 --activate
-# WORKDIR /app
-# 
-# ENV NODE_ENV=production
-# 
-# COPY .npmrc package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-# COPY apps/api/package.json ./apps/api/
-# COPY packages/shared/package.json ./packages/shared/
-# 
-# RUN pnpm install --frozen-lockfile --prod
-# 
-# COPY --from=build /app/apps/api/dist ./apps/api/dist
-# COPY --from=build /app/apps/api/prisma ./apps/api/prisma
-# COPY --from=build /app/packages/shared ./packages/shared
-# 
-# RUN pnpm --filter @jeo/api exec prisma generate
-# 
-# EXPOSE 3001
-# 
-# USER node
-# CMD ["dumb-init", "node", "apps/api/dist/main.js"]
+COPY .npmrc package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json tsconfig.base.json ./
+COPY apps/api/package.json ./apps/api/
+COPY packages/shared/package.json ./packages/shared/
 
+RUN pnpm install --frozen-lockfile
 
+COPY packages/shared ./packages/shared
+COPY apps/api ./apps/api
+
+RUN cd packages/shared && pnpm run build
+RUN cd apps/api && pnpm exec prisma generate
+RUN cd apps/api && pnpm run build
+
+# ── Stage 2: Production ──
+FROM node:20-alpine AS production
+RUN apk add --no-cache dumb-init
+RUN corepack enable && corepack prepare pnpm@9.15.4 --activate
+WORKDIR /app
+
+ENV NODE_ENV=production
+
+COPY .npmrc package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY apps/api/package.json ./apps/api/
+COPY packages/shared/package.json ./packages/shared/
+
+RUN pnpm install --frozen-lockfile --prod
+
+COPY --from=build /app/apps/api/dist ./apps/api/dist
+COPY --from=build /app/apps/api/prisma ./apps/api/prisma
+COPY --from=build /app/packages/shared/dist ./packages/shared/dist
+
+RUN pnpm --filter @jeo/api exec prisma generate
+
+EXPOSE 3001
+
+USER node
+CMD ["dumb-init", "node", "apps/api/dist/main.js"]

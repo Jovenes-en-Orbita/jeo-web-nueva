@@ -1,73 +1,68 @@
 # ==============================================================================
-# TODO: RE-IMPLEMENTAR DOCKER COMPOSE EN EL FUTURO
-# La containerización con Docker está temporalmente desactivada.
-# Para reactivarla:
-# 1. Descomentar las secciones de los servicios (db, api, web) y volúmenes a continuación.
-# 2. Asegurarse de que apps/api/Dockerfile y apps/web/Dockerfile también estén reactivados.
-# 3. Ejecutar `docker compose up --build`.
+# JEO — Docker Compose
+# Orquestación de servicios PostgreSQL, API NestJS y Frontend Next.js
 # ==============================================================================
 
-# services:
-#   # ── PostgreSQL Database ──
-#   db:
-#     image: postgres:16-alpine
-#     restart: unless-stopped
-#     environment:
-#       POSTGRES_USER: jeo
-#       POSTGRES_PASSWORD: jeo_pass
-#       POSTGRES_DB: jeo_db
-#     ports:
-#       - "5432:5432"
-#     volumes:
-#       - pgdata:/var/lib/postgresql/data
-#     healthcheck:
-#       test: ["CMD-SHELL", "pg_isready -U jeo -d jeo_db"]
-#       interval: 5s
-#       timeout: 5s
-#       retries: 5
-# 
-#   # ── NestJS API ──
-#   api:
-#     build:
-#       context: .
-#       dockerfile: apps/api/Dockerfile
-#     restart: unless-stopped
-#     ports:
-#       - "3001:3001"
-#     environment:
-#       PORT: 3001
-#       DATABASE_URL: postgresql://jeo:jeo_pass@db:5432/jeo_db
-#       CORS_ORIGIN: http://localhost:3000
-#     depends_on:
-#       db:
-#         condition: service_healthy
-#     healthcheck:
-#       test: ["CMD-SHELL", "node -e \"require('http').get('http://127.0.0.1:3001/api/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1))\""]
-#       interval: 5s
-#       timeout: 5s
-#       retries: 5
-# 
-#   # ── Next.js Frontend ──
-#   web:
-#     build:
-#       context: .
-#       dockerfile: apps/web/Dockerfile
-#     restart: unless-stopped
-#     ports:
-#       - "3000:3000"
-#     environment:
-#       PORT: 3000
-#       HOSTNAME: "0.0.0.0"
-#       NEXT_PUBLIC_API_URL: http://localhost:3001/api
-#     depends_on:
-#       api:
-#         condition: service_healthy
-#     healthcheck:
-#       test: ["CMD-SHELL", "node -e \"require('http').get('http://127.0.0.1:3000/', (res) => process.exit(res.statusCode === 200 ? 0 : 1))\""]
-#       interval: 5s
-#       timeout: 5s
-#       retries: 5
-# 
-# volumes:
-#   pgdata:
+services:
+  # ── PostgreSQL Database ──
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: jeo
+      POSTGRES_PASSWORD: jeo_pass
+      POSTGRES_DB: jeo_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U jeo -d jeo_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
+  # ── NestJS API ──
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      PORT: 3001
+      DATABASE_URL: postgresql://jeo:jeo_pass@db:5432/jeo_db
+      CORS_ORIGIN: http://localhost:3000
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"require('http').get('http://127.0.0.1:3001/api/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1))\""]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ── Next.js Frontend ──
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: 3000
+      HOSTNAME: "0.0.0.0"
+      NEXT_PUBLIC_API_URL: http://localhost:3001/api
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"require('http').get('http://127.0.0.1:3000/', (res) => process.exit(res.statusCode === 200 ? 0 : 1))\""]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgdata:
