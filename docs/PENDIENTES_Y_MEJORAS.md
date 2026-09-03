@@ -6,59 +6,36 @@ Documento de seguimiento sobre las tareas pendientes (`TODO`s), mejoras de arqui
 
 ## ✅ 0. Estado de Avance - Etapas Completadas
 
+### 🐳 Etapa 3: Containerización Docker & Docker Compose (`COMPLETADA`)
+- **Backend Dockerfile (`apps/api/Dockerfile`):** Multi-stage build optimizado para NestJS + Prisma ORM (`prisma generate`).
+- **Frontend Dockerfile (`apps/web/Dockerfile`):** Multi-stage build para Next.js 16 aprovechando el modo `output: 'standalone'`.
+- **Orquestación Docker Compose (`docker-compose.yml`):** Reactivados los servicios de PostgreSQL 16 (`db`), NestJS API (`api`) y Next.js Frontend (`web`) con healthchecks entre sí.
+- **Reglas `.dockerignore`:** Habilitadas para omitir `node_modules`, `.next`, `dist` y `.git` en builds de producción.
+
 ### 🚀 Etapa 2: Buscador de Imágenes Gratuitas (NASA/Unsplash), Caché & Paginación (`COMPLETADA`)
-- **🚀 Buscador de Imágenes Gratuitas Libres de Derechos (`FreeImagePicker`):**
-  - **Backend (`MediaModule`):** Implementado `media.service.ts` y `media.controller.ts` para consultar las APIs oficiales de la **NASA** y **Unsplash** (libres para uso comercial público).
-  - **Frontend UI:** Creado el componente modal `FreeImagePicker.tsx` e integrado en la Intranet Admin (`/admin/noticias`). Permite buscar por etiquetas (*marte, nebulosa, apollo, hubble*), previsualizar fotos y autocompletar la URL y los créditos de autor con un solo clic.
-- **⚡ Caché & Rendimiento de API (`@nestjs/cache-manager`):**
-  - Configurado `CacheModule` globalmente en `apps/api/src/app.module.ts` (5 min de TTL).
-  - Decorados endpoints de lectura masiva con `@UseInterceptors(CacheInterceptor)` en `/api/solar-system` y `/api/stats`.
-- **📄 Paginación Estandarizada:**
-  - Incorporados parámetros `page` y `limit` en `/api/news` y retorno estructurado con metadatos (`items`, `total`, `page`, `totalPages`).
-- **🧪 Cobertura de Pruebas Unitarias (Jest):**
-  - **22 de 22 tests unitarios pasados exitosamente** (5 test suites pasados: `media`, `news`, `newsletter`, `applications`, `auth`).
+- **Buscador de Fotos Gratis (`FreeImagePicker.tsx`):** Integración en el panel Admin (`/admin/noticias`) con las APIs de la NASA y Unsplash para autocompletar imágenes astronómicas y créditos con un clic.
+- **Caché & Rendimiento de API (`@nestjs/cache-manager`):** Respuestas hiper rápidas en `/api/solar-system` y `/api/stats`.
+- **Paginación Estandarizada:** Incorporados parámetros `page` y `limit` en `/api/news` (`items`, `total`, `page`, `totalPages`).
+- **Pruebas Unitarias (Jest):** 22/22 tests unitarios pasados exitosamente en 5 suites.
 
 ### 🛡️ Etapa 1: Seguridad, Cabeceras HTTP y Rate Limiting (`COMPLETADA`)
-- **Cabeceras HTTP (`helmet`):** Integrado en `apps/api/src/main.ts` para proteger la API NestJS contra vulnerabilidades como XSS, Clickjacking, MIME sniffing, etc.
-- **Protección Anti-Spam (`@nestjs/throttler`):**
-  - Configurado `ThrottlerGuard` globalmente en `apps/api/src/app.module.ts` (60 req/min).
-  - Aplicados límites estrictos en: `/api/newsletter/subscribe` (5/min), `/api/applications` (3/hora), `/api/auth/login` (5/min contra fuerza bruta).
-- **Frontend E2E (Playwright):** Test E2E `tests/application-flow.spec.ts` para validar el flujo completo de postulación de voluntarios (`/unite`).
+- **Cabeceras HTTP (`helmet`):** Integrado en `apps/api/src/main.ts` contra ataques XSS, Clickjacking, MIME sniffing, etc.
+- **Protección Anti-Spam (`@nestjs/throttler`):** Límites estrictos en `/api/newsletter/subscribe` (5/min), `/api/applications` (3/hora), `/api/auth/login` (5/min).
+- **Pruebas E2E (Playwright):** Spec `tests/application-flow.spec.ts` para la postulación de voluntarios.
 
 ---
 
-## 📌 1. Pendientes Explícitos (`TODO`s en Código y Docs)
+## 📌 1. Pendientes Futuros / Producción
 
-### 🐳 Docker y Docker Compose (Pospuesto / Inactivo)
-- **Estado actual:** Archivos como `docker-compose.yml`, `apps/api/Dockerfile` y `apps/web/Dockerfile` se encuentran deshabilitados o comentados con notas `TODO`.
-- **Falta:** 
-  - Re-implementar la configuración multi-stage para NestJS/Prisma.
-  - Re-implementar Next.js con soporte `output: 'standalone'`.
-  - Descomentar y validar el orquestado en `docker-compose.yml`.
-
-### ✉️ Servicio de Emails / Newsletter Masivo
-- **Estado actual:** El backend incluye `mail.service.ts` y `newsletter.service.ts` preparados para integraciones con proveedores como Resend.
-- **Falta:** 
-  - Configurar las credenciales reales (`RESEND_API_KEY`) en entorno de producción.
-  - Diseñar y validar la plantilla HTML definitiva para la emisión de boletines.
+### ✉️ Credenciales Reales de Producción
+- Configurar las llaves reales de envío (`RESEND_API_KEY`) y dominio oficial para las campañas masivas de newsletter.
 
 ---
 
-## 🛠️ 2. Mejoras y Funcionalidades Faltantes (Próximas Etapas)
+## 📊 Matriz de Prioridades Final
 
-### 🎨 Frontend (Next.js 16 + Tailwind 4)
-- **Manejo Global de Sesión / Auth State:**
-  - Optimizar el refresco de token o la experiencia ante expiración de sesión en la Intranet Admin sin perder cambios no guardados.
-- **Subida Local Directa (Cloud Storage):**
-  - Opcional: Integrar un bucket de almacenamiento (S3 / Cloudinary / Supabase Storage) si se requiere subir archivos locales de los administradores en lugar de usar la biblioteca libre de la NASA/Unsplash.
-
----
-
-## 📊 Matriz de Prioridades Actualizada
-
-| Prioridad | Tarea | Estado | Componentes Afectados |
-| :--- | :--- | :--- | :--- |
-| ✅ **Completado** | **Helmet, Rate Limiting & Testing Base** | `FINALIZADO` | Backend (`api`), Frontend (`web`) |
-| ✅ **Completado** | **Buscador de Fotos Gratis (NASA/Unsplash), Caché y Paginación** | `FINALIZADO` | Backend (`api`), Frontend (`web`) |
-| 🟡 **Media** | **Almacenamiento Directo de Archivos Locales (S3/Cloudinary)** | `PENDIENTE` | Backend (`api`), Frontend (`web`) |
-| 🟢 **Baja** | **Docker & Docker Compose** | `POSPUESTO` | Infraestructura / DevOps |
+| Tarea | Estado | Componentes Afectados |
+| :--- | :--- | :--- |
+| **Helmet, Rate Limiting & Testing Base** | `FINALIZADO` | Backend (`api`), Frontend (`web`) |
+| **Buscador de Fotos Gratis (NASA/Unsplash), Caché y Paginación** | `FINALIZADO` | Backend (`api`), Frontend (`web`) |
+| **Docker, Dockerfiles Multi-Stage & Docker Compose** | `FINALIZADO` | Infraestructura / DevOps |
