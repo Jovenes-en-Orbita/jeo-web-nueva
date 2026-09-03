@@ -3,8 +3,9 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { Logo } from '@/components/ui/Logo';
+import { PasswordInput } from '@/components/ui/PasswordInput';
 import { useAdminAuth } from '@/context/AdminAuthContext';
-import { FiLock, FiMail, FiLoader, FiAlertCircle, FiArrowLeft } from 'react-icons/fi';
+import { FiMail, FiLoader, FiAlertCircle, FiArrowLeft } from 'react-icons/fi';
 
 export default function AdminLoginPage() {
   const { login } = useAdminAuth();
@@ -82,7 +83,6 @@ export default function AdminLoginPage() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@jovenesenorbita.com"
                   disabled={isSubmitting}
                   className="w-full bg-[#060a17] border border-white/15 pl-10 pr-4 py-3 rounded-xl text-sm text-white placeholder:text-slate-600 outline-none focus:border-[var(--color-yellow)] transition-colors"
                   required
@@ -94,18 +94,12 @@ export default function AdminLoginPage() {
               <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-2">
                 Contraseña
               </label>
-              <div className="relative">
-                <FiLock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 w-4 h-4" />
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  disabled={isSubmitting}
-                  className="w-full bg-[#060a17] border border-white/15 pl-10 pr-4 py-3 rounded-xl text-sm text-white placeholder:text-slate-600 outline-none focus:border-[var(--color-yellow)] transition-colors"
-                  required
-                />
-              </div>
+              <PasswordInput
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                disabled={isSubmitting}
+                required
+              />
             </div>
 
             <button
@@ -124,12 +118,6 @@ export default function AdminLoginPage() {
             </button>
           </form>
 
-          <div className="mt-8 pt-6 border-t border-white/10 text-center">
-            <p className="text-[11px] text-slate-500">
-              Credenciales por defecto en base de datos: <br />
-              <code className="text-slate-300 bg-white/5 px-2 py-0.5 rounded">admin@jovenesenorbita.com</code> / <code className="text-slate-300 bg-white/5 px-2 py-0.5 rounded">admin1234</code>
-            </p>
-          </div>
         </div>
       </main>
 
