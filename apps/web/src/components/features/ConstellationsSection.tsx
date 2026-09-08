@@ -37,7 +37,7 @@ export async function ConstellationsSection() {
                 </Tag>
               ))}
             </div>
-            <div className='text-[#FFC72C] hover:text-white'>
+            <div className='text-[#d83933] hover:text-white'>
               <Button href="/constelaciones" variant="gold">
                 Ver constelaciones completas
               </Button>

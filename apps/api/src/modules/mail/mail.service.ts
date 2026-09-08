@@ -28,7 +28,7 @@ export class MailService {
     const html = `
       <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #080d1a; color: #ffffff; padding: 30px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
         <div style="text-align: center; margin-bottom: 24px;">
-          <h1 style="color: #FFC72C; font-size: 24px; text-transform: uppercase; margin: 0 0 8px 0; letter-spacing: 2px;">Jóvenes en Órbita</h1>
+          <h1 style="color: #d83933; font-size: 24px; text-transform: uppercase; margin: 0 0 8px 0; letter-spacing: 2px;">Jóvenes en Órbita</h1>
           <p style="color: #94a3b8; font-size: 13px; margin: 0;">Divulgación científica espacial hecha por y para jóvenes</p>
         </div>
 
@@ -47,7 +47,7 @@ export class MailService {
 
         <div style="text-align: center; color: #64748b; font-size: 11px;">
           <p style="margin: 4px 0;">© ${new Date().getFullYear()} Jóvenes en Órbita (JEO). Todos los derechos reservados.</p>
-          <p style="margin: 4px 0;">Contacto: <a href="mailto:jovenesenorbita@gmail.com" style="color: #FFC72C; text-decoration: none;">jovenesenorbita@gmail.com</a></p>
+          <p style="margin: 4px 0;">Contacto: <a href="mailto:jovenesenorbita@gmail.com" style="color: #d83933; text-decoration: none;">jovenesenorbita@gmail.com</a></p>
         </div>
       </div>
     `;
@@ -87,11 +87,11 @@ export class MailService {
     const html = `
       <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #080d1a; color: #ffffff; padding: 30px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
         <div style="text-align: center; margin-bottom: 24px;">
-          <h1 style="color: #FFC72C; font-size: 24px; text-transform: uppercase; margin: 0 0 8px 0; letter-spacing: 2px;">Jóvenes en Órbita</h1>
+          <h1 style="color: #d83933; font-size: 24px; text-transform: uppercase; margin: 0 0 8px 0; letter-spacing: 2px;">Jóvenes en Órbita</h1>
           <p style="color: #94a3b8; font-size: 12px; margin: 0; text-transform: uppercase; letter-spacing: 1px;">Boletín Informativo — Órbita Semanal</p>
         </div>
 
-        <div style="background: #0d162a; padding: 24px; border-radius: 10px; margin-bottom: 24px; border-left: 4px solid #FFC72C;">
+        <div style="background: #0d162a; padding: 24px; border-radius: 10px; margin-bottom: 24px; border-left: 4px solid #d83933;">
           <h2 style="font-size: 20px; color: #ffffff; margin-top: 0;">${title}</h2>
           <div style="color: #cbd5e1; font-size: 14px; line-height: 1.7; white-space: pre-wrap;">${content}</div>
         </div>
@@ -100,7 +100,7 @@ export class MailService {
 
         <div style="text-align: center; color: #64748b; font-size: 11px;">
           <p style="margin: 4px 0;">Recibiste este correo porque estás suscrito al boletín de Jóvenes en Órbita.</p>
-          <p style="margin: 4px 0;">Contacto: <a href="mailto:jovenesenorbita@gmail.com" style="color: #FFC72C; text-decoration: none;">jovenesenorbita@gmail.com</a></p>
+          <p style="margin: 4px 0;">Contacto: <a href="mailto:jovenesenorbita@gmail.com" style="color: #d83933; text-decoration: none;">jovenesenorbita@gmail.com</a></p>
         </div>
       </div>
     `;
@@ -135,7 +135,7 @@ export class MailService {
     const subject = `✨ Recibimos tu postulación a Jóvenes en Órbita (${area})`;
     const html = `
       <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #080d1a; color: #ffffff; padding: 30px; border-radius: 12px;">
-        <h1 style="color: #FFC72C; font-size: 22px; text-transform: uppercase;">¡Hola, ${applicantName}!</h1>
+        <h1 style="color: #d83933; font-size: 22px; text-transform: uppercase;">¡Hola, ${applicantName}!</h1>
         <p style="color: #cbd5e1; font-size: 14px; line-height: 1.6;">
           Hemos recibido tu postulación para sumarte al equipo de <strong>Jóvenes en Órbita</strong> en el área de <strong>${area.toUpperCase()}</strong>.
         </p>

@@ -6,17 +6,17 @@
    ══════════════════════════════════════════════ */
 
 @theme {
-  --color-navy: #0B1B33;
-  --color-navy-2: #122548;
+  --color-navy: #000000;
+  --color-navy-2: #09090b;
   --color-white: #FFFFFF;
-  --color-black: #111111;
-  --color-yellow: #FFC72C;
-  --color-red: #E4002B;
-  --color-line: #D9D9D9;
-  --color-ph: #C7CBD1;
+  --color-black: #000000;
+  --color-yellow: #d83933;
+  --color-red: #d83933;
+  --color-line: #222222;
+  --color-ph: #1a1a1a;
   --color-ph-ink: #7A828C;
-  --color-ink: #111111;
-  --color-ink-2: #4B4F56;
+  --color-ink: #FFFFFF;
+  --color-ink-2: #A1A1AA;
 
   --font-montserrat: 'Montserrat', sans-serif;
   --font-poppins: 'Poppins', sans-serif;

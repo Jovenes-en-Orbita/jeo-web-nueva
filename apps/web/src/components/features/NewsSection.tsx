@@ -40,17 +40,17 @@ export async function NewsSection() {
   const bottomArticles = articles.length > 4 ? articles.slice(4, 8) : articles.slice(0, 4);
 
   return (
-    <section className="block py-12 border-b border-white/10 bg-[#060a17] text-white" id="news">
+    <section className="block py-12 border-b border-slate-200 bg-white text-slate-900" id="news">
       <div className="wrap w-full">
         {/* Section Header */}
         <div className="flex items-center justify-between mb-8 flex-wrap gap-4">
-          <SectionHeader title="Noticias Espaciales" theme="dark" />
+          <SectionHeader title="Noticias Espaciales" theme="light" />
           <Link
             href="/noticias"
-            className="inline-flex items-center gap-2 font-[var(--font-montserrat)] font-bold text-xs uppercase tracking-wider text-[var(--color-yellow)] hover:text-white transition-colors group"
+            className="inline-flex items-center gap-2 font-[var(--font-montserrat)] font-bold text-xs uppercase tracking-wider text-slate-900 hover:text-[#d83933] transition-colors group"
           >
             <span>Recientemente publicadas</span>
-            <span className="w-6 h-6 rounded-full bg-[var(--color-red)] text-white flex items-center justify-center group-hover:scale-110 transition-transform">
+            <span className="w-6 h-6 rounded-full bg-[#d83933] text-white flex items-center justify-center group-hover:scale-110 transition-transform">
               →
             </span>
           </Link>
@@ -62,7 +62,7 @@ export async function NewsSection() {
           {mainHero && (
             <Link
               href={`/noticias/${mainHero.slug}`}
-              className="group relative lg:col-span-2 h-[340px] overflow-hidden border border-white/10 hover:border-[var(--color-yellow)]/60 transition-all duration-300 bg-[#090d1a]"
+              className="group relative lg:col-span-2 h-[340px] overflow-hidden border border-slate-200 hover:border-[#d83933]/60 transition-all duration-300 bg-slate-900"
             >
               <Image
                 src={getArticleImage(mainHero)}
@@ -74,14 +74,14 @@ export async function NewsSection() {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-between p-6">
                 <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-300">
-                  <FiLayers className="text-[var(--color-yellow)]" />
+                  <FiLayers className="text-[#d83933]" />
                   <span>Blog</span>
                 </div>
                 <div>
                   <span className="text-[10px] font-bold tracking-widest text-slate-300 uppercase block mb-1 font-[var(--font-poppins)]">
                     {mainHero.readTimeMinutes} Min Read
                   </span>
-                  <h3 className="font-extrabold text-xl sm:text-2xl text-white leading-tight font-[var(--font-montserrat)] group-hover:text-[var(--color-yellow)] transition-colors">
+                  <h3 className="font-extrabold text-xl sm:text-2xl text-white leading-tight font-[var(--font-montserrat)] group-hover:text-[#d83933] transition-colors">
                     {mainHero.title}
                   </h3>
                 </div>
@@ -93,7 +93,7 @@ export async function NewsSection() {
           {verticalHero && (
             <Link
               href={`/noticias/${verticalHero.slug}`}
-              className="group relative lg:col-span-1 h-[340px] overflow-hidden border border-white/10 hover:border-[var(--color-yellow)]/60 transition-all duration-300 bg-[#090d1a]"
+              className="group relative lg:col-span-1 h-[340px] overflow-hidden border border-slate-200 hover:border-[#d83933]/60 transition-all duration-300 bg-slate-900"
             >
               <Image
                 src={getArticleImage(verticalHero)}
@@ -104,14 +104,14 @@ export async function NewsSection() {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-between p-6">
                 <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-300">
-                  <FiLayers className="text-[var(--color-yellow)]" />
+                  <FiLayers className="text-[#d83933]" />
                   <span>Blog</span>
                 </div>
                 <div>
                   <span className="text-[10px] font-bold tracking-widest text-slate-300 uppercase block mb-1 font-[var(--font-poppins)]">
                     {verticalHero.readTimeMinutes} Min Read
                   </span>
-                  <h3 className="font-extrabold text-lg text-white leading-tight font-[var(--font-montserrat)] group-hover:text-[var(--color-yellow)] transition-colors line-clamp-3">
+                  <h3 className="font-extrabold text-lg text-white leading-tight font-[var(--font-montserrat)] group-hover:text-[#d83933] transition-colors line-clamp-3">
                     {verticalHero.title}
                   </h3>
                 </div>
@@ -124,7 +124,7 @@ export async function NewsSection() {
             {stackedTop && (
               <Link
                 href={`/noticias/${stackedTop.slug}`}
-                className="group relative flex-1 overflow-hidden border border-white/10 hover:border-[var(--color-yellow)]/60 transition-all duration-300 bg-[#090d1a]"
+                className="group relative flex-1 overflow-hidden border border-slate-200 hover:border-[#d83933]/60 transition-all duration-300 bg-slate-900"
               >
                 <Image
                   src={getArticleImage(stackedTop)}
@@ -135,14 +135,14 @@ export async function NewsSection() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-between p-4">
                   <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-300">
-                    <FiLayers className="text-[var(--color-yellow)]" />
+                    <FiLayers className="text-[#d83933]" />
                     <span>Blog</span>
                   </div>
                   <div>
                     <span className="text-[10px] font-bold tracking-widest text-slate-300 uppercase block mb-1 font-[var(--font-poppins)]">
                       {stackedTop.readTimeMinutes} Min Read
                     </span>
-                    <h3 className="font-bold text-sm text-white leading-snug font-[var(--font-montserrat)] group-hover:text-[var(--color-yellow)] transition-colors line-clamp-2">
+                    <h3 className="font-bold text-sm text-white leading-snug font-[var(--font-montserrat)] group-hover:text-[#d83933] transition-colors line-clamp-2">
                       {stackedTop.title}
                     </h3>
                   </div>
@@ -153,7 +153,7 @@ export async function NewsSection() {
             {stackedBottom && (
               <Link
                 href={`/noticias/${stackedBottom.slug}`}
-                className="group relative flex-1 overflow-hidden border border-white/10 hover:border-[var(--color-yellow)]/60 transition-all duration-300 bg-[#090d1a]"
+                className="group relative flex-1 overflow-hidden border border-slate-200 hover:border-[#d83933]/60 transition-all duration-300 bg-slate-900"
               >
                 <Image
                   src={getArticleImage(stackedBottom)}
@@ -164,14 +164,14 @@ export async function NewsSection() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-between p-4">
                   <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-300">
-                    <FiLayers className="text-[var(--color-yellow)]" />
+                    <FiLayers className="text-[#d83933]" />
                     <span>Blog</span>
                   </div>
                   <div>
                     <span className="text-[10px] font-bold tracking-widest text-slate-300 uppercase block mb-1 font-[var(--font-poppins)]">
                       {stackedBottom.readTimeMinutes} Min Read
                     </span>
-                    <h3 className="font-bold text-sm text-white leading-snug font-[var(--font-montserrat)] group-hover:text-[var(--color-yellow)] transition-colors line-clamp-2">
+                    <h3 className="font-bold text-sm text-white leading-snug font-[var(--font-montserrat)] group-hover:text-[#d83933] transition-colors line-clamp-2">
                       {stackedBottom.title}
                     </h3>
                   </div>
@@ -182,15 +182,15 @@ export async function NewsSection() {
         </div>
 
         {/* BOTTOM ROW (4 Columns of Circular Thumbnails + Meta Details) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pt-6 border-t border-white/10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pt-6 border-t border-slate-200">
           {bottomArticles.map((art, idx) => (
             <Link
               key={art.id || idx}
               href={`/noticias/${art.slug}`}
-              className="group flex items-start gap-3 p-2 hover:bg-white/[0.03] transition-colors"
+              className="group flex items-start gap-3 p-2 hover:bg-slate-100 transition-colors"
             >
               {/* Circular Avatar Image */}
-              <div className="relative w-12 h-12 rounded-full overflow-hidden shrink-0 border border-white/20 group-hover:border-[var(--color-yellow)] transition-colors">
+              <div className="relative w-12 h-12 rounded-full overflow-hidden shrink-0 border border-slate-300 group-hover:border-[#d83933] transition-colors">
                 <Image
                   src={getArticleImage(art)}
                   alt={art.title}
@@ -202,14 +202,14 @@ export async function NewsSection() {
 
               {/* Text Meta Content */}
               <div className="flex-1 min-w-0">
-                <span className="text-[10px] font-bold tracking-widest text-slate-400 uppercase block mb-0.5 font-[var(--font-poppins)]">
+                <span className="text-[10px] font-bold tracking-widest text-slate-500 uppercase block mb-0.5 font-[var(--font-poppins)]">
                   {art.readTimeMinutes} Min Read
                 </span>
-                <h4 className="font-bold text-xs text-white leading-snug font-[var(--font-montserrat)] group-hover:text-[var(--color-yellow)] transition-colors line-clamp-2">
+                <h4 className="font-bold text-xs text-slate-900 leading-snug font-[var(--font-montserrat)] group-hover:text-[#d83933] transition-colors line-clamp-2">
                   {art.title}
                 </h4>
-                <div className="flex items-center gap-1 text-[10px] font-semibold text-slate-400 uppercase mt-1">
-                  <FiLayers className="w-3 h-3 text-[var(--color-yellow)]" />
+                <div className="flex items-center gap-1 text-[10px] font-semibold text-slate-500 uppercase mt-1">
+                  <FiLayers className="w-3 h-3 text-[#d83933]" />
                   <span>Article</span>
                 </div>
               </div>

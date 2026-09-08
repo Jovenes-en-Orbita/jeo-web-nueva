@@ -18,7 +18,7 @@ export async function Hero() {
 
   return (
     <section className="relative w-full h-[calc(100vh-76px)] min-h-[560px] overflow-hidden flex items-center" id="hero">
-      <div className="absolute inset-0 bg-[#030712]">
+      <div className="absolute inset-0 bg-black">
         <Image
           src="/assets/hero-cosmos.svg"
           alt="Jóvenes en Órbita — Divulgación Científica Espacial"
@@ -27,13 +27,13 @@ export async function Hero() {
           className="object-cover"
           priority
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#080d1a]/95 via-[#080d1a]/60 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/95 via-black/70 to-transparent" />
       </div>
 
       <div className="relative z-10 wrap w-full">
-        <div className="bg-[var(--color-navy)]/90 backdrop-blur-md text-white p-7 sm:p-9 max-w-[640px] animate-fade-in-up border border-[var(--color-yellow)]/40 rounded-none shadow-2xl space-y-6">
+        <div className="bg-black/90 backdrop-blur-md text-white p-7 sm:p-9 max-w-[640px] animate-fade-in-up border border-[#d83933]/60 rounded-none shadow-2xl space-y-6">
           <div>
-            <span className="text-[var(--color-yellow)] font-[var(--font-montserrat)] font-semibold text-xs sm:text-sm tracking-[0.14em] mb-2 block">
+            <span className="text-[#d83933] font-[var(--font-montserrat)] font-bold text-xs sm:text-sm tracking-[0.14em] mb-2 block uppercase">
               Divulgación científica espacial
             </span>
             <h1 className="font-[var(--font-montserrat)] font-bold text-3xl sm:text-5xl leading-tight mb-3 uppercase tracking-[0.02em]">

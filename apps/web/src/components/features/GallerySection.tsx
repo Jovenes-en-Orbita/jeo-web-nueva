@@ -30,7 +30,7 @@ export async function GallerySection() {
             </span>
             <SectionHeader title="Fragmentos de Memoria" theme="dark" />
           </div>
-          <div className="text-[#FFC72C] hover:text-white">
+          <div className="text-[#d83933] hover:text-white">
             <Button href="/galeria" variant="gold">
               Ver galería completa ({collections.length} álbumes)
             </Button>

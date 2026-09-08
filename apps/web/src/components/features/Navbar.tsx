@@ -21,12 +21,12 @@ export function Navbar() {
 
   return (
     <>
-      <header className="bg-[var(--color-navy)] border-b-[3px] border-[var(--color-yellow)] relative text-white sticky top-0 z-40 shadow-xl">
+      <header className="bg-black border-b-[3px] border-[#d83933] relative text-white sticky top-0 z-40 shadow-xl">
         <div className="wrap relative flex justify-between items-center h-[76px] px-4 md:px-6">
 
           {/* Mobile Layout Left */}
           <div className="flex lg:hidden items-center">
-            <Link href="/" className="font-[var(--font-montserrat)] font-extrabold text-sm tracking-wider uppercase text-[var(--color-yellow)]">
+            <Link href="/" className="font-[var(--font-montserrat)] font-extrabold text-sm tracking-wider uppercase text-[#d83933]">
               JEO
             </Link>
           </div>
