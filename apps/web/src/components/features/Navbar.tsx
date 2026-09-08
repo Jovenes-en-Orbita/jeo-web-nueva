@@ -21,22 +21,22 @@ export function Navbar() {
 
   return (
     <>
-      <header className="bg-[var(--color-navy)] border-b-[3px] border-[var(--color-yellow)] relative text-white sticky top-0 z-40 shadow-lg">
-        <div className="wrap flex justify-between items-center h-[76px] px-4 md:px-6">
-          {/* Left: Official Logo */}
-          <div className="py-1">
-            <Logo size={46} showText={true} />
+      <header className="bg-[var(--color-navy)] border-b-[3px] border-[var(--color-yellow)] relative text-white sticky top-0 z-40 shadow-xl">
+        <div className="wrap relative flex justify-between items-center h-[76px] px-4 md:px-6">
+
+          {/* Mobile Layout Left */}
+          <div className="flex lg:hidden items-center">
+            <Link href="/" className="font-[var(--font-montserrat)] font-extrabold text-sm tracking-wider uppercase text-[var(--color-yellow)]">
+              JEO
+            </Link>
           </div>
 
-          {/* Center/Right: Desktop Navigation */}
+          {/* Desktop Left Navigation */}
           <nav className="hidden lg:flex items-center gap-6">
             <Dropdown
               label="Cosmos"
               items={[
                 { label: 'El Universo', href: '/universo' },
-                // TODO: Sección en desarrollo
-                // { label: 'Sistema Solar', href: '/sistema-solar' },
-                // { label: 'Constelaciones', href: '/constelaciones' },
                 { label: 'Noticias Espaciales', href: '/noticias' },
                 { label: 'Fragmentos de Memoria', href: '/galeria' },
               ]}
@@ -48,6 +48,15 @@ export function Navbar() {
                 { label: 'Libros electrónicos', href: '/libros' },
               ]}
             />
+          </nav>
+
+          {/* Centered Overhanging Prominent Logo */}
+          <div className="absolute left-1/2 -translate-x-1/2 top-1 z-50 flex justify-center items-center">
+            <Logo size={90} />
+          </div>
+
+          {/* Desktop Right Navigation */}
+          <nav className="hidden lg:flex items-center gap-6">
             <Dropdown
               label="Quiénes somos"
               items={[
@@ -59,10 +68,10 @@ export function Navbar() {
           </nav>
 
           {/* Right Mobile Actions */}
-          <div className="flex items-center gap-3 lg:hidden">
+          <div className="flex items-center gap-3 lg:hidden z-50">
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="p-2 rounded-xl bg-white/10 text-white hover:bg-white/20"
+              className="p-2 rounded-none border border-white/20 bg-white/10 text-white hover:bg-white/20"
               title="Menú"
             >
               {isMobileMenuOpen ? <FiX className="w-6 h-6" /> : <FiMenu className="w-6 h-6" />}

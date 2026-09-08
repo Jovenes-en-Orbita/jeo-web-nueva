@@ -4,14 +4,12 @@ import Link from 'next/link';
 interface LogoProps {
   /** Tamaño en píxeles del emblema circular (default: 44) */
   size?: number;
-  /** Mostrar el texto "Jóvenes en Órbita" al lado o debajo (default: true) */
+  /** Mostrar texto o prop legado (default: true) */
   showText?: boolean;
   /** Enlace opcional al hacer clic (default: '/') */
   href?: string;
   /** Clases CSS adicionales para el contenedor */
   className?: string;
-  /** Clases CSS para el texto */
-  textClassName?: string;
 }
 
 /**
@@ -23,7 +21,6 @@ export function Logo({
   showText = true,
   href = '/',
   className = '',
-  textClassName = '',
 }: LogoProps) {
   const content = (
     <div className={`inline-flex items-center gap-3 ${className} transition-transform duration-200 hover:scale-105`}>
@@ -41,16 +38,6 @@ export function Logo({
           priority
         />
       </div>
-
-      {/* Texto opcional */}
-      {showText && (
-        <div className="flex flex-col justify-center">
-          <span className={`font-[var(--font-montserrat)] font-extrabold text-white tracking-[0.06em] uppercase text-[17px] leading-tight ${textClassName}`}
-          >
-            JEO - Jóvenes en Órbita
-          </span>
-        </div>
-      )}
     </div>
   );
 
