@@ -112,11 +112,12 @@ export default async function NoticiaDetailPage({ params }: ArticlePageProps) {
           </div>
 
           {/* Hero Image */}
-          <div className="relative w-full h-[320px] md:h-[460px] rounded-2xl overflow-hidden mb-4 border border-white/10 bg-[#090d1a] shadow-2xl">
+          <div className="relative w-full h-[320px] md:h-[460px] rounded-none overflow-hidden mb-4 border border-white/10 bg-[#090d1a] shadow-2xl">
             <Image
               src={imageSrc}
               alt={article.title}
               fill
+              sizes="(max-width: 896px) 100vw, 896px"
               className="object-cover"
               priority
             />
@@ -128,7 +129,7 @@ export default async function NoticiaDetailPage({ params }: ArticlePageProps) {
           )}
 
           {/* Lead Summary */}
-          <div className="bg-[#0d162a] border-l-4 border-[var(--color-yellow)] p-6 rounded-r-xl mb-10">
+          <div className="bg-[#0d162a] border-l-4 border-[var(--color-yellow)] p-6 rounded-none mb-10">
             <p className="text-base md:text-lg text-slate-200 leading-relaxed font-medium">
               {article.summary}
             </p>

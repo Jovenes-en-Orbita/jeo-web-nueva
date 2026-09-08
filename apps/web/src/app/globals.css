@@ -150,6 +150,15 @@ section.block.alt {
   background: #F7F8FA;
 }
 
+/* ── Professional Technical Square Theme Overrides ── */
+.rounded-2xl,
+.rounded-3xl,
+.rounded-xl,
+.rounded-2xl,
+.rounded-3xl {
+  border-radius: 0px !important;
+}
+
 /* ── Responsive ── */
 @media (max-width: 900px) {
   .wrap {

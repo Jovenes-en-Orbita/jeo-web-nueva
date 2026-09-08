@@ -23,6 +23,7 @@ export async function Hero() {
           src="/assets/hero-cosmos.svg"
           alt="Jóvenes en Órbita — Divulgación Científica Espacial"
           fill
+          sizes="100vw"
           className="object-cover"
           priority
         />
@@ -30,7 +31,7 @@ export async function Hero() {
       </div>
 
       <div className="relative z-10 wrap w-full">
-        <div className="bg-[var(--color-navy)]/90 backdrop-blur-md text-white p-7 sm:p-9 max-w-[640px] animate-fade-in-up border-2 border-[var(--color-yellow)]/40 rounded-3xl shadow-2xl space-y-6">
+        <div className="bg-[var(--color-navy)]/90 backdrop-blur-md text-white p-7 sm:p-9 max-w-[640px] animate-fade-in-up border border-[var(--color-yellow)]/40 rounded-none shadow-2xl space-y-6">
           <div>
             <span className="text-[var(--color-yellow)] font-[var(--font-montserrat)] font-semibold text-xs sm:text-sm tracking-[0.14em] mb-2 block">
               Divulgación científica espacial

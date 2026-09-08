@@ -46,7 +46,6 @@ export function Navbar() {
               items={[
                 { label: 'Newsletter', href: '/newsletter' },
                 { label: 'Libros electrónicos', href: '/libros' },
-                { label: 'Redes sociales', href: '/redes' },
               ]}
             />
             <Dropdown
@@ -95,7 +94,6 @@ export function Navbar() {
               <div className="flex flex-col space-y-2 text-sm text-slate-300">
                 <Link href="/newsletter" onClick={() => setIsMobileMenuOpen(false)}>Newsletter</Link>
                 <Link href="/libros" onClick={() => setIsMobileMenuOpen(false)}>Libros electrónicos</Link>
-                <Link href="/redes" onClick={() => setIsMobileMenuOpen(false)}>Redes sociales</Link>
               </div>
             </div>
 

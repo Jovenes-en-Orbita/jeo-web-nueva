@@ -74,7 +74,7 @@ export interface UpdateMoonDto {
  * DTO para crear una colección de galería.
  */
 export interface CreateGalleryCollectionDto {
-  id: string;
+  id?: string;
   title: string;
   description: string;
   rotationFrequency?: string;

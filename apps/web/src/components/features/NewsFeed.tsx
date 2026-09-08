@@ -67,7 +67,7 @@ export function NewsFeed({ initialArticles }: NewsFeedProps) {
   return (
     <div className="wrap max-w-6xl mx-auto px-4 py-8">
       {/* Search & Filter Controls */}
-      <div className="mb-10 flex flex-col md:flex-row items-center justify-between gap-4 bg-[#0d162a] p-4 rounded-2xl border border-white/10">
+      <div className="mb-10 flex flex-col md:flex-row items-center justify-between gap-4 bg-[#0d162a] p-4 rounded-none border border-white/10">
         {/* Search Bar */}
         <div className="relative w-full md:w-80">
           <FiSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -76,7 +76,7 @@ export function NewsFeed({ initialArticles }: NewsFeedProps) {
             placeholder="Buscar noticias o temáticas..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-[#060a17] border border-white/10 pl-10 pr-4 py-2 rounded-xl text-sm text-white placeholder:text-slate-500 outline-none focus:border-[var(--color-yellow)] transition-colors"
+            className="w-full bg-[#060a17] border border-white/10 pl-10 pr-4 py-2 rounded-none text-sm text-white placeholder:text-slate-500 outline-none focus:border-[var(--color-yellow)] transition-colors"
           />
         </div>
 
@@ -86,7 +86,7 @@ export function NewsFeed({ initialArticles }: NewsFeedProps) {
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
-              className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
+              className={`px-3.5 py-1.5 rounded-none text-xs font-semibold whitespace-nowrap transition-all ${
                 selectedCategory === cat
                   ? 'bg-[var(--color-yellow)] text-[#060a17] shadow-lg shadow-amber-500/20'
                   : 'bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white border border-white/5'
@@ -99,7 +99,7 @@ export function NewsFeed({ initialArticles }: NewsFeedProps) {
       </div>
 
       {filteredArticles.length === 0 ? (
-        <div className="text-center py-16 bg-[#0d162a] rounded-2xl border border-white/10">
+        <div className="text-center py-16 bg-[#0d162a] rounded-none border border-white/10">
           <p className="text-lg text-slate-300 font-semibold mb-2">No se encontraron noticias</p>
           <p className="text-sm text-slate-400">Intenta buscar con otros términos o seleccionar otra categoría.</p>
           <button
@@ -107,7 +107,7 @@ export function NewsFeed({ initialArticles }: NewsFeedProps) {
               setSearchQuery('');
               setSelectedCategory('Todas');
             }}
-            className="mt-4 px-4 py-2 bg-[var(--color-yellow)] text-[#060a17] rounded-xl text-xs font-bold uppercase tracking-wider"
+            className="mt-4 px-4 py-2 bg-[var(--color-yellow)] text-[#060a17] rounded-none text-xs font-bold uppercase tracking-wider"
           >
             Limpiar filtros
           </button>
@@ -118,7 +118,7 @@ export function NewsFeed({ initialArticles }: NewsFeedProps) {
           {featuredArticle && (
             <Link
               href={`/noticias/${featuredArticle.slug}`}
-              className="group block bg-[#0d162a] border border-white/10 rounded-3xl overflow-hidden hover:border-[var(--color-yellow)]/60 transition-all duration-300 hover:-translate-y-1 shadow-2xl"
+              className="group block bg-[#0d162a] border border-white/10 rounded-none overflow-hidden hover:border-[var(--color-yellow)]/60 transition-all duration-300 hover:-translate-y-1 shadow-2xl"
             >
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
                 <div className="lg:col-span-7 relative h-[280px] sm:h-[360px] w-full bg-[#060a17] overflow-hidden">
@@ -126,10 +126,11 @@ export function NewsFeed({ initialArticles }: NewsFeedProps) {
                     src={getArticleImage(featuredArticle)}
                     alt={featuredArticle.title}
                     fill
+                    sizes="(max-width: 1024px) 100vw, 60vw"
                     className="object-cover transition-transform duration-700 group-hover:scale-105"
                     priority
                   />
-                  <div className="absolute top-4 left-4 bg-[var(--color-red)] text-white text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-full shadow-lg">
+                  <div className="absolute top-4 left-4 bg-[var(--color-red)] text-white text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-none shadow-lg">
                     Destacado
                   </div>
                 </div>
@@ -167,14 +168,15 @@ export function NewsFeed({ initialArticles }: NewsFeedProps) {
                 <Link
                   key={article.id}
                   href={`/noticias/${article.slug}`}
-                  className="bg-[#0d162a] border border-white/10 rounded-2xl p-6 group hover:border-[var(--color-yellow)]/50 transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between"
+                  className="bg-[#0d162a] border border-white/10 rounded-none p-6 group hover:border-[var(--color-yellow)]/50 transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between"
                 >
                   <div>
-                    <div className="relative w-full h-[200px] mb-5 rounded-xl overflow-hidden bg-[#090d1a]">
+                    <div className="relative w-full h-[200px] mb-5 rounded-none overflow-hidden bg-[#090d1a]">
                       <Image
                         src={getArticleImage(article)}
                         alt={article.title}
                         fill
+                        sizes="(max-width: 768px) 100vw, 50vw"
                         className="object-cover transition-transform duration-500 group-hover:scale-105"
                       />
                     </div>

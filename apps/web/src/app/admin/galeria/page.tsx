@@ -246,9 +246,15 @@ export default function AdminGaleriaPage() {
                     return (
                       <div
                         key={img.id || idx}
-                        className="group relative h-48 rounded-2xl overflow-hidden bg-[#060a17] border border-white/10 flex flex-col justify-between p-3"
+                        className="group relative h-48 rounded-none overflow-hidden bg-[#060a17] border border-white/10 flex flex-col justify-between p-3"
                       >
-                        <Image src={imageSrc} alt={img.alt} fill className="object-cover" />
+                        <Image
+                          src={imageSrc}
+                          alt={img.alt || 'Fotografía de galería'}
+                          fill
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 33vw, 25vw"
+                          className="object-cover"
+                        />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/40" />
 
                         <div className="relative z-10 flex justify-between items-start">

@@ -55,13 +55,14 @@ export async function GallerySection() {
             <Link
               key={img.id || i}
               href="/galeria"
-              className={`group cursor-pointer overflow-hidden rounded-2xl border border-white/10 relative hover:border-[var(--color-yellow)]/60 transition-all duration-300 bg-[#090d1a] ${i === 0 ? 'row-span-2 col-span-2' : ''
+              className={`group cursor-pointer overflow-hidden rounded-none border border-white/10 relative hover:border-[var(--color-yellow)]/60 transition-all duration-300 bg-[#090d1a] ${i === 0 ? 'row-span-2 col-span-2' : ''
                 }`}
             >
               <Image
                 src={img.url && img.url.trim() !== '' ? img.url : `/assets/gallery-${(i % 6) + 1}.svg`}
-                alt={img.alt}
+                alt={img.alt || 'Fotografía astronómica'}
                 fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 className="object-cover transition-transform duration-500 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">

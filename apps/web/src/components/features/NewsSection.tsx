@@ -53,14 +53,15 @@ export async function NewsSection() {
             <Link
               key={article.id}
               href={`/noticias/${article.slug}`}
-              className="bg-[#0d162a] border border-white/10 rounded-2xl p-5 group cursor-pointer hover:border-[var(--color-yellow)]/50 transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between"
+              className="bg-[#0d162a] border border-white/10 rounded-none p-5 group cursor-pointer hover:border-[var(--color-yellow)]/50 transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between"
             >
               <div>
-                <div className="relative w-full h-[180px] mb-4 rounded-xl overflow-hidden bg-[#090d1a] border border-white/5">
+                <div className="relative w-full h-[180px] mb-4 rounded-none overflow-hidden bg-[#090d1a] border border-white/5">
                   <Image
                     src={getArticleImage(article)}
                     alt={article.title}
                     fill
+                    sizes="(max-width: 900px) 100vw, 33vw"
                     className="object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                 </div>
