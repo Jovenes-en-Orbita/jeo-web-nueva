@@ -25,7 +25,7 @@ const socialLinks = [
  */
 export function Footer() {
   return (
-    <footer className="bg-[#050811] text-white border-t-[3px] border-[var(--color-yellow)] relative h-full flex flex-col justify-between">
+    <footer className="bg-black text-white border-t-[3px] border-[#d83933] relative h-full flex flex-col justify-between">
       {/* Centered Main Content Area */}
       <div className="flex-1 flex items-center justify-center py-6">
         <div className="wrap grid grid-cols-[1.4fr_1fr_1fr_1.1fr] gap-10 items-start max-[900px]:grid-cols-2 max-[600px]:grid-cols-1 w-full">
@@ -56,8 +56,9 @@ export function Footer() {
             <div className="flex flex-col space-y-2.5 font-[var(--font-poppins)]">
               {[
                 { label: 'El Universo', href: '/universo' },
-                { label: 'Sistema Solar', href: '/sistema-solar' },
-                { label: 'Constelaciones', href: '/constelaciones' },
+                // TODO: Secciones en desarrollo
+                // { label: 'Sistema Solar', href: '/sistema-solar' },
+                // { label: 'Constelaciones', href: '/constelaciones' },
                 { label: 'Noticias Espaciales', href: '/noticias' },
                 { label: 'Fragmentos de Memoria', href: '/galeria' },
               ].map((link) => (

@@ -55,7 +55,7 @@ export function GalleryViewer({ initialFeatured, collections }: GalleryViewerPro
   return (
     <div className="wrap max-w-6xl mx-auto px-4 py-8">
       {/* Header Info & Collection Switcher */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10 bg-[#0d162a] p-6 rounded-3xl border border-white/10">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 bg-[#0d162a] p-6 rounded-none border border-white/10">
         <div>
           <span className="text-xs uppercase tracking-widest text-[var(--color-yellow)] font-bold block mb-1">
             Colección Activa
@@ -63,44 +63,71 @@ export function GalleryViewer({ initialFeatured, collections }: GalleryViewerPro
           <h2 className="text-2xl font-bold text-white font-[var(--font-montserrat)]">
             {activeCollection.title}
           </h2>
-          <p className="text-xs text-slate-300 mt-1 max-w-xl">
-            {activeCollection.description}
-          </p>
+          {activeCollection.description && (
+            <p className="text-xs text-slate-300 mt-1 max-w-xl">
+              {activeCollection.description}
+            </p>
+          )}
         </div>
 
         <div className="flex items-center gap-3">
-          <span className="text-xs text-slate-400 bg-white/5 border border-white/10 px-3 py-1.5 rounded-full flex items-center gap-2">
+          <span className="text-xs text-slate-400 bg-white/5 border border-white/10 px-3.5 py-2 rounded-none flex items-center gap-2">
             <FiCamera className="text-[var(--color-yellow)]" />
-            <span>{images.length} fotografías en alta resolución</span>
+            <span>{images.length} fotografías</span>
           </span>
         </div>
       </div>
+
+      {/* Collection Switcher Pills */}
+      {collections.length > 1 && (
+        <div className="flex items-center gap-2 overflow-x-auto mb-8 pb-2 scrollbar-none">
+          {collections.map((col) => (
+            <button
+              key={col.id}
+              onClick={() => {
+                setSelectedCollectionId(col.id);
+                setActiveImageIndex(null);
+              }}
+              className={`px-4 py-2.5 rounded-none text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+                activeCollection.id === col.id
+                  ? 'bg-[var(--color-yellow)] text-[#060a17] shadow-lg shadow-amber-500/20'
+                  : 'bg-[#0d162a] text-slate-300 hover:bg-white/10 hover:text-white border border-white/10'
+              }`}
+            >
+              📷 {col.title} ({col.images?.length ?? 0})
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* Gallery Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {images.map((img, idx) => {
           const imageSrc =
-            img.url && img.url.startsWith('/') ? img.url : `/assets/gallery-${(idx % 6) + 1}.svg`;
+            img.url && img.url.trim() !== ''
+              ? img.url
+              : `/assets/gallery-${(idx % 6) + 1}.svg`;
 
           return (
             <div
               key={img.id || idx}
               onClick={() => handleOpenLightbox(idx)}
-              className="group relative h-[280px] rounded-2xl overflow-hidden bg-[#0d162a] border border-white/10 cursor-pointer hover:border-[var(--color-yellow)]/60 transition-all duration-300 hover:-translate-y-1 shadow-xl"
+              className="group relative h-[280px] rounded-none overflow-hidden bg-[#0d162a] border border-white/10 cursor-pointer hover:border-[var(--color-yellow)]/60 transition-all duration-300 hover:-translate-y-1 shadow-xl"
             >
               <Image
                 src={imageSrc}
-                alt={img.alt}
+                alt={img.alt || 'Fotografía astronómica'}
                 fill
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                 className="object-cover transition-transform duration-700 group-hover:scale-105"
               />
 
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-5">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold text-white drop-shadow">
-                    {img.alt}
+                    {img.alt || 'Ver fotografía'}
                   </span>
-                  <div className="p-2 rounded-full bg-white/20 backdrop-blur-md text-white">
+                  <div className="p-2 rounded-none bg-white/20 backdrop-blur-md text-white">
                     <FiMaximize2 className="w-3.5 h-3.5" />
                   </div>
                 </div>
@@ -132,7 +159,7 @@ export function GalleryViewer({ initialFeatured, collections }: GalleryViewerPro
             <div className="flex items-center gap-3">
               <button
                 onClick={handleCloseLightbox}
-                className="p-2.5 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+                className="p-2.5 rounded-none bg-white/10 hover:bg-white/20 text-white transition-colors"
                 title="Cerrar (Esc)"
               >
                 <FiX className="w-5 h-5" />
@@ -145,7 +172,7 @@ export function GalleryViewer({ initialFeatured, collections }: GalleryViewerPro
             {/* Prev Button */}
             <button
               onClick={handlePrev}
-              className="absolute left-2 md:-left-12 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/10 hover:bg-[var(--color-yellow)] hover:text-[#060a17] text-white transition-all z-20"
+              className="absolute left-2 md:-left-12 top-1/2 -translate-y-1/2 p-3 rounded-none bg-white/10 hover:bg-[var(--color-yellow)] hover:text-[#060a17] text-white transition-all z-20"
               title="Foto anterior (Flecha izquierda)"
             >
               <FiChevronLeft className="w-6 h-6" />
@@ -154,21 +181,22 @@ export function GalleryViewer({ initialFeatured, collections }: GalleryViewerPro
             {/* Next Button */}
             <button
               onClick={handleNext}
-              className="absolute right-2 md:-right-12 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/10 hover:bg-[var(--color-yellow)] hover:text-[#060a17] text-white transition-all z-20"
+              className="absolute right-2 md:-right-12 top-1/2 -translate-y-1/2 p-3 rounded-none bg-white/10 hover:bg-[var(--color-yellow)] hover:text-[#060a17] text-white transition-all z-20"
               title="Foto siguiente (Flecha derecha)"
             >
               <FiChevronRight className="w-6 h-6" />
             </button>
 
-            <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-2xl border border-white/10 bg-[#090d1a]">
+            <div className="relative w-full h-full rounded-none overflow-hidden shadow-2xl border border-white/10 bg-[#090d1a]">
               <Image
                 src={
-                  currentImage.url && currentImage.url.startsWith('/')
+                  currentImage.url && currentImage.url.trim() !== ''
                     ? currentImage.url
                     : `/assets/gallery-${((activeImageIndex ?? 0) % 6) + 1}.svg`
                 }
-                alt={currentImage.alt}
+                alt={currentImage.alt || 'Fotografía ampliada'}
                 fill
+                sizes="100vw"
                 className="object-contain"
                 priority
               />
@@ -176,7 +204,7 @@ export function GalleryViewer({ initialFeatured, collections }: GalleryViewerPro
           </div>
 
           {/* Bottom Info Bar */}
-          <div className="w-full max-w-3xl bg-white/5 border border-white/10 backdrop-blur-xl p-4 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4 z-10">
+          <div className="w-full max-w-3xl bg-white/5 border border-white/10 backdrop-blur-xl p-4 rounded-none flex flex-col sm:flex-row items-center justify-between gap-4 z-10">
             <div className="flex items-start gap-2.5 text-xs text-slate-300">
               <FiInfo className="w-4 h-4 text-[var(--color-yellow)] flex-shrink-0 mt-0.5" />
               <p>{currentImage.caption || currentImage.alt}</p>
@@ -184,12 +212,12 @@ export function GalleryViewer({ initialFeatured, collections }: GalleryViewerPro
 
             <a
               href={
-                currentImage.url && currentImage.url.startsWith('/')
+                currentImage.url && currentImage.url.trim() !== ''
                   ? currentImage.url
                   : `/assets/gallery-${((activeImageIndex ?? 0) % 6) + 1}.svg`
               }
               download
-              className="flex items-center gap-1.5 px-4 py-2 bg-[var(--color-yellow)] text-[#060a17] rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-white transition-colors flex-shrink-0"
+              className="flex items-center gap-1.5 px-4 py-2 bg-[var(--color-yellow)] text-[#060a17] rounded-none text-xs font-bold uppercase tracking-wider hover:bg-white transition-colors flex-shrink-0"
             >
               <FiDownload className="w-3.5 h-3.5" />
               <span>Descargar</span>

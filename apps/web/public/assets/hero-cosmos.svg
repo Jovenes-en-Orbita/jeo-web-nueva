@@ -18,6 +18,4 @@
   <circle cx="400" cy="210" r="55" fill="#0284c7" opacity="0.8" />
   <circle cx="370" cy="190" r="15" fill="#38bdf8" opacity="0.6" />
 </g>
-    <text x="400" y="415" font-family="system-ui, -apple-system, sans-serif" font-weight="bold" font-size="22" fill="#ffffff" text-anchor="middle" letter-spacing="1.5">JÓVENES EN ÓRBITA</text>
-    <text x="400" y="445" font-family="system-ui, -apple-system, sans-serif" font-size="14" fill="#94a3b8" text-anchor="middle">Divulgación científica espacial juvenil</text>
   </svg>

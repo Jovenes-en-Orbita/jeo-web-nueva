@@ -70,7 +70,7 @@ Los tokens de diseño están definidos en `globals.css`:
 /* Colores principales */
 --color-navy: #0B1B33;      /* Azul Marino Principal */
 --color-navy-2: #122548;    /* Azul Marino Secundario */
---color-yellow: #FFC72C;    /* Amarillo Acento */
+--color-yellow: #d83933;    /* Amarillo Acento */
 --color-red: #E4002B;       /* Rojo Acento */
 --color-line: #D9D9D9;      /* Líneas y Separadores */
 --color-ink: #111111;       /* Texto Principal */

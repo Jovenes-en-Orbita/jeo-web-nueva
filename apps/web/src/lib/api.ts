@@ -32,18 +32,25 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
  * Envoltorio principal para llamadas a la API de NestJS.
  */
 async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> {
-  const res = await fetch(`${API_BASE}${endpoint}`, {
-    next: { revalidate: 30 },
-    ...options,
-  });
+  try {
+    const res = await fetch(`${API_BASE}${endpoint}`, {
+      next: { revalidate: 30 },
+      ...options,
+    });
 
-  if (!res.ok) {
-    const errorText = await res.text().catch(() => res.statusText);
-    throw new Error(`API Error [${res.status}] ${endpoint}: ${errorText}`);
+    if (!res.ok) {
+      const errorText = await res.text().catch(() => res.statusText);
+      throw new Error(`API Error [${res.status}] ${endpoint}: ${errorText}`);
+    }
+
+    const json: ApiResponse<T> = await res.json();
+    return json.data;
+  } catch (err) {
+    if (process.env.NODE_ENV === 'development') {
+      // Capturar silenciosamente en desarrollo si el backend se está iniciando
+    }
+    throw err;
   }
-
-  const json: ApiResponse<T> = await res.json();
-  return json.data;
 }
 
 /**

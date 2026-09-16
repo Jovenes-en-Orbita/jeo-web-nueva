@@ -77,7 +77,7 @@ export function Dropdown({
 
       {/* Dropdown menu con puente de hover invisible */}
       <div
-        className={`absolute top-full right-0 bg-white text-[var(--color-ink)] min-w-[210px] border-t-[3px] border-[var(--color-yellow)] shadow-[0_12px_28px_rgba(0,0,0,0.18)] z-30 transition-all duration-200 origin-top before:content-[''] before:absolute before:-top-4 before:left-0 before:right-0 before:h-4 ${
+        className={`absolute top-full left-0 bg-[#0a0a0a] text-white min-w-[220px] border border-white/10 border-t-[3px] border-t-[#d83933] shadow-2xl z-50 transition-all duration-200 origin-top before:content-[''] before:absolute before:-top-4 before:left-0 before:right-0 before:h-4 ${
           open
             ? 'opacity-100 scale-y-100 pointer-events-auto mt-1'
             : 'opacity-0 scale-y-95 pointer-events-none mt-2'
@@ -88,8 +88,8 @@ export function Dropdown({
             key={item.href + i}
             href={item.href}
             onClick={() => setOpen(false)}
-            className={`block px-4 py-2.5 font-[var(--font-poppins)] text-[13px] font-medium normal-case tracking-normal transition-colors duration-150 hover:bg-[#F2F4F7] hover:underline ${
-              i < items.length - 1 ? 'border-b border-[var(--color-line)]' : ''
+            className={`block px-4 py-3 font-[var(--font-poppins)] text-xs font-semibold normal-case tracking-wide text-slate-200 transition-colors duration-150 hover:bg-[#161616] hover:text-[#d83933] ${
+              i < items.length - 1 ? 'border-b border-white/10' : ''
             }`}
           >
             {item.label}

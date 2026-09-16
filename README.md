@@ -210,3 +210,5 @@ El frontend implementa fielmente todas las secciones del wireframe original:
 ## 📄 Licencia
 
 Este proyecto es privado. Todos los derechos reservados.
+
+qwdqwdqwqwdqwwwwwwwwwwww

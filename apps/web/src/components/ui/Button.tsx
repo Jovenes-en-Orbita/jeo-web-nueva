@@ -18,11 +18,11 @@ export function Button({
   let borderColor = 'border-[var(--color-red)]';
 
   if (variant === 'gold') {
-    textColor = 'text-[#FFC72C] hover:text-white';
-    borderColor = 'border-[#FFC72C]';
+    textColor = 'text-[#d83933] hover:text-white';
+    borderColor = 'border-[#d83933]';
   } else if (variant === 'light') {
-    textColor = 'text-white hover:text-[#FFC72C]';
-    borderColor = 'border-[#FFC72C]';
+    textColor = 'text-white hover:text-[#d83933]';
+    borderColor = 'border-[#d83933]';
   }
 
   return (

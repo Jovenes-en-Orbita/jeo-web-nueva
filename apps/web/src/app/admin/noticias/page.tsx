@@ -70,7 +70,7 @@ export default function AdminNoticiasPage() {
     setAuthor('Equipo JEO');
     setTagsStr('Misiones Espaciales, Cosmos');
     setReadTimeMinutes(4);
-    setImageUrl('/assets/artemis.svg');
+    setImageUrl('');
     setCoverImageCaption('');
     setContent('# Título de la noticia\n\nEscribe aquí el contenido...');
     setFormError('');
