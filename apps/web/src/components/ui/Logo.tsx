@@ -9,7 +9,7 @@ interface LogoProps {
   /** Enlace opcional al hacer clic (default: '/') */
   href?: string;
   /** Clases CSS adicionales para el contenedor */
-  className?: string;
+  className?: string; wefqfq
 }
 
 /**
