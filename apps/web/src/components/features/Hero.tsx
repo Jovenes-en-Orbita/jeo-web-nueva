@@ -39,11 +39,12 @@ export async function Hero() {
             <h1 className="font-[var(--font-montserrat)] font-bold text-3xl sm:text-5xl leading-tight mb-3 uppercase tracking-[0.02em]">
               Jóvenes en Órbita
             </h1>
-            <p className="text-sm sm:text-base leading-relaxed text-[#D6DCE6] m-0 font-[var(--font-poppins)]">
+            <p className="text-sm sm:text-base leading-relaxed text-[#D6DCE6] m-0 font-[var(--font-poppins)]" >
               Exploramos el universo, el sistema solar y las noticias del espacio
               con rigurosidad, pasión y cercanía.
             </p>
           </div>
+
 
           {/* Integrated Statistics Grid */}
           <div className="pt-5 border-t border-white/15 grid grid-cols-2 sm:grid-cols-4 gap-4">

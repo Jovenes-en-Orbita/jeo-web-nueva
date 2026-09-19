@@ -21,8 +21,8 @@ export function Navbar() {
 
   return (
     <>
-      <header className="bg-black border-b-[3px] border-[#d83933] relative text-white sticky top-0 z-40 shadow-xl">
-        <div className="wrap relative flex justify-between items-center h-[76px] px-4 md:px-6">
+      <header className="bg-slate-950 border-b-[3px] border-[#d83933] relative text-white sticky top-0 z-40 shadow-xl">
+        <div className="wrap relative flex justify-evenly items-center h-[96px] px-4 md:px-6 md:justify-around">
 
           {/* Mobile Layout Left */}
           <div className="flex lg:hidden items-center">
@@ -31,30 +31,10 @@ export function Navbar() {
             </Link>
           </div>
 
-          {/* Desktop Left Navigation */}
-          <nav className="hidden lg:flex items-center gap-6">
-            <Dropdown
-              label="Cosmos"
-              items={[
-                { label: 'El Universo', href: '/universo' },
-                { label: 'Noticias Espaciales', href: '/noticias' },
-                { label: 'Fragmentos de Memoria', href: '/galeria' },
-              ]}
-            />
-            <Dropdown
-              label="Multimedia"
-              items={[
-                { label: 'Newsletter', href: '/newsletter' },
-                { label: 'Libros electrónicos', href: '/libros' },
-              ]}
-            />
-          </nav>
-
           {/* Centered Overhanging Prominent Logo */}
-          <div className="absolute left-1/2 -translate-x-1/2 top-1 z-50 flex justify-center items-center">
-            <Logo size={90} />
+          <div className="relative z-50 flex justify-center items-center  ">
+            <Logo size={80} />
           </div>
-
           {/* Desktop Right Navigation */}
           <nav className="hidden lg:flex items-center gap-6">
             <Dropdown
@@ -66,7 +46,24 @@ export function Navbar() {
               ]}
             />
           </nav>
-
+          {/* Desktop Left Navigation */}
+          <nav className="relative hidden lg:flex items-center gap-6">
+            <Dropdown
+              label="Cosmos"
+              items={[
+                { label: 'El Universo', href: '/universo' },
+                { label: 'Fragmentos de Memoria', href: '/galeria' },
+              ]}
+            />
+            <Dropdown
+              label="Multimedia"
+              items={[
+                { label: 'Noticias Espaciales', href: '/noticias' },
+                { label: 'Newsletter', href: '/newsletter' },
+                { label: 'Libros electrónicos', href: '/libros' },
+              ]}
+            />
+          </nav>
           {/* Right Mobile Actions */}
           <div className="flex items-center gap-3 lg:hidden z-50">
             <button

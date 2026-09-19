@@ -34,3 +34,5 @@ yarn-error.log*
 apps/api/prisma/*.db
 
 .vercel
+
+/generated/prisma
