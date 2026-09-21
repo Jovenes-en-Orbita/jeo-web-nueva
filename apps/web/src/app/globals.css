@@ -110,6 +110,24 @@ a {
 }
 
 /* ── Animations ── */
+@keyframes colorswheel {
+  0% {
+      background-position: 0% center;
+    }
+    100%{
+      background-position: 100% center;
+    }
+}
+.animate-colorwheel{
+  /*Colors match the carousel*/
+  background: linear-gradient(to left, red, orange, yellow,
+  blue,purple,violet,white,red);
+  animation: colorswheel 25s ease-in forwards infinite  ;
+  background-size: 2000%;
+  background-clip: text;
+  color: transparent;
+} 
+
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -122,11 +140,11 @@ a {
   }
 }
 
+
 @keyframes fadeIn {
   from {
     opacity: 0;
   }
-
   to {
     opacity: 1;
   }

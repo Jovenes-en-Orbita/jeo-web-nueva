@@ -29,8 +29,8 @@ export async function Hero() {
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/95 via-black/70 to-transparent" />
       </div>
-
-      <div className="relative z-10 wrap w-full">
+        {/* Hidden por si se reutiliza */}
+      <div className="relative z-10 wrap w-full hidden">
         <div className="bg-black/90 backdrop-blur-md text-white p-7 sm:p-9 max-w-[640px] animate-fade-in-up border border-[#d83933]/60 rounded-none shadow-2xl space-y-6">
           <div>
             <span className="text-[#d83933] font-[var(--font-montserrat)] font-bold text-xs sm:text-sm tracking-[0.14em] mb-2 block uppercase">
@@ -59,6 +59,24 @@ export async function Hero() {
               </div>
             ))}
           </div>
+        </div>
+      </div>
+      <div className="animation-spin relative wrap w-full left-border border-l-4 flex-[3-1] flex flex-col gap-y-4"> 
+        <div className="flex-1 ">
+          <span className="font-[var(--font-montserrat)] font-bold text-3xl sm:text-6xl leading-tight mb-3 uppercase tracking-[0.02em]">
+              Jóvenes
+            </span>
+        </div>
+        <div className="flex-1 ">
+          <span className="font-[var(--font-montserrat)] animate-colorwheel text-blue-900 font-bold text-2xl sm:text-4xl leading-tight mb-3 uppercase tracking-[0.02em]">
+            En Órbita
+          </span>
+        </div>
+        <div className="w-1/2 hidden md:block">
+          <span className="font-[var(--font-montserrat)] text-white-400/75 font-bold md:text-xs leading-tight mb-3 uppercase tracking-[0.02em]" >
+            Exploramos el universo, el sistema solar y las noticias del espacio
+            con rigurosidad, pasión y cercanía.
+          </span>
         </div>
       </div>
     </section>

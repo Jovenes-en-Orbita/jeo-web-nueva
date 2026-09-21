@@ -21,7 +21,7 @@ export function Navbar() {
 
   return (
     <>
-      <header className="bg-slate-950 border-b-[3px] border-[#d83933] relative text-white sticky top-0 z-40 shadow-xl">
+      <header className="bg-slate-950 border-b-[3px] border-[#ECECF6] relative text-white sticky top-0 z-40 shadow-xl">
         <div className="wrap relative flex justify-evenly items-center h-[96px] px-4 md:px-6 md:justify-around">
 
           {/* Mobile Layout Left */}
@@ -41,7 +41,7 @@ export function Navbar() {
               label="Quiénes somos"
               items={[
                 { label: 'Conoce a JEO', href: '/nosotros' },
-                { label: 'Ecosistema Espacial Argentino', href: '/ecosistema' },
+                
                 { label: 'Unite a nosotros', href: '/unite' },
               ]}
             />
@@ -59,6 +59,7 @@ export function Navbar() {
               label="Multimedia"
               items={[
                 { label: 'Noticias Espaciales', href: '/noticias' },
+                { label: 'Ecosistema Espacial Argentino', href: '/ecosistema' },
                 { label: 'Newsletter', href: '/newsletter' },
                 { label: 'Libros electrónicos', href: '/libros' },
               ]}

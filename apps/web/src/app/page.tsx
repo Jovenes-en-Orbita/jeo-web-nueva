@@ -19,7 +19,7 @@ export default function Home() {
         {/* TODO: Sección Sistema Solar en desarrollo (Oculta temporalmente) */}
         {/* <SolarSystemSection /> */}
         {/* TODO: Sección Constelaciones en desarrollo (Oculta temporalmente) */}
-        {/* <ConstellationsSection /> */}
+        <ConstellationsSection />
         <NewsSection />
         <GallerySection />
         <ExploreSection />
