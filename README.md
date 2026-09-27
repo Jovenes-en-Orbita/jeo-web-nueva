@@ -31,12 +31,12 @@ jeo-monorepo/
 └── pnpm-workspace.yaml
 ```
 
-| Capa | Tecnología | Puerto |
-|------|-----------|--------|
-| **Frontend** | Next.js 16 (App Router), React 19, Tailwind CSS 4 | `3000` |
-| **Backend** | NestJS 10, Prisma ORM | `3001` |
-| **Base de datos** | PostgreSQL 16 | `5432` |
-| **Monorepo** | pnpm workspaces + Turborepo | — |
+| Capa              | Tecnología                                        | Puerto |
+| ----------------- | ------------------------------------------------- | ------ |
+| **Frontend**      | Next.js 16 (App Router), React 19, Tailwind CSS 4 | `3000` |
+| **Backend**       | NestJS 10, Prisma ORM                             | `3001` |
+| **Base de datos** | PostgreSQL 16                                     | `5432` |
+| **Monorepo**      | pnpm workspaces + Turborepo                       | —      |
 
 ## 🚀 Inicio Rápido
 
@@ -45,7 +45,7 @@ jeo-monorepo/
 - [Node.js](https://nodejs.org/) ≥ 20
 - [pnpm](https://pnpm.io/) ≥ 9 (`corepack enable && corepack prepare pnpm@9.15.4 --activate`)
 - [PostgreSQL](https://www.postgresql.org/) 16 (o PostgreSQL local)
-- [Docker](https://www.docker.com/) y Docker Compose *(Pospuesto / TODO)*
+- [Docker](https://www.docker.com/) y Docker Compose _(Pospuesto / TODO)_
 
 ### Opción A: Desarrollo Local
 
@@ -75,10 +75,10 @@ pnpm dev
 
 > **💡 Tip:** El frontend funciona **sin el backend** gracias al sistema de fallback data integrado. Podés correr solo `pnpm --filter @jeo/web dev` para trabajar en la UI.
 
-### Opción B: Docker Compose *(Pospuesto / TODO)*
+### Opción B: Docker Compose _(Pospuesto / TODO)_
 
 > **📌 Nota:** La integración con Docker está deshabilitada temporalmente (TODO: Re-implementar Docker Compose en el futuro).
-> 
+>
 > ```bash
 > # TODO: Descomentar services en docker-compose.yml antes de ejecutar:
 > # docker compose up --build
@@ -86,16 +86,16 @@ pnpm dev
 
 ## 📜 Scripts Disponibles
 
-| Script | Descripción |
-|--------|-------------|
-| `pnpm dev` | Inicia ambas apps en modo desarrollo (Turborepo) |
-| `pnpm build` | Build de producción de todas las apps |
-| `pnpm lint` | Ejecuta linters en todo el monorepo |
-| `pnpm clean` | Limpia carpetas de build (`dist/`, `.next/`) |
-| `pnpm db:generate` | Genera el Prisma Client |
-| `pnpm db:migrate` | Ejecuta migraciones de Prisma |
-| `pnpm db:push` | Sincroniza el schema sin crear migración |
-| `pnpm db:seed` | Puebla la base de datos con datos iniciales |
+| Script             | Descripción                                      |
+| ------------------ | ------------------------------------------------ |
+| `pnpm dev`         | Inicia ambas apps en modo desarrollo (Turborepo) |
+| `pnpm build`       | Build de producción de todas las apps            |
+| `pnpm lint`        | Ejecuta linters en todo el monorepo              |
+| `pnpm clean`       | Limpia carpetas de build (`dist/`, `.next/`)     |
+| `pnpm db:generate` | Genera el Prisma Client                          |
+| `pnpm db:migrate`  | Ejecuta migraciones de Prisma                    |
+| `pnpm db:push`     | Sincroniza el schema sin crear migración         |
+| `pnpm db:seed`     | Puebla la base de datos con datos iniciales      |
 
 Para ejecutar scripts en una app específica:
 
@@ -132,36 +132,36 @@ Todos los endpoints están bajo el prefijo `/api` y devuelven el formato estanda
 }
 ```
 
-| Método | Endpoint | Descripción |
-|--------|----------|-------------|
-| `GET` | `/api/stats` | Estadísticas de la franja superior |
-| `GET` | `/api/news` | Lista de noticias espaciales |
-| `GET` | `/api/news/:slug` | Detalle de noticia por slug |
-| `GET` | `/api/universe` | Datos de la sección El Universo |
-| `GET` | `/api/universe/tabs` | Pestañas del universo |
-| `GET` | `/api/solar-system` | Sección completa (planetas + lunas) |
-| `GET` | `/api/solar-system/planets` | Lista de planetas |
-| `GET` | `/api/solar-system/moons` | Lista de lunas |
-| `GET` | `/api/constellations` | Sección constelaciones |
-| `GET` | `/api/gallery` | Todas las colecciones |
-| `GET` | `/api/gallery/featured` | Colección destacada |
+| Método | Endpoint                    | Descripción                         |
+| ------ | --------------------------- | ----------------------------------- |
+| `GET`  | `/api/stats`                | Estadísticas de la franja superior  |
+| `GET`  | `/api/news`                 | Lista de noticias espaciales        |
+| `GET`  | `/api/news/:slug`           | Detalle de noticia por slug         |
+| `GET`  | `/api/universe`             | Datos de la sección El Universo     |
+| `GET`  | `/api/universe/tabs`        | Pestañas del universo               |
+| `GET`  | `/api/solar-system`         | Sección completa (planetas + lunas) |
+| `GET`  | `/api/solar-system/planets` | Lista de planetas                   |
+| `GET`  | `/api/solar-system/moons`   | Lista de lunas                      |
+| `GET`  | `/api/constellations`       | Sección constelaciones              |
+| `GET`  | `/api/gallery`              | Todas las colecciones               |
+| `GET`  | `/api/gallery/featured`     | Colección destacada                 |
 
-## 🐳 Docker *(Pospuesto / TODO)*
+## 🐳 Docker _(Pospuesto / TODO)_
 
 > **⚠️ Estado:** La configuración de Docker está deshabilitada temporalmente (archivos comentados con notas `TODO`).
 
-- **`apps/api/Dockerfile`** — *(TODO)* Multi-stage build para NestJS con Prisma
-- **`apps/web/Dockerfile`** — *(TODO)* Multi-stage build con Next.js `standalone` output
-- **`docker-compose.yml`** — *(TODO)* Orquestación de servicios PostgreSQL, API y Web
+- **`apps/api/Dockerfile`** — _(TODO)_ Multi-stage build para NestJS con Prisma
+- **`apps/web/Dockerfile`** — _(TODO)_ Multi-stage build con Next.js `standalone` output
+- **`docker-compose.yml`** — _(TODO)_ Orquestación de servicios PostgreSQL, API y Web
 
 ### Variables de Entorno
 
-| Variable | App | Default | Descripción |
-|----------|-----|---------|-------------|
-| `DATABASE_URL` | api | — | Connection string de PostgreSQL |
-| `PORT` | api | `3001` | Puerto del servidor |
-| `CORS_ORIGIN` | api | `http://localhost:3000` | Origen permitido para CORS |
-| `NEXT_PUBLIC_API_URL` | web | `http://localhost:3001/api` | URL base de la API |
+| Variable              | App | Default                     | Descripción                     |
+| --------------------- | --- | --------------------------- | ------------------------------- |
+| `DATABASE_URL`        | api | —                           | Connection string de PostgreSQL |
+| `PORT`                | api | `3001`                      | Puerto del servidor             |
+| `CORS_ORIGIN`         | api | `http://localhost:3000`     | Origen permitido para CORS      |
+| `NEXT_PUBLIC_API_URL` | web | `http://localhost:3001/api` | URL base de la API              |
 
 ## 🧩 Paquete Compartido (`@jeo/shared`)
 
@@ -172,7 +172,7 @@ Tipos TypeScript compartidos entre frontend y backend para **End-to-End Type Saf
 - DTOs de creación (`CreateNewsDto`)
 
 ```typescript
-import type { ApiResponse, NewsArticle } from '@jeo/shared';
+import type { ApiResponse, NewsArticle } from "@jeo/shared";
 ```
 
 ## 📁 Secciones del Wireframe
@@ -195,20 +195,18 @@ El frontend implementa fielmente todas las secciones del wireframe original:
 
 ## 🛠️ Tech Stack Detallado
 
-| Categoría | Tecnología |
-|-----------|-----------|
-| **Lenguaje** | TypeScript 5.9 (strict mode) |
-| **Frontend** | Next.js 16 (App Router, RSC), React 19, Tailwind CSS 4 |
-| **Backend** | NestJS 10, Express |
-| **ORM** | Prisma 6 |
-| **Base de datos** | PostgreSQL 16 |
-| **Validación** | class-validator, class-transformer |
-| **Monorepo** | pnpm workspaces, Turborepo |
-| **Containerización** | Docker, Docker Compose *(Pospuesto / TODO)* |
-| **Fonts** | Montserrat, Poppins (via `next/font/google`) |
+| Categoría            | Tecnología                                             |
+| -------------------- | ------------------------------------------------------ |
+| **Lenguaje**         | TypeScript 5.9 (strict mode)                           |
+| **Frontend**         | Next.js 16 (App Router, RSC), React 19, Tailwind CSS 4 |
+| **Backend**          | NestJS 10, Express                                     |
+| **ORM**              | Prisma 6                                               |
+| **Base de datos**    | PostgreSQL 16                                          |
+| **Validación**       | class-validator, class-transformer                     |
+| **Monorepo**         | pnpm workspaces, Turborepo                             |
+| **Containerización** | Docker, Docker Compose _(Pospuesto / TODO)_            |
+| **Fonts**            | Montserrat, Poppins (via `next/font/google`)           |
 
 ## 📄 Licencia
 
 Este proyecto es privado. Todos los derechos reservados.
-
-qwdqwdqwqwdqwwwwwwwwwwww
