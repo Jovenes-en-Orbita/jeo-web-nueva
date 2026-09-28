@@ -1,0 +1,56 @@
+name: CI - Integración Continua
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  build-and-test:
+    name: Build, Lint & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repositorio
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configurar pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9.15.4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Caché de Turborepo
+        uses: actions/cache@v4
+        with:
+          path: .turbo/cache
+          key: ${{ runner.os }}-turbo-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-
+
+      - name: Instalación de dependencias
+        run: pnpm install --frozen-lockfile
+
+      - name: Generar Prisma Client
+        run: pnpm db:generate
+
+      - name: Ejecutar Linting (Format & Static Analysis)
+        run: pnpm lint
+
+      - name: Ejecutar Compilación (Build)
+        run: pnpm build
+
+      - name: Ejecutar Pruebas (Unit Tests)
+        run: pnpm test
