@@ -11,28 +11,28 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 📥 Checkout repositorio
+      - name: Checkout repositorio
         uses: actions/checkout@v4
 
-      - name: 🟢 Configurar pnpm
+      - name: Configurar pnpm
         uses: pnpm/action-setup@v3
         with:
           version: 9.15.4
 
-      - name: 🟢 Configurar Node.js
+      - name: Configurar Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'pnpm'
 
-      - name: 📦 Instalación de dependencias
+      - name: Instalación de dependencias
         run: pnpm install --frozen-lockfile
 
-      - name: 🗄️ Generar Prisma Client
+      - name: Generar Prisma Client
         run: pnpm db:generate
 
-      - name: 🛠️ Verificación Build de Producción
+      - name: Verificación Build de Producción
         run: pnpm build
 
-      - name: 🚀 Notificar listo para despliegue
-        run: echo "Compilación de producción exitosa. Listo para conectar Vercel/Railway tokens."
+      - name: Notificar listo para despliegue
+        run: echo "Compilación de producción exitosa. Listo para conectar Vercel tokens."
