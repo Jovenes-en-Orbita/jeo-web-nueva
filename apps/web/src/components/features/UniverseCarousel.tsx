@@ -12,8 +12,13 @@ import { TooltipCursor } from "@/components/ui/TooltipCursor";
 
 export function UniverseCarousel() {
   const scrollRef = useRef<HTMLDivElement>(null);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(true);
+  // Triple array for seamless infinite scroll
+  const items = [
+    ...UNIVERSE_STRUCTURES.map((s) => ({ ...s, uniqueKey: `set1-${s.id}` })),
+    ...UNIVERSE_STRUCTURES.map((s) => ({ ...s, uniqueKey: `set2-${s.id}` })),
+    ...UNIVERSE_STRUCTURES.map((s) => ({ ...s, uniqueKey: `set3-${s.id}` })),
+  ];
+
   const [isHovered, setIsHovered] = useState(false);
   const [selectedStructure, setSelectedStructure] =
     useState<UniverseStructure | null>(null);
@@ -33,20 +38,48 @@ export function UniverseCarousel() {
   const startXRef = useRef(0);
   const scrollLeftStartRef = useRef(0);
   const dragMovedRef = useRef(false);
+  const isResettingRef = useRef(false);
 
-  // Check scroll positions to enable/disable arrow buttons
-  const checkScroll = () => {
-    if (!scrollRef.current) return;
-    const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
-    setCanScrollLeft(scrollLeft > 5);
-    setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 5);
-  };
-
+  // Initialize scroll position in the middle set
   useEffect(() => {
-    checkScroll();
-    window.addEventListener("resize", checkScroll);
-    return () => window.removeEventListener("resize", checkScroll);
+    const el = scrollRef.current;
+    if (!el) return;
+
+    const timer = setTimeout(() => {
+      if (el) {
+        const singleSetWidth = el.scrollWidth / 3;
+        el.scrollLeft = singleSetWidth;
+      }
+    }, 50);
+
+    return () => clearTimeout(timer);
   }, []);
+
+  // Handle infinite wrap-around on scroll
+  const handleScroll = () => {
+    const el = scrollRef.current;
+    if (!el || isResettingRef.current) return;
+
+    const singleSetWidth = el.scrollWidth / 3;
+    if (singleSetWidth <= 0) return;
+
+    // If reached set 1 (scrolled too far left), jump to set 2 seamlessly
+    if (el.scrollLeft < singleSetWidth * 0.2) {
+      isResettingRef.current = true;
+      el.scrollLeft += singleSetWidth;
+      requestAnimationFrame(() => {
+        isResettingRef.current = false;
+      });
+    }
+    // If reached set 3 (scrolled too far right), jump back to set 2 seamlessly
+    else if (el.scrollLeft > singleSetWidth * 1.8) {
+      isResettingRef.current = true;
+      el.scrollLeft -= singleSetWidth;
+      requestAnimationFrame(() => {
+        isResettingRef.current = false;
+      });
+    }
+  };
 
   // Autoplay functionality: scroll horizontally smoothly every 3.2 seconds, pause when hovering or dragging
   useEffect(() => {
@@ -54,14 +87,7 @@ export function UniverseCarousel() {
 
     const interval = setInterval(() => {
       if (!scrollRef.current) return;
-      const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
-
-      // If at end, loop back smoothly
-      if (scrollLeft >= scrollWidth - clientWidth - 10) {
-        scrollRef.current.scrollTo({ left: 0, behavior: "smooth" });
-      } else {
-        scrollRef.current.scrollBy({ left: 240, behavior: "smooth" });
-      }
+      scrollRef.current.scrollBy({ left: 240, behavior: "smooth" });
     }, 3200);
 
     return () => clearInterval(interval);
@@ -147,13 +173,8 @@ export function UniverseCarousel() {
         {/* Left Circular Arrow */}
         <button
           onClick={() => scroll("left")}
-          disabled={!canScrollLeft}
           aria-label="Estructura anterior"
-          className={`absolute left-0 top-1/2 -translate-y-1/2 -translate-x-3 sm:-translate-x-5 z-20 w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-[#1b1c3b] text-white flex items-center justify-center shadow-lg transition-all ${
-            canScrollLeft
-              ? "opacity-100 hover:scale-105 hover:bg-[#252854]"
-              : "opacity-35 cursor-not-allowed"
-          }`}
+          className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-3 sm:-translate-x-5 z-20 w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-[#1b1c3b] text-white flex items-center justify-center shadow-lg transition-all opacity-100 hover:scale-105 hover:bg-[#252854]"
         >
           <FiChevronLeft className="w-5 h-5" />
         </button>
@@ -161,7 +182,7 @@ export function UniverseCarousel() {
         {/* Carousel Scroll Container (pt-12 to prevent tooltip cut-off at top) */}
         <div
           ref={scrollRef}
-          onScroll={checkScroll}
+          onScroll={handleScroll}
           onMouseDown={handleMouseDown}
           onMouseMove={handleContainerMouseMove}
           onMouseUp={handleMouseUp}
@@ -172,12 +193,13 @@ export function UniverseCarousel() {
             scrollSnapType: isDragging ? "none" : "x mandatory",
           }}
         >
-          {UNIVERSE_STRUCTURES.map((struct) => {
-            const isHover = hoveredCardId === struct.id && mousePos !== null;
+          {items.map((struct) => {
+            const isHover =
+              hoveredCardId === struct.uniqueKey && mousePos !== null;
 
             return (
               <div
-                key={struct.id}
+                key={struct.uniqueKey}
                 role="button"
                 tabIndex={0}
                 onClick={() => handleOpenModal(struct)}
@@ -187,7 +209,7 @@ export function UniverseCarousel() {
                     handleOpenModal(struct);
                   }
                 }}
-                onMouseMove={(e) => handleMouseMove(e, struct.id)}
+                onMouseMove={(e) => handleMouseMove(e, struct.uniqueKey)}
                 onMouseLeave={handleMouseLeave}
                 className={`relative shrink-0 w-[170px] sm:w-[190px] md:w-[210px] aspect-[16/10] bg-[#0c1022] rounded-none overflow-visible group border border-slate-700/60 hover:border-[#1b1c3b] transition-all duration-300 hover:z-30 ${
                   isDragging ? "cursor-grabbing" : "cursor-none"
@@ -230,13 +252,8 @@ export function UniverseCarousel() {
         {/* Right Circular Arrow */}
         <button
           onClick={() => scroll("right")}
-          disabled={!canScrollRight}
           aria-label="Siguiente estructura"
-          className={`absolute right-0 top-1/2 -translate-y-1/2 translate-x-3 sm:translate-x-5 z-20 w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-[#1b1c3b] text-white flex items-center justify-center shadow-lg transition-all ${
-            canScrollRight
-              ? "opacity-100 hover:scale-105 hover:bg-[#252854]"
-              : "opacity-35 cursor-not-allowed"
-          }`}
+          className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-3 sm:translate-x-5 z-20 w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-[#1b1c3b] text-white flex items-center justify-center shadow-lg transition-all opacity-100 hover:scale-105 hover:bg-[#252854]"
         >
           <FiChevronRight className="w-5 h-5" />
         </button>
