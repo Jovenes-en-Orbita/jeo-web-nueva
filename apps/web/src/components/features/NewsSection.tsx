@@ -1,221 +1,57 @@
-import Link from 'next/link';
-import Image from 'next/image';
-import { SectionHeader } from '@/components/ui/SectionHeader';
-import { Button } from '@/components/ui/Button';
-import { getNews } from '@/lib/api';
-import { FiArrowUpRight, FiLayers } from 'react-icons/fi';
+import Link from "next/link";
+import { getNews } from "@/lib/api";
+import { NewsCard } from "./NewsCard";
 
 /**
- * Section 04: Noticias Espaciales
- * Replicando exactamente el diseño de referencia editorial (NASA style):
- * - Fila Superior: Grilla asimétrica (Main Hero 50%, Vertical Hero 25%, Stacked 25%) con texto overlay sobre imagen.
- * - Fila Inferior: Lista de 4 noticias secundarias con avatar circular y metadatos.
+ * Section 04: Noticias Espaciales (Home)
+ * Displays the latest 3 news articles in a flex layout, matching the new design.
  */
 export async function NewsSection() {
-  const articles = await getNews();
-
-  const getArticleImage = (article: { slug: string; imageUrl?: string | null }) => {
-    if (article.imageUrl && article.imageUrl.trim() !== '') {
-      return article.imageUrl;
-    }
-    switch (article.slug) {
-      case 'artemis-iii':
-        return '/assets/artemis.svg';
-      case 'exoplaneta-habitable':
-        return '/assets/exoplanet.svg';
-      case 'spacex-starship':
-        return '/assets/starship.svg';
-      default:
-        return '/assets/hero-cosmos.svg';
-    }
-  };
-
-  // Asignaciones para las grillas
-  const mainHero = articles[0] || null;
-  const verticalHero = articles[1] || null;
-  const stackedTop = articles[2] || null;
-  const stackedBottom = articles[3] || null;
-
-  // Fila inferior de miniaturas circulares (usar siguientes artículos o fallback)
-  const bottomArticles = articles.length > 4 ? articles.slice(4, 8) : articles.slice(0, 4);
+  const allArticles = await getNews();
+  const recentArticles = allArticles.slice(0, 3);
 
   return (
-    <section className="block py-12 border-b border-slate-200 bg-white text-slate-900" id="news">
-      <div className="wrap w-full">
-        {/* Section Header */}
-        <div className="flex items-center justify-between mb-8 flex-wrap gap-4">
-          <SectionHeader title="Noticias Espaciales" theme="light" />
+    <section
+      className="py-16 md:py-20 bg-[#050811] text-white border-b border-white/10"
+      id="news"
+    >
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header strip */}
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8 sm:mb-10">
+          <div>
+            <span className="block text-xs uppercase tracking-widest text-slate-400 mb-1 font-inter font-semibold">
+              Noticias recientes
+            </span>
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold uppercase tracking-tight text-white font-chakra">
+              NOTICIAS ESPACIALES
+            </h2>
+          </div>
+
           <Link
             href="/noticias"
-            className="inline-flex items-center gap-2 font-[var(--font-montserrat)] font-bold text-xs uppercase tracking-wider text-slate-900 hover:text-[#d83933] transition-colors group"
+            className="inline-flex items-center text-xs sm:text-sm font-bold tracking-wider text-[#8a7cf8] hover:text-[#a89eff] transition-colors uppercase font-inter group self-start sm:self-auto"
           >
-            <span>Recientemente publicadas</span>
-            <span className="w-6 h-6 rounded-full bg-[#d83933] text-white flex items-center justify-center group-hover:scale-110 transition-transform">
+            <span>VER TODAS LAS NOTICIAS</span>
+            <span className="ml-1 transition-transform group-hover:translate-x-1">
               →
             </span>
           </Link>
         </div>
 
-        {/* TOP ASYMMETRIC GRID (4 Featured Overlay Cards) */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-8">
-          {/* Main Hero Card (Span 2 Columns) */}
-          {mainHero && (
-            <Link
-              href={`/noticias/${mainHero.slug}`}
-              className="group relative lg:col-span-2 h-[340px] overflow-hidden border border-slate-200 hover:border-[#d83933]/60 transition-all duration-300 bg-slate-900"
-            >
-              <Image
-                src={getArticleImage(mainHero)}
-                alt={mainHero.title}
-                fill
-                sizes="(max-width: 1024px) 100vw, 50vw"
-                className="object-cover transition-transform duration-700 group-hover:scale-105"
-                priority
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-between p-6">
-                <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-300">
-                  <FiLayers className="text-[#d83933]" />
-                  <span>Blog</span>
-                </div>
-                <div>
-                  <span className="text-[10px] font-bold tracking-widest text-slate-300 uppercase block mb-1 font-[var(--font-poppins)]">
-                    {mainHero.readTimeMinutes} Min Read
-                  </span>
-                  <h3 className="font-extrabold text-xl sm:text-2xl text-white leading-tight font-[var(--font-montserrat)] group-hover:text-[#d83933] transition-colors">
-                    {mainHero.title}
-                  </h3>
-                </div>
-              </div>
-            </Link>
-          )}
-
-          {/* Vertical Hero Card (Span 1 Column) */}
-          {verticalHero && (
-            <Link
-              href={`/noticias/${verticalHero.slug}`}
-              className="group relative lg:col-span-1 h-[340px] overflow-hidden border border-slate-200 hover:border-[#d83933]/60 transition-all duration-300 bg-slate-900"
-            >
-              <Image
-                src={getArticleImage(verticalHero)}
-                alt={verticalHero.title}
-                fill
-                sizes="(max-width: 1024px) 100vw, 25vw"
-                className="object-cover transition-transform duration-700 group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-between p-6">
-                <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-300">
-                  <FiLayers className="text-[#d83933]" />
-                  <span>Blog</span>
-                </div>
-                <div>
-                  <span className="text-[10px] font-bold tracking-widest text-slate-300 uppercase block mb-1 font-[var(--font-poppins)]">
-                    {verticalHero.readTimeMinutes} Min Read
-                  </span>
-                  <h3 className="font-extrabold text-lg text-white leading-tight font-[var(--font-montserrat)] group-hover:text-[#d83933] transition-colors line-clamp-3">
-                    {verticalHero.title}
-                  </h3>
-                </div>
-              </div>
-            </Link>
-          )}
-
-          {/* Stacked Right Column (Span 1 Column, 2 Horizontal Stacked Cards) */}
-          <div className="lg:col-span-1 flex flex-col gap-4 h-[340px]">
-            {stackedTop && (
-              <Link
-                href={`/noticias/${stackedTop.slug}`}
-                className="group relative flex-1 overflow-hidden border border-slate-200 hover:border-[#d83933]/60 transition-all duration-300 bg-slate-900"
-              >
-                <Image
-                  src={getArticleImage(stackedTop)}
-                  alt={stackedTop.title}
-                  fill
-                  sizes="(max-width: 1024px) 100vw, 25vw"
-                  className="object-cover transition-transform duration-700 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-between p-4">
-                  <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-300">
-                    <FiLayers className="text-[#d83933]" />
-                    <span>Blog</span>
-                  </div>
-                  <div>
-                    <span className="text-[10px] font-bold tracking-widest text-slate-300 uppercase block mb-1 font-[var(--font-poppins)]">
-                      {stackedTop.readTimeMinutes} Min Read
-                    </span>
-                    <h3 className="font-bold text-sm text-white leading-snug font-[var(--font-montserrat)] group-hover:text-[#d83933] transition-colors line-clamp-2">
-                      {stackedTop.title}
-                    </h3>
-                  </div>
-                </div>
-              </Link>
-            )}
-
-            {stackedBottom && (
-              <Link
-                href={`/noticias/${stackedBottom.slug}`}
-                className="group relative flex-1 overflow-hidden border border-slate-200 hover:border-[#d83933]/60 transition-all duration-300 bg-slate-900"
-              >
-                <Image
-                  src={getArticleImage(stackedBottom)}
-                  alt={stackedBottom.title}
-                  fill
-                  sizes="(max-width: 1024px) 100vw, 25vw"
-                  className="object-cover transition-transform duration-700 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-between p-4">
-                  <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-300">
-                    <FiLayers className="text-[#d83933]" />
-                    <span>Blog</span>
-                  </div>
-                  <div>
-                    <span className="text-[10px] font-bold tracking-widest text-slate-300 uppercase block mb-1 font-[var(--font-poppins)]">
-                      {stackedBottom.readTimeMinutes} Min Read
-                    </span>
-                    <h3 className="font-bold text-sm text-white leading-snug font-[var(--font-montserrat)] group-hover:text-[#d83933] transition-colors line-clamp-2">
-                      {stackedBottom.title}
-                    </h3>
-                  </div>
-                </div>
-              </Link>
-            )}
+        {/* 3 Articles in Flex / Grid */}
+        {recentArticles.length === 0 ? (
+          <div className="py-12 text-center border border-white/10 bg-[#080d1a]">
+            <p className="text-sm text-slate-400 font-inter">
+              No hay noticias disponibles en este momento.
+            </p>
           </div>
-        </div>
-
-        {/* BOTTOM ROW (4 Columns of Circular Thumbnails + Meta Details) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pt-6 border-t border-slate-200">
-          {bottomArticles.map((art, idx) => (
-            <Link
-              key={art.id || idx}
-              href={`/noticias/${art.slug}`}
-              className="group flex items-start gap-3 p-2 hover:bg-slate-100 transition-colors"
-            >
-              {/* Circular Avatar Image */}
-              <div className="relative w-12 h-12 rounded-full overflow-hidden shrink-0 border border-slate-300 group-hover:border-[#d83933] transition-colors">
-                <Image
-                  src={getArticleImage(art)}
-                  alt={art.title}
-                  fill
-                  sizes="48px"
-                  className="object-cover group-hover:scale-110 transition-transform duration-300"
-                />
-              </div>
-
-              {/* Text Meta Content */}
-              <div className="flex-1 min-w-0">
-                <span className="text-[10px] font-bold tracking-widest text-slate-500 uppercase block mb-0.5 font-[var(--font-poppins)]">
-                  {art.readTimeMinutes} Min Read
-                </span>
-                <h4 className="font-bold text-xs text-slate-900 leading-snug font-[var(--font-montserrat)] group-hover:text-[#d83933] transition-colors line-clamp-2">
-                  {art.title}
-                </h4>
-                <div className="flex items-center gap-1 text-[10px] font-semibold text-slate-500 uppercase mt-1">
-                  <FiLayers className="w-3 h-3 text-[#d83933]" />
-                  <span>Article</span>
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 items-stretch">
+            {recentArticles.map((article) => (
+              <NewsCard key={article.id || article.slug} article={article} />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

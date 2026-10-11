@@ -8,24 +8,25 @@
 @theme {
   --color-navy: #000000;
   --color-navy-2: #09090b;
-  --color-white: #FFFFFF;
+  --color-white: #ffffff;
   --color-black: #000000;
   --color-yellow: #d83933;
   --color-red: #d83933;
   --color-line: #222222;
   --color-ph: #1a1a1a;
-  --color-ph-ink: #7A828C;
-  --color-ink: #FFFFFF;
-  --color-ink-2: #A1A1AA;
+  --color-ph-ink: #7a828c;
+  --color-ink: #ffffff;
+  --color-ink-2: #a1a1aa;
 
-  --font-montserrat: 'Montserrat', sans-serif;
-  --font-poppins: 'Poppins', sans-serif;
+  --font-montserrat: "Montserrat", sans-serif;
+  --font-poppins: "Poppins", sans-serif;
+  --font-inter: var(--font-inter, "Inter", sans-serif);
+  --font-chakra: var(--font-chakra, "Chakra Petch", sans-serif);
 
   /* Aliases para compatibilidad */
   --font-heading: var(--font-montserrat);
   --font-body: var(--font-poppins);
   --font-barlow: var(--font-montserrat);
-  --font-inter: var(--font-poppins);
 }
 
 /* ── Base Reset ── */
@@ -96,10 +97,12 @@ a {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg,
-      transparent 47%,
-      rgba(255, 255, 255, 0.35) 50%,
-      transparent 53%);
+  background: linear-gradient(
+    135deg,
+    transparent 47%,
+    rgba(255, 255, 255, 0.35) 50%,
+    transparent 53%
+  );
 }
 
 .ph span {
@@ -147,7 +150,7 @@ section.block {
 }
 
 section.block.alt {
-  background: #F7F8FA;
+  background: #f7f8fa;
 }
 
 /* ── Professional Technical Square Theme Overrides ── */
