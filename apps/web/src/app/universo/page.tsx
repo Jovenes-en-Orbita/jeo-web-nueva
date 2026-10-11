@@ -10,6 +10,7 @@ import {
   type UniverseStructure,
 } from "@/lib/universeStructures";
 import { StructureModal } from "@/components/features/StructureModal";
+import { ActionButton } from "@/components/ui/ActionButton";
 
 const TIMELINE_EVENTS = [
   {
@@ -220,12 +221,7 @@ export default function UniversoPage() {
 
           {/* Volver al inicio */}
           <div className="pt-8 pb-12 border-t border-white/10 flex justify-between items-center">
-            <Link
-              href="/"
-              className="inline-block bg-[#1b1c3b] hover:bg-[#252854] text-white font-bold text-xs sm:text-sm uppercase tracking-wider px-6 py-3 rounded-none shadow-md transition-all font-chakra"
-            >
-              ← VOLVER AL INICIO
-            </Link>
+            <ActionButton href="/">← VOLVER AL INICIO</ActionButton>
           </div>
         </div>
       </main>

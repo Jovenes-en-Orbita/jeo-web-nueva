@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import { ActionButton } from "@/components/ui/ActionButton";
 import { UniverseCarousel } from "./UniverseCarousel";
 
 /**
@@ -40,18 +41,11 @@ export function UniverseSection() {
               ejemplo Aldus PageMaker, el cual incluye versiones de Lorem Ipsum.
             </p>
 
-            <div>
-              <Link
-                href="/universo"
-                className="inline-block bg-[#1b1c3b] hover:bg-[#252854] text-white font-bold text-xs sm:text-sm uppercase tracking-wider px-7 py-3 rounded-none shadow-md transition-all duration-200 hover:-translate-y-0.5 font-chakra"
-              >
-                CONOCÉ MÁS
-              </Link>
-            </div>
+            <ActionButton href="/universo">CONOCÉ MÁS</ActionButton>
           </div>
 
           {/* Right Astronomical Image */}
-          <div className="lg:col-span-6 relative aspect-[16/10] w-full bg-black overflow-hidden shadow-xl border border-slate-200">
+          <div className="lg:col-span-6 relative aspect-16/10 w-full bg-black overflow-hidden shadow-xl border border-slate-200">
             <Image
               src="/assets/hero-cosmos.svg"
               alt="Campo profundo del universo con galaxias y estrellas"
