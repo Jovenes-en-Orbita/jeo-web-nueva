@@ -10,9 +10,11 @@ interface NewsCardProps {
 }
 
 export function NewsCard({ article }: NewsCardProps) {
-  const [mousePos, setMousePos] = useState<{ x: number; y: number } | null>(
-    null,
-  );
+  const [mousePos, setMousePos] = useState<{
+    x: number;
+    y: number;
+    isNearRight?: boolean;
+  } | null>(null);
 
   const formattedDate = (() => {
     try {
@@ -34,9 +36,16 @@ export function NewsCard({ article }: NewsCardProps) {
 
   const handleMouseMove = (e: React.MouseEvent<HTMLAnchorElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    // Si el cursor se acerca al borde derecho, desplazar el tooltip a la izquierda
+    const isNearRight = x > rect.width - 150;
+
     setMousePos({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
+      x,
+      y,
+      isNearRight,
     });
   };
 
@@ -49,26 +58,32 @@ export function NewsCard({ article }: NewsCardProps) {
       href={`/noticias/${article.slug}`}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className="relative flex flex-col bg-[#050811] border border-white/20 hover:border-white/50 transition-all duration-300 group overflow-hidden w-full cursor-none"
+      className="relative flex flex-col bg-[#050811] border border-white/20 hover:border-white/50 transition-all duration-300 group w-full cursor-none hover:z-30"
     >
       {/* Floating Tooltip following the cursor */}
       {mousePos && (
         <div
-          className="pointer-events-none absolute z-30 transition-transform duration-75 ease-out"
+          className="pointer-events-none absolute z-50 transition-transform duration-75 ease-out"
           style={{
             left: `${mousePos.x}px`,
             top: `${mousePos.y}px`,
-            transform: "translate(4px, -100%)",
+            transform: mousePos.isNearRight
+              ? "translate(calc(-100% + 12px), -100%)"
+              : "translate(-8px, -100%)",
           }}
         >
-          <div className="relative">
+          <div className="relative mb-2">
             {/* Tooltip Bubble */}
-            <div className="bg-[#171a33] text-white text-[11px] sm:text-xs font-semibold px-3 py-1.5 rounded-md shadow-2xl border border-white/20 whitespace-nowrap tracking-wide font-chakra">
+            <div className="bg-[#171a33] text-white text-[11px] sm:text-xs font-semibold px-3 py-1.5 rounded-md shadow-2xl border border-white/30 whitespace-nowrap tracking-wide font-chakra">
               VER MAS INFORMACIÓN
             </div>
 
             {/* Downward triangle/pointer */}
-            <div className="absolute left-2 -bottom-1.5 w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[7px] border-t-[#171a33]" />
+            <div
+              className={`absolute -bottom-1.5 w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[7px] border-t-[#171a33] ${
+                mousePos.isNearRight ? "right-3" : "left-3"
+              }`}
+            />
           </div>
         </div>
       )}
