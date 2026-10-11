@@ -27,14 +27,14 @@ export function NewsCard({ article }: NewsCardProps) {
 
   return (
     <div className="flex flex-col bg-[#050811] border border-white/20 hover:border-white/50 transition-all duration-300 group overflow-hidden w-full">
-      {/* Upper area with white background for character/illustration */}
-      <div className="relative w-full aspect-[4/3] bg-white flex items-center justify-center overflow-hidden p-2">
+      {/* Upper area for image (full cover without white border) */}
+      <div className="relative w-full aspect-[16/10] bg-[#090e1d] overflow-hidden">
         <Image
           src={imageSrc}
           alt={article.title}
           fill
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          className="object-contain p-2 group-hover:scale-105 transition-transform duration-300"
+          className="object-cover group-hover:scale-105 transition-transform duration-300"
         />
       </div>
 

@@ -112,15 +112,15 @@ export default async function NoticiaDetailPage({ params }: ArticlePageProps) {
             </span>
           </div>
 
-          {/* Row 1: Image Left with white background + Text Right */}
+          {/* Row 1: Image Left + Text Right */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center mb-16 sm:mb-24">
-            <div className="lg:col-span-5 bg-white aspect-[4/3] flex items-center justify-center p-4 relative overflow-hidden border border-white/20">
+            <div className="lg:col-span-5 bg-[#090e1d] aspect-[16/10] flex items-center justify-center relative overflow-hidden border border-white/20">
               <Image
                 src={imageSrc}
                 alt={article.title}
                 fill
                 sizes="(max-width: 1024px) 100vw, 40vw"
-                className="object-contain p-4"
+                className="object-cover"
                 priority
               />
             </div>
@@ -147,13 +147,13 @@ export default async function NoticiaDetailPage({ params }: ArticlePageProps) {
                 ))}
               </div>
 
-              <div className="lg:col-span-5 order-1 lg:order-2 bg-white aspect-[4/3] flex items-center justify-center p-4 relative overflow-hidden border border-white/20">
+              <div className="lg:col-span-5 order-1 lg:order-2 bg-[#090e1d] aspect-[16/10] flex items-center justify-center relative overflow-hidden border border-white/20">
                 <Image
                   src={imageSrc}
                   alt={article.title}
                   fill
                   sizes="(max-width: 1024px) 100vw, 40vw"
-                  className="object-contain p-4"
+                  className="object-cover"
                 />
               </div>
             </div>
