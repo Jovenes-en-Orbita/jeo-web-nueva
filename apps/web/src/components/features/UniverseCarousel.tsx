@@ -8,16 +8,24 @@ import {
   type UniverseStructure,
 } from "@/lib/universeStructures";
 import { StructureModal } from "./StructureModal";
+import { TooltipCursor } from "@/components/ui/TooltipCursor";
 
 export function UniverseCarousel() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
   const [isHovered, setIsHovered] = useState(false);
-  const [activeTooltipId, setActiveTooltipId] = useState<string | null>(null);
   const [selectedStructure, setSelectedStructure] =
     useState<UniverseStructure | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Cursor position state for hovered card
+  const [hoveredCardId, setHoveredCardId] = useState<string | null>(null);
+  const [mousePos, setMousePos] = useState<{
+    x: number;
+    y: number;
+    isNearRight?: boolean;
+  } | null>(null);
 
   // Check scroll positions to enable/disable arrow buttons
   const checkScroll = () => {
@@ -33,7 +41,7 @@ export function UniverseCarousel() {
     return () => window.removeEventListener("resize", checkScroll);
   }, []);
 
-  // Autoplay functionality: scroll horizontally smoothly every 3 seconds, pause when hovering
+  // Autoplay functionality: scroll horizontally smoothly every 3.2 seconds, pause when hovering
   useEffect(() => {
     if (isHovered || isModalOpen) return;
 
@@ -63,6 +71,24 @@ export function UniverseCarousel() {
     setIsModalOpen(true);
   };
 
+  const handleMouseMove = (
+    e: React.MouseEvent<HTMLDivElement>,
+    structId: string,
+  ) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const isNearRight = x > rect.width - 140;
+
+    setHoveredCardId(structId);
+    setMousePos({ x, y, isNearRight });
+  };
+
+  const handleMouseLeave = () => {
+    setHoveredCardId(null);
+    setMousePos(null);
+  };
+
   return (
     <>
       <div
@@ -70,7 +96,7 @@ export function UniverseCarousel() {
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => {
           setIsHovered(false);
-          setActiveTooltipId(null);
+          handleMouseLeave();
         }}
       >
         {/* Left Circular Arrow */}
@@ -87,15 +113,15 @@ export function UniverseCarousel() {
           <FiChevronLeft className="w-5 h-5" />
         </button>
 
-        {/* Carousel Scroll Container */}
+        {/* Carousel Scroll Container (pt-12 to prevent tooltip cut-off at top) */}
         <div
           ref={scrollRef}
           onScroll={checkScroll}
-          className="flex gap-4 sm:gap-5 overflow-x-auto scroll-smooth scrollbar-none py-6 px-1"
+          className="flex gap-4 sm:gap-5 overflow-x-auto overflow-y-visible scroll-smooth scrollbar-none pt-12 pb-6 px-1"
           style={{ scrollSnapType: "x mandatory" }}
         >
           {UNIVERSE_STRUCTURES.map((struct) => {
-            const isHover = activeTooltipId === struct.id;
+            const isHover = hoveredCardId === struct.id && mousePos !== null;
 
             return (
               <div
@@ -109,21 +135,18 @@ export function UniverseCarousel() {
                     handleOpenModal(struct);
                   }
                 }}
-                onMouseEnter={() => setActiveTooltipId(struct.id)}
-                onMouseLeave={() => setActiveTooltipId(null)}
-                className="relative shrink-0 w-[170px] sm:w-[190px] md:w-[210px] aspect-[16/10] bg-[#0c1022] rounded-none overflow-visible cursor-pointer group border border-slate-700/60 hover:border-[#1b1c3b] transition-all duration-300"
+                onMouseMove={(e) => handleMouseMove(e, struct.id)}
+                onMouseLeave={handleMouseLeave}
+                className="relative shrink-0 w-[170px] sm:w-[190px] md:w-[210px] aspect-[16/10] bg-[#0c1022] rounded-none overflow-visible cursor-none group border border-slate-700/60 hover:border-[#1b1c3b] transition-all duration-300 hover:z-30"
                 style={{ scrollSnapAlign: "start" }}
               >
-                {/* Floating Tooltip */}
-                {isHover && (
-                  <div className="pointer-events-none absolute -top-10 left-3 z-30 transition-all duration-150 animate-fade-in">
-                    <div className="relative">
-                      <div className="bg-[#171a33] text-white text-[10px] sm:text-[11px] font-semibold px-2.5 py-1 rounded shadow-xl border border-white/20 whitespace-nowrap tracking-wide font-chakra">
-                        VER MAS INFORMACIÓN
-                      </div>
-                      <div className="absolute left-3 -bottom-1.5 w-0 h-0 border-l-[5px] border-l-transparent border-r-[5px] border-r-transparent border-t-[6px] border-t-[#171a33]" />
-                    </div>
-                  </div>
+                {/* Floating Tooltip following the cursor */}
+                {isHover && mousePos && (
+                  <TooltipCursor
+                    x={mousePos.x}
+                    y={mousePos.y}
+                    isNearRight={mousePos.isNearRight}
+                  />
                 )}
 
                 {/* Structure Image Background */}
@@ -140,7 +163,7 @@ export function UniverseCarousel() {
                 </div>
 
                 {/* Structure Name at bottom */}
-                <div className="absolute bottom-2.5 left-2.5 right-2.5 z-10">
+                <div className="absolute bottom-2.5 left-2.5 right-2.5 z-10 pointer-events-none">
                   <span className="block text-[11px] sm:text-xs font-bold uppercase tracking-wider text-white font-chakra leading-tight drop-shadow-md">
                     {struct.name}
                   </span>

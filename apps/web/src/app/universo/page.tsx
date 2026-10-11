@@ -11,6 +11,7 @@ import {
 } from "@/lib/universeStructures";
 import { StructureModal } from "@/components/features/StructureModal";
 import { ActionButton } from "@/components/ui/ActionButton";
+import { TooltipCursor } from "@/components/ui/TooltipCursor";
 
 const TIMELINE_EVENTS = [
   {
@@ -52,10 +53,33 @@ export default function UniversoPage() {
     useState<UniverseStructure | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [mousePos, setMousePos] = useState<{
+    x: number;
+    y: number;
+    isNearRight?: boolean;
+  } | null>(null);
 
   const handleOpenModal = (struct: UniverseStructure) => {
     setSelectedStructure(struct);
     setIsModalOpen(true);
+  };
+
+  const handleMouseMove = (
+    e: React.MouseEvent<HTMLDivElement>,
+    structId: string,
+  ) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const isNearRight = x > rect.width - 140;
+
+    setHoveredId(structId);
+    setMousePos({ x, y, isNearRight });
+  };
+
+  const handleMouseLeave = () => {
+    setHoveredId(null);
+    setMousePos(null);
   };
 
   return (
@@ -142,7 +166,7 @@ export default function UniversoPage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
               {UNIVERSE_STRUCTURES.map((struct) => {
-                const isHover = hoveredId === struct.id;
+                const isHover = hoveredId === struct.id && mousePos !== null;
 
                 return (
                   <div
@@ -156,20 +180,17 @@ export default function UniversoPage() {
                         handleOpenModal(struct);
                       }
                     }}
-                    onMouseEnter={() => setHoveredId(struct.id)}
-                    onMouseLeave={() => setHoveredId(null)}
-                    className="relative aspect-[16/10] bg-[#0c1022] rounded-none overflow-visible cursor-pointer group border border-white/20 hover:border-[#e5a912] transition-all duration-300"
+                    onMouseMove={(e) => handleMouseMove(e, struct.id)}
+                    onMouseLeave={handleMouseLeave}
+                    className="relative aspect-16/10 bg-[#0c1022] rounded-none overflow-visible cursor-none group border border-white/20 hover:border-[#e5a912] transition-all duration-300 hover:z-30"
                   >
-                    {/* Floating Tooltip */}
-                    {isHover && (
-                      <div className="pointer-events-none absolute -top-10 left-3 z-30 transition-all duration-150 animate-fade-in">
-                        <div className="relative">
-                          <div className="bg-[#171a33] text-white text-[10px] sm:text-[11px] font-semibold px-2.5 py-1 rounded shadow-xl border border-white/20 whitespace-nowrap tracking-wide font-chakra">
-                            VER MAS INFORMACIÓN
-                          </div>
-                          <div className="absolute left-3 -bottom-1.5 w-0 h-0 border-l-[5px] border-l-transparent border-r-[5px] border-r-transparent border-t-[6px] border-t-[#171a33]" />
-                        </div>
-                      </div>
+                    {/* Floating Tooltip following the cursor */}
+                    {isHover && mousePos && (
+                      <TooltipCursor
+                        x={mousePos.x}
+                        y={mousePos.y}
+                        isNearRight={mousePos.isNearRight}
+                      />
                     )}
 
                     {/* Background Image */}
@@ -185,7 +206,7 @@ export default function UniversoPage() {
                     </div>
 
                     {/* Name */}
-                    <div className="absolute bottom-3 left-3 right-3 z-10">
+                    <div className="absolute bottom-3 left-3 right-3 z-10 pointer-events-none">
                       <span className="block text-xs sm:text-sm font-bold uppercase tracking-wider text-white font-chakra drop-shadow-md">
                         {struct.name}
                       </span>

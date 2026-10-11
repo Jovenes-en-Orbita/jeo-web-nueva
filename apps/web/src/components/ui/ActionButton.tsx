@@ -24,22 +24,26 @@ export function ActionButton({
 
   const variantClasses =
     variant === "solid"
-      ? "bg-[#1b1c3b] hover:bg-[#252854] text-white"
-      : "bg-transparent border border-white/20 text-white hover:bg-white/10 hover:border-white/40";
+      ? "bg-[#1b1c3b] hover:bg-[#252854] "
+      : "bg-transparent border border-white/20  hover:bg-white/10 hover:border-white/40";
 
   const combinedClasses = `${baseClasses} ${variantClasses} ${className}`;
 
   if (href) {
     return (
-      <Link href={href} className={combinedClasses} onClick={onClick}>
-        {children}
-      </Link>
+      <div className="text-white">
+        <Link href={href} className={combinedClasses} onClick={onClick}>
+          {children}
+        </Link>
+      </div>
     );
   }
 
   return (
-    <button type="button" onClick={onClick} className={combinedClasses}>
-      {children}
-    </button>
+    <div className="text-white">
+      <button type="button" onClick={onClick} className={combinedClasses}>
+        {children}
+      </button>
+    </div>
   );
 }
