@@ -81,20 +81,50 @@ export function UniverseCarousel() {
     }
   };
 
-  // Autoplay functionality: scroll horizontally smoothly every 3.2 seconds, pause when hovering or dragging
+  // User interaction pause timer (resumes auto-scroll after inactivity)
+  const [isInteracting, setIsInteracting] = useState(false);
+  const interactionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const triggerInteractionPause = (durationMs = 3000) => {
+    setIsInteracting(true);
+    if (interactionTimeoutRef.current) {
+      clearTimeout(interactionTimeoutRef.current);
+    }
+    interactionTimeoutRef.current = setTimeout(() => {
+      setIsInteracting(false);
+    }, durationMs);
+  };
+
+  // Continuous smooth auto-scroll to the right (ticker style) via requestAnimationFrame
   useEffect(() => {
-    if (isHovered || isModalOpen || isDragging) return;
+    // Pause if user is hovering, interacting, dragging, or modal is open
+    if (isHovered || isModalOpen || isDragging || isInteracting) return;
 
-    const interval = setInterval(() => {
-      if (!scrollRef.current) return;
-      scrollRef.current.scrollBy({ left: 240, behavior: "smooth" });
-    }, 3200);
+    let animationFrameId: number;
+    let lastTime = performance.now();
+    const speedPixelsPerSecond = 45; // Smooth cinematic cruising speed
 
-    return () => clearInterval(interval);
-  }, [isHovered, isModalOpen, isDragging]);
+    const step = (now: number) => {
+      const dt = (now - lastTime) / 1000;
+      lastTime = now;
+
+      if (scrollRef.current && !isResettingRef.current) {
+        scrollRef.current.scrollLeft += speedPixelsPerSecond * dt;
+      }
+
+      animationFrameId = requestAnimationFrame(step);
+    };
+
+    animationFrameId = requestAnimationFrame(step);
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, [isHovered, isModalOpen, isDragging, isInteracting]);
 
   const scroll = (direction: "left" | "right") => {
     if (!scrollRef.current) return;
+    triggerInteractionPause(3500);
     const offset = direction === "left" ? -280 : 280;
     scrollRef.current.scrollBy({ left: offset, behavior: "smooth" });
   };
@@ -112,6 +142,7 @@ export function UniverseCarousel() {
     // Only primary button
     if (e.button !== 0) return;
 
+    triggerInteractionPause(3500);
     isDraggingRef.current = true;
     setIsDragging(true);
     dragMovedRef.current = false;
@@ -122,6 +153,7 @@ export function UniverseCarousel() {
   const handleContainerMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!isDraggingRef.current || !scrollRef.current) return;
 
+    triggerInteractionPause(3500);
     const deltaX = e.pageX - startXRef.current;
     if (Math.abs(deltaX) > 6) {
       dragMovedRef.current = true;
@@ -134,6 +166,7 @@ export function UniverseCarousel() {
     if (isDraggingRef.current) {
       isDraggingRef.current = false;
       setIsDragging(false);
+      triggerInteractionPause(3500);
       // Wait a tick before resetting dragMovedRef to allow click handlers to inspect it
       setTimeout(() => {
         dragMovedRef.current = false;
@@ -187,10 +220,15 @@ export function UniverseCarousel() {
           onMouseMove={handleContainerMouseMove}
           onMouseUp={handleMouseUp}
           className={`flex gap-4 sm:gap-5 overflow-x-auto overflow-y-visible scrollbar-none pt-12 pb-6 px-1 ${
-            isDragging ? "cursor-grabbing select-none" : "scroll-smooth"
+            isDragging
+              ? "cursor-grabbing select-none"
+              : isInteracting
+                ? "scroll-smooth"
+                : ""
           }`}
           style={{
-            scrollSnapType: isDragging ? "none" : "x mandatory",
+            scrollSnapType:
+              isInteracting && !isDragging ? "x mandatory" : "none",
           }}
         >
           {items.map((struct) => {
@@ -214,7 +252,10 @@ export function UniverseCarousel() {
                 className={`relative shrink-0 w-[170px] sm:w-[190px] md:w-[210px] aspect-[16/10] bg-[#0c1022] rounded-none overflow-visible group border border-slate-700/60 hover:border-[#1b1c3b] transition-all duration-300 hover:z-30 ${
                   isDragging ? "cursor-grabbing" : "cursor-none"
                 }`}
-                style={{ scrollSnapAlign: isDragging ? "none" : "start" }}
+                style={{
+                  scrollSnapAlign:
+                    isInteracting && !isDragging ? "start" : "none",
+                }}
               >
                 {/* Floating Tooltip following the cursor */}
                 {isHover && mousePos && (
