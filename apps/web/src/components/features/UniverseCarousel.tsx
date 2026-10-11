@@ -27,6 +27,13 @@ export function UniverseCarousel() {
     isNearRight?: boolean;
   } | null>(null);
 
+  // Drag-to-scroll state
+  const isDraggingRef = useRef(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const startXRef = useRef(0);
+  const scrollLeftStartRef = useRef(0);
+  const dragMovedRef = useRef(false);
+
   // Check scroll positions to enable/disable arrow buttons
   const checkScroll = () => {
     if (!scrollRef.current) return;
@@ -41,9 +48,9 @@ export function UniverseCarousel() {
     return () => window.removeEventListener("resize", checkScroll);
   }, []);
 
-  // Autoplay functionality: scroll horizontally smoothly every 3.2 seconds, pause when hovering
+  // Autoplay functionality: scroll horizontally smoothly every 3.2 seconds, pause when hovering or dragging
   useEffect(() => {
-    if (isHovered || isModalOpen) return;
+    if (isHovered || isModalOpen || isDragging) return;
 
     const interval = setInterval(() => {
       if (!scrollRef.current) return;
@@ -58,7 +65,7 @@ export function UniverseCarousel() {
     }, 3200);
 
     return () => clearInterval(interval);
-  }, [isHovered, isModalOpen]);
+  }, [isHovered, isModalOpen, isDragging]);
 
   const scroll = (direction: "left" | "right") => {
     if (!scrollRef.current) return;
@@ -67,8 +74,45 @@ export function UniverseCarousel() {
   };
 
   const handleOpenModal = (struct: UniverseStructure) => {
+    // Only open if the user didn't perform a drag gesture
+    if (dragMovedRef.current) return;
     setSelectedStructure(struct);
     setIsModalOpen(true);
+  };
+
+  // Mouse Drag to Scroll handlers
+  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!scrollRef.current) return;
+    // Only primary button
+    if (e.button !== 0) return;
+
+    isDraggingRef.current = true;
+    setIsDragging(true);
+    dragMovedRef.current = false;
+    startXRef.current = e.pageX;
+    scrollLeftStartRef.current = scrollRef.current.scrollLeft;
+  };
+
+  const handleContainerMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!isDraggingRef.current || !scrollRef.current) return;
+
+    const deltaX = e.pageX - startXRef.current;
+    if (Math.abs(deltaX) > 6) {
+      dragMovedRef.current = true;
+    }
+
+    scrollRef.current.scrollLeft = scrollLeftStartRef.current - deltaX;
+  };
+
+  const handleMouseUp = () => {
+    if (isDraggingRef.current) {
+      isDraggingRef.current = false;
+      setIsDragging(false);
+      // Wait a tick before resetting dragMovedRef to allow click handlers to inspect it
+      setTimeout(() => {
+        dragMovedRef.current = false;
+      }, 50);
+    }
   };
 
   const handleMouseMove = (
@@ -87,12 +131,13 @@ export function UniverseCarousel() {
   const handleMouseLeave = () => {
     setHoveredCardId(null);
     setMousePos(null);
+    handleMouseUp();
   };
 
   return (
     <>
       <div
-        className="relative w-full py-4"
+        className="relative w-full py-4 select-none"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => {
           setIsHovered(false);
@@ -117,8 +162,15 @@ export function UniverseCarousel() {
         <div
           ref={scrollRef}
           onScroll={checkScroll}
-          className="flex gap-4 sm:gap-5 overflow-x-auto overflow-y-visible scroll-smooth scrollbar-none pt-12 pb-6 px-1"
-          style={{ scrollSnapType: "x mandatory" }}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleContainerMouseMove}
+          onMouseUp={handleMouseUp}
+          className={`flex gap-4 sm:gap-5 overflow-x-auto overflow-y-visible scrollbar-none pt-12 pb-6 px-1 ${
+            isDragging ? "cursor-grabbing select-none" : "scroll-smooth"
+          }`}
+          style={{
+            scrollSnapType: isDragging ? "none" : "x mandatory",
+          }}
         >
           {UNIVERSE_STRUCTURES.map((struct) => {
             const isHover = hoveredCardId === struct.id && mousePos !== null;
@@ -137,8 +189,10 @@ export function UniverseCarousel() {
                 }}
                 onMouseMove={(e) => handleMouseMove(e, struct.id)}
                 onMouseLeave={handleMouseLeave}
-                className="relative shrink-0 w-[170px] sm:w-[190px] md:w-[210px] aspect-[16/10] bg-[#0c1022] rounded-none overflow-visible cursor-none group border border-slate-700/60 hover:border-[#1b1c3b] transition-all duration-300 hover:z-30"
-                style={{ scrollSnapAlign: "start" }}
+                className={`relative shrink-0 w-[170px] sm:w-[190px] md:w-[210px] aspect-[16/10] bg-[#0c1022] rounded-none overflow-visible group border border-slate-700/60 hover:border-[#1b1c3b] transition-all duration-300 hover:z-30 ${
+                  isDragging ? "cursor-grabbing" : "cursor-none"
+                }`}
+                style={{ scrollSnapAlign: isDragging ? "none" : "start" }}
               >
                 {/* Floating Tooltip following the cursor */}
                 {isHover && mousePos && (
