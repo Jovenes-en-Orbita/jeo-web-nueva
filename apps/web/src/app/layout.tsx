@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Montserrat, Poppins } from "next/font/google";
+import { Montserrat, Poppins, Inter, Chakra_Petch } from "next/font/google";
 import "./globals.css";
 
 const montserrat = Montserrat({
@@ -13,6 +13,20 @@ const poppins = Poppins({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
   variable: "--font-poppins",
+  display: "swap",
+});
+
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-inter",
+  display: "swap",
+});
+
+const chakraPetch = Chakra_Petch({
+  subsets: ["latin"],
+  weight: ["400", "600", "700"],
+  variable: "--font-chakra",
   display: "swap",
 });
 
@@ -44,9 +58,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es" className={`${montserrat.variable} ${poppins.variable}`}>
+    <html
+      lang="es"
+      className={`${montserrat.variable} ${poppins.variable} ${inter.variable} ${chakraPetch.variable}`}
+    >
       <body suppressHydrationWarning>{children}</body>
     </html>
   );
 }
-
