@@ -19,17 +19,17 @@ export async function NewsSection() {
         {/* Header strip */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8 sm:mb-10">
           <div>
-            <span className="block text-xs uppercase tracking-widest text-slate-400 mb-1 font-[var(--font-inter)] font-semibold">
+            <span className="block text-xs uppercase tracking-widest text-slate-400 mb-1 font-inter font-semibold">
               Noticias recientes
             </span>
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold uppercase tracking-tight text-white font-[var(--font-chakra)]">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold uppercase tracking-tight text-white font-chakra">
               NOTICIAS ESPACIALES
             </h2>
           </div>
 
           <Link
             href="/noticias"
-            className="inline-flex items-center text-xs sm:text-sm font-bold tracking-wider text-[#8a7cf8] hover:text-[#a89eff] transition-colors uppercase font-[var(--font-inter)] group self-start sm:self-auto"
+            className="inline-flex items-center text-xs sm:text-sm font-bold tracking-wider text-[#8a7cf8] hover:text-[#a89eff] transition-colors uppercase font-inter group self-start sm:self-auto"
           >
             <span>VER TODAS LAS NOTICIAS</span>
             <span className="ml-1 transition-transform group-hover:translate-x-1">
@@ -41,7 +41,7 @@ export async function NewsSection() {
         {/* 3 Articles in Flex / Grid */}
         {recentArticles.length === 0 ? (
           <div className="py-12 text-center border border-white/10 bg-[#080d1a]">
-            <p className="text-sm text-slate-400 font-[var(--font-inter)]">
+            <p className="text-sm text-slate-400 font-inter">
               No hay noticias disponibles en este momento.
             </p>
           </div>
