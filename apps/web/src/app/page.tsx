@@ -16,10 +16,8 @@ export default function Home() {
       <Navbar />
       <main className="flex-1 relative">
         <Hero />
-        {/* TODO: Sección Sistema Solar en desarrollo (Oculta temporalmente) */}
-        {/* <SolarSystemSection /> */}
-        {/* TODO: Sección Constelaciones en desarrollo (Oculta temporalmente) */}
-        {/* <ConstellationsSection /> */}
+        <SolarSystemSection />
+        <ConstellationsSection />
         <NewsSection />
         <GallerySection />
         <ExploreSection />
