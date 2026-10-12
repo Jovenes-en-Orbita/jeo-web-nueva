@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
 import { FiGlobe } from "react-icons/fi";
 
 const LANGUAGES = [
@@ -12,8 +14,10 @@ type LanguageCode = (typeof LANGUAGES)[number]["code"];
 
 export function LanguageSwitcher() {
   const [open, setOpen] = useState(false);
-  const [current, setCurrent] = useState<LanguageCode>("es");
   const ref = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+  const current = useLocale() as LanguageCode;
+  const t = useTranslations("Navbar");
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -33,8 +37,9 @@ export function LanguageSwitcher() {
   }, []);
 
   const handleSelect = (code: LanguageCode) => {
-    setCurrent(code);
+    document.cookie = `NEXT_LOCALE=${code}; path=/; max-age=31536000; samesite=lax`;
     setOpen(false);
+    router.refresh();
   };
 
   return (
@@ -42,7 +47,7 @@ export function LanguageSwitcher() {
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        aria-label="Cambiar idioma"
+        aria-label={t("language")}
         aria-haspopup="menu"
         aria-expanded={open}
         className="flex items-center p-1 transition-colors hover:text-[#d83933]"

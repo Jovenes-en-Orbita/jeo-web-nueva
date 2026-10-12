@@ -2,12 +2,14 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { Dropdown } from "@/components/ui/Dropdown";
 import { Logo } from "@/components/ui/Logo";
 import { FiMenu, FiX } from "react-icons/fi";
 import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher";
 
 export function Navbar() {
+  const t = useTranslations("Navbar");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -47,25 +49,25 @@ export function Navbar() {
           {/* Desktop Navigation (derecha) */}
           <nav className="hidden lg:flex items-center gap-6">
             <Dropdown
-              label="Quiénes somos"
+              label={t("about")}
               items={[
-                { label: "Conoce a JEO", href: "/nosotros" },
-                { label: "Unite a nosotros", href: "/unite" },
+                { label: t("aboutJeo"), href: "/nosotros" },
+                { label: t("join"), href: "/unite" },
               ]}
             />
             <Dropdown
-              label="Cosmos"
+              label={t("cosmos")}
               items={[
-                { label: "El Universo", href: "/universo" },
-                { label: "Noticias Espaciales", href: "/noticias" },
-                { label: "Fragmentos de Memoria", href: "/galeria" },
+                { label: t("universe"), href: "/universo" },
+                { label: t("news"), href: "/noticias" },
+                { label: t("gallery"), href: "/galeria" },
               ]}
             />
             <Dropdown
-              label="Multimedia"
+              label={t("multimedia")}
               items={[
-                { label: "Newsletter", href: "/newsletter" },
-                { label: "Libros electrónicos", href: "/libros" },
+                { label: t("newsletter"), href: "/newsletter" },
+                { label: t("books"), href: "/libros" },
               ]}
             />
             <LanguageSwitcher />
@@ -77,7 +79,7 @@ export function Navbar() {
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="p-2 rounded-none border border-white/20 bg-white/10 text-white hover:bg-white/20"
-              title="Menú"
+              title={t("menu")}
             >
               {isMobileMenuOpen ? (
                 <FiX className="w-6 h-6" />
@@ -93,14 +95,14 @@ export function Navbar() {
           <div className="lg:hidden bg-[#060a17] border-b border-white/10 px-6 py-6 space-y-6 animate-fade-in-up">
             <div>
               <span className="text-[11px] font-bold uppercase tracking-wider text-[var(--color-yellow)] block mb-2 font-[var(--font-montserrat)]">
-                Cosmos
+                {t("cosmos")}
               </span>
               <div className="flex flex-col space-y-2 text-sm text-slate-300">
                 <Link
                   href="/universo"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  El Universo
+                  {t("universe")}
                 </Link>
                 {/* TODO: Secciones en desarrollo */}
                 {/* <Link href="/sistema-solar" onClick={() => setIsMobileMenuOpen(false)}>Sistema Solar</Link> */}
@@ -109,47 +111,47 @@ export function Navbar() {
                   href="/noticias"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  Noticias Espaciales
+                  {t("news")}
                 </Link>
                 <Link
                   href="/galeria"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  Fragmentos de Memoria
+                  {t("gallery")}
                 </Link>
               </div>
             </div>
 
             <div>
               <span className="text-[11px] font-bold uppercase tracking-wider text-[var(--color-yellow)] block mb-2 font-[var(--font-montserrat)]">
-                Multimedia & Recursos
+                {t("multimediaMobile")}
               </span>
               <div className="flex flex-col space-y-2 text-sm text-slate-300">
                 <Link
                   href="/newsletter"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  Newsletter
+                  {t("newsletter")}
                 </Link>
                 <Link href="/libros" onClick={() => setIsMobileMenuOpen(false)}>
-                  Libros electrónicos
+                  {t("books")}
                 </Link>
               </div>
             </div>
 
             <div>
               <span className="text-[11px] font-bold uppercase tracking-wider text-[var(--color-yellow)] block mb-2 font-[var(--font-montserrat)]">
-                Quiénes somos
+                {t("about")}
               </span>
               <div className="flex flex-col space-y-2 text-sm text-slate-300">
                 <Link
                   href="/nosotros"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  Conoce a JEO
+                  {t("aboutJeo")}
                 </Link>
                 <Link href="/unite" onClick={() => setIsMobileMenuOpen(false)}>
-                  Unite a nosotros
+                  {t("join")}
                 </Link>
               </div>
             </div>
