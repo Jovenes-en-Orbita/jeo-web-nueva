@@ -11,6 +11,9 @@ const LANGUAGES = [
 ] as const;
 
 type LanguageCode = (typeof LANGUAGES)[number]["code"];
+function saveLocale(code: LanguageCode) {
+  document.cookie = `NEXT_LOCALE=${code}; path=/; max-age=31536000; samesite=lax`;
+}
 
 export function LanguageSwitcher() {
   const [open, setOpen] = useState(false);
@@ -37,7 +40,7 @@ export function LanguageSwitcher() {
   }, []);
 
   const handleSelect = (code: LanguageCode) => {
-    document.cookie = `NEXT_LOCALE=${code}; path=/; max-age=31536000; samesite=lax`;
+    saveLocale(code);
     setOpen(false);
     router.refresh();
   };
