@@ -22,11 +22,11 @@ export function Hero() {
         alt="Jóvenes en Órbita — Divulgación Científica Espacial"
         fill
         sizes="100vw"
-        className="object-cover"
+        className="object-cover [mask-image:linear-gradient(to_bottom,black_60%,transparent_100%)]"
         priority
       />
 
-      <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/60 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/40 to-transparent" />
       <div className="relative z-10 h-full flex items-center pb-24 pl-6 sm:pl-10">
         <h1
           className={`${font.className} border-l-4 border-[#FFB800] pl-4 sm:pl-5 uppercase leading-none text-[#FFB800]`}
