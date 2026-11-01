@@ -15,10 +15,10 @@ export function Hero() {
   return (
     <section
       id="hero"
-      className="relative w-full h-[calc(100vh-76px)] min-h-[560px] overflow-hidden flex items-center"
+      className="relative w-full h-[calc(100vh-76px)] min-h-[560px] overflow-hidden flex items-center "
     >
       <Image
-        src="/assets/hero_earth_f.jpg"
+        src="/assets/imgs/hero_earth_f.jpg"
         alt="Jóvenes en Órbita — Divulgación Científica Espacial"
         fill
         sizes="100vw"

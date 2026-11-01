@@ -1,11 +1,12 @@
-import { Navbar } from '@/components/features/Navbar';
-import { Hero } from '@/components/features/Hero';
-import { SolarSystemSection } from '@/components/features/SolarSystemSection';
-import { ConstellationsSection } from '@/components/features/ConstellationsSection';
-import { NewsSection } from '@/components/features/NewsSection';
-import { GallerySection } from '@/components/features/GallerySection';
-import { ExploreSection } from '@/components/features/ExploreSection';
-import { Footer } from '@/components/features/Footer';
+import { Navbar } from "@/components/features/Navbar";
+import { Hero } from "@/components/features/Hero";
+import { SolarSystemSection } from "@/components/features/SolarSystemSection";
+import { ConstellationsSection } from "@/components/features/ConstellationsSection";
+import { NewsSection } from "@/components/features/NewsSection";
+import { GallerySection } from "@/components/features/GallerySection";
+import { ExploreSection } from "@/components/features/ExploreSection";
+import { Footer } from "@/components/features/Footer";
+import { GrandesMentesSection } from "@/components/features/GrandesMentesSection";
 
 /**
  * JEO Home Page — Vertical layout.
@@ -17,6 +18,7 @@ export default function Home() {
       <main className="flex-1 relative">
         <Hero />
         <SolarSystemSection />
+        <GrandesMentesSection />
         <ConstellationsSection />
         <NewsSection />
         <GallerySection />
