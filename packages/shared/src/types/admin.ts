@@ -1,3 +1,9 @@
+import type {
+  ArticleStatus,
+  CreateArticleReferenceDto,
+  UpdateArticleReferenceDto,
+} from "./news";
+
 /**
  * Métricas generales para el dashboard de la intranet.
  */
@@ -7,7 +13,7 @@ export interface AdminDashboardStats {
   pendingApplications: number;
   totalConstellations: number;
   totalGalleryImages: number;
-  serverStatus: 'online' | 'degraded' | 'offline';
+  serverStatus: "online" | "degraded" | "offline";
   uptimeSeconds: number;
 }
 
@@ -25,6 +31,15 @@ export interface UpdateNewsDto {
   author?: string;
   tags?: string[];
   coverImageCaption?: string;
+  status?: ArticleStatus;
+  categoryIds?: string[];
+  categories?: string[];
+  addCategoryIds?: string[];
+  removeCategoryIds?: string[];
+  references?: UpdateArticleReferenceDto[];
+  addReferences?: CreateArticleReferenceDto[];
+  updateReferences?: UpdateArticleReferenceDto[];
+  removeReferenceIds?: string[];
 }
 
 /**
@@ -114,5 +129,5 @@ export interface NewsletterBroadcastDto {
  * DTO para actualizar el estado de una postulación.
  */
 export interface UpdateApplicationStatusDto {
-  status: 'PENDING' | 'REVIEWED' | 'ACCEPTED' | 'REJECTED';
+  status: "PENDING" | "REVIEWED" | "ACCEPTED" | "REJECTED";
 }
