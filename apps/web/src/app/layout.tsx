@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Montserrat, Poppins, Inter, Chakra_Petch } from "next/font/google";
 import "./globals.css";
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale } from "next-intl/server";
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -52,17 +54,20 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await getLocale();
   return (
     <html
-      lang="es"
+      lang={locale}
       className={`${montserrat.variable} ${poppins.variable} ${inter.variable} ${chakraPetch.variable}`}
     >
-      <body suppressHydrationWarning>{children}</body>
+      <body suppressHydrationWarning>
+        <NextIntlClientProvider>{children}</NextIntlClientProvider>
+      </body>
     </html>
   );
 }
