@@ -1,0 +1,68 @@
+name: Preview Deployments (Vercel API + Web)
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  deploy-preview:
+    name: Deploy API & Web Preview to Vercel
+    runs-on: ubuntu-latest
+    # Solo se ejecuta si están configurados los secrets de Vercel en GitHub
+    if: ${{ secrets.VERCEL_TOKEN != '' && secrets.VERCEL_ORG_ID != '' && secrets.VERCEL_API_PROJECT_ID != '' && secrets.VERCEL_WEB_PROJECT_ID != '' }}
+
+    steps:
+      - name: Checkout repositorio
+        uses: actions/checkout@v4
+
+      - name: Instalar Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: Desplegar Backend (apps/api) Preview en Vercel
+        id: deploy_api
+        working-directory: apps/api
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_API_PROJECT_ID }}
+        run: |
+          vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+          API_URL=$(vercel deploy --prebuilt=false --token=${{ secrets.VERCEL_TOKEN }})
+          echo "api_url=${API_URL}" >> $GITHUB_OUTPUT
+          echo "🚀 API Preview desplegada en: ${API_URL}"
+
+      - name: Desplegar Frontend (apps/web) Preview apuntando a la API de esta rama
+        id: deploy_web
+        working-directory: apps/web
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_WEB_PROJECT_ID }}
+        run: |
+          vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+          WEB_URL=$(vercel deploy --build-env NEXT_PUBLIC_API_URL="${{ steps.deploy_api.outputs.api_url }}/api" --env NEXT_PUBLIC_API_URL="${{ steps.deploy_api.outputs.api_url }}/api" --token=${{ secrets.VERCEL_TOKEN }})
+          echo "web_url=${WEB_URL}" >> $GITHUB_OUTPUT
+          echo "🌐 Web Preview desplegada en: ${WEB_URL}"
+
+      - name: Comentar URLs de Preview en la Pull Request
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const apiUrl = '${{ steps.deploy_api.outputs.api_url }}';
+            const webUrl = '${{ steps.deploy_web.outputs.web_url }}';
+            const body = [
+              '### 🚀 Preview Deployment listo para esta rama',
+              '',
+              `- **Frontend (Web):** ${webUrl}`,
+              `- **Backend (API):** ${apiUrl}/api`,
+              `- **Swagger Docs:** ${apiUrl}/api/docs`,
+            ].join('\n');
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body,
+            });
