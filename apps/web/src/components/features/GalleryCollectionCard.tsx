@@ -34,7 +34,7 @@ export function GalleryCollectionCard({
   const images = collection.images ?? [];
   const totalImages = collection.totalImages ?? images.length;
   const targetHref =
-    href ?? `/galeria?collection=${encodeURIComponent(collection.id)}`;
+    href ?? `/galeria/${encodeURIComponent(collection.slug || collection.id)}`;
 
   const primaryImage = images[0];
   const secondaryTopImage = images[1];
