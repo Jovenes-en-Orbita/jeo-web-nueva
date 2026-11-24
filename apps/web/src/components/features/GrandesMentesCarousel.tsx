@@ -2,13 +2,7 @@
 
 import Image from "next/image";
 import { useRef, useState, type ReactNode } from "react";
-import { Montserrat } from "next/font/google";
 import { MENTES_DATA } from "@/lib/grandesMentesData";
-
-const font = Montserrat({
-  subsets: ["latin"],
-  weight: ["600", "700"],
-});
 
 const AREAS = [
   { key: "astronomía", label: "Astronomía" },
@@ -79,7 +73,7 @@ export function GrandesMentesCarousel() {
   };
 
   return (
-    <section className={`${font.className}`}>
+    <section>
       <h3 className="text-center text-3xl font-bold uppercase text-blue-950 sm:text-4xl p-6">
         Grandes mentes
       </h3>
@@ -143,7 +137,7 @@ export function GrandesMentesCarousel() {
                     {/* Tarjeta: solo nombre y bio */}
                     <article className="border border-white/10 p-2 text-black backdrop-blur-sm sm:p-2 md:flex-1">
                       <h4
-                        className={`${font.className} mb-5 text-start text-3xl font-bold sm:text-5xl`}
+                        className={`mb-5 text-start text-3xl font-bold sm:text-5xl`}
                       >
                         {mente.name}
                       </h4>
