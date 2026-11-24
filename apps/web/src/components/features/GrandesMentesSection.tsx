@@ -17,20 +17,9 @@ export async function GrandesMentesSection() {
   return (
     <section
       id="fondo"
-      className="relative w-full h-[calc(100vh-76px)] min-h-[560px] overflow-hidden flex items-center"
+      className="relative flex w-full scroll-mt-[76px] items-center bg-white py-10 sm:py-12 md:min-h-[calc(100vh-76px)] md:py-10"
     >
-      {/* Fondo de estrellas */}
-      <Image
-        src="/assets/imgs/Starry_sky.jpg"
-        alt=""
-        fill
-        sizes="100vw"
-        className="object-cover"
-      />
-
-      <div className="absolute inset-0 bg-black/30" />
-
-      <div className="relative z-10 w-full px-2">
+      <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">
         <GrandesMentesCarousel />
       </div>
     </section>
