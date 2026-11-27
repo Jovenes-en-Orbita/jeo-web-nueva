@@ -1,19 +1,26 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import Image from 'next/image';
-import { useAdminAuth } from '@/context/AdminAuthContext';
+import React, { useState, useEffect, useCallback } from "react";
+import Image from "next/image";
+import { useAdminAuth } from "@/context/AdminAuthContext";
 import {
   getGalleryCollections,
   adminCreateGalleryCollection,
+  adminUpdateGalleryCollection,
+  adminDeleteGalleryCollection,
+  adminGetPendingGalleryImages,
   adminAddGalleryImage,
+  adminUpdateGalleryImage,
+  adminAssignGalleryImage,
   adminDeleteGalleryImage,
-} from '@/lib/api';
-import { FreeImagePicker } from '@/components/ui/FreeImagePicker';
-import type { GalleryCollection } from '@jeo/shared';
+  adminSyncGallerySiteAssets,
+} from "@/lib/api";
+import { FreeImagePicker } from "@/components/ui/FreeImagePicker";
+import type { GalleryCollection, GalleryImage } from "@jeo/shared";
 import {
   FiImage,
   FiPlus,
+  FiEdit2,
   FiTrash2,
   FiX,
   FiCheck,
@@ -21,158 +28,393 @@ import {
   FiAlertCircle,
   FiCamera,
   FiFolderPlus,
-} from 'react-icons/fi';
+  FiLink,
+  FiRefreshCw,
+  FiInbox,
+  FiStar,
+} from "react-icons/fi";
+
+const SOURCE_LABELS: Record<string, string> = {
+  NEWS: "Noticias",
+  MANUAL: "Manual",
+  SOLAR_SYSTEM: "Sistema Solar",
+  UNIVERSE: "El Universo",
+  CONSTELLATION: "Constelaciones",
+  SITE_ASSET: "Sitio",
+};
 
 export default function AdminGaleriaPage() {
   const { token } = useAdminAuth();
+  const [activeTab, setActiveTab] = useState<"collections" | "pending">(
+    "collections",
+  );
   const [collections, setCollections] = useState<GalleryCollection[]>([]);
+  const [pendingImages, setPendingImages] = useState<GalleryImage[]>([]);
+  const [pendingTotal, setPendingTotal] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [syncMessage, setSyncMessage] = useState("");
 
-  // Free Image Picker State
+  // Selección de colección por imagen pendiente
+  const [assignTargets, setAssignTargets] = useState<Record<string, string>>(
+    {},
+  );
+  const [assigningId, setAssigningId] = useState<string | null>(null);
+
+  // Free Image Picker
   const [isFreePickerOpen, setIsFreePickerOpen] = useState(false);
 
-  // Create Collection Modal State
+  // Modal de Colección (Crear / Editar)
   const [isCollectionModalOpen, setIsCollectionModalOpen] = useState(false);
-  const [colTitle, setColTitle] = useState('Fragmentos de Memoria');
-  const [colDesc, setColDesc] = useState('Galería oficial de astrofotografía y momentos cósmicos de Jóvenes en Órbita.');
+  const [editingCollectionId, setEditingCollectionId] = useState<string | null>(
+    null,
+  );
+  const [colTitle, setColTitle] = useState("");
+  const [colDesc, setColDesc] = useState("");
+  const [colCategory, setColCategory] = useState("");
+  const [colTagsStr, setColTagsStr] = useState("");
+  const [colFeatured, setColFeatured] = useState(false);
   const [colSaving, setColSaving] = useState(false);
-  const [colError, setColError] = useState('');
+  const [colError, setColError] = useState("");
 
-  // Add Image Modal State
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [collectionId, setCollectionId] = useState('');
-  const [alt, setAlt] = useState('');
-  const [caption, setCaption] = useState('');
-  const [url, setUrl] = useState('');
+  // Modal de Imagen (Crear / Editar con metadatos astrofotográficos)
+  const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+  const [editingImageId, setEditingImageId] = useState<string | null>(null);
+  const [collectionId, setCollectionId] = useState("");
+  const [alt, setAlt] = useState("");
+  const [caption, setCaption] = useState("");
+  const [url, setUrl] = useState("");
   const [featured, setFeatured] = useState(false);
+  const [photographer, setPhotographer] = useState("");
+  const [telescope, setTelescope] = useState("");
+  const [camera, setCamera] = useState("");
+  const [exposureTime, setExposureTime] = useState("");
+  const [location, setLocation] = useState("");
+  const [creditUrl, setCreditUrl] = useState("");
   const [saving, setSaving] = useState(false);
-  const [errorMsg, setErrorMsg] = useState('');
+  const [errorMsg, setErrorMsg] = useState("");
 
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     setIsLoading(true);
     try {
-      const data = await getGalleryCollections();
-      setCollections(data);
-      if (data.length > 0) {
-        setCollectionId(data[0].id);
+      const [cols, pendingRes] = await Promise.all([
+        getGalleryCollections(),
+        token
+          ? adminGetPendingGalleryImages(token, 1, 50).catch(() => ({
+              data: [],
+              items: [],
+              total: 0,
+              page: 1,
+              limit: 50,
+              totalPages: 1,
+            }))
+          : Promise.resolve({
+              data: [],
+              items: [],
+              total: 0,
+              page: 1,
+              limit: 50,
+              totalPages: 1,
+            }),
+      ]);
+
+      setCollections(cols);
+      setPendingImages(pendingRes.data);
+      setPendingTotal(pendingRes.total);
+
+      if (cols.length > 0) {
+        setCollectionId((prev) => prev || cols[0].id);
+        setAssignTargets((prev) => {
+          const next = { ...prev };
+          for (const img of pendingRes.data) {
+            if (!next[img.id]) {
+              next[img.id] = cols[0].id;
+            }
+          }
+          return next;
+        });
       }
     } catch (err) {
-      console.error('Error loading gallery collections:', err);
+      console.error("Error loading gallery data:", err);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [token]);
 
   useEffect(() => {
     loadData();
-  }, []);
+  }, [loadData]);
 
-  const handleCreateCollection = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    if (!token || !colTitle.trim()) return;
+  // ── Acciones de Sincronización ──
+
+  const handleSyncSiteAssets = async () => {
+    if (!token) return;
+    setIsSyncing(true);
+    setSyncMessage("");
+    try {
+      const res = await adminSyncGallerySiteAssets(token);
+      setSyncMessage(
+        `Sincronización completada: ${res.linkedFromSite} imágenes del sitio vinculadas y ${res.pendingFromNews} imágenes de noticias añadidas a pendientes.`,
+      );
+      await loadData();
+    } catch (err: any) {
+      setSyncMessage(err.message || "Error al sincronizar activos");
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
+  // ── Acciones de Colecciones ──
+
+  const handleOpenCreateCollection = () => {
+    setEditingCollectionId(null);
+    setColTitle("");
+    setColDesc("");
+    setColCategory("");
+    setColTagsStr("");
+    setColFeatured(false);
+    setColError("");
+    setIsCollectionModalOpen(true);
+  };
+
+  const handleOpenEditCollection = (col: GalleryCollection) => {
+    setEditingCollectionId(col.id);
+    setColTitle(col.title);
+    setColDesc(col.description);
+    setColCategory(col.category || "");
+    setColTagsStr((col.tags || []).join(", "));
+    setColFeatured(Boolean(col.featured));
+    setColError("");
+    setIsCollectionModalOpen(true);
+  };
+
+  const handleSaveCollection = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!token || !colTitle.trim() || !colDesc.trim()) {
+      setColError("Título y descripción son obligatorios.");
+      return;
+    }
 
     setColSaving(true);
-    setColError('');
+    setColError("");
+    const parsedTags = colTagsStr
+      .split(",")
+      .map((t) => t.trim())
+      .filter(Boolean);
 
     try {
-      await adminCreateGalleryCollection(
-        {
-          title: colTitle,
-          description: colDesc,
-          rotationFrequency: 'semanal',
-        },
-        token,
-      );
+      if (editingCollectionId) {
+        await adminUpdateGalleryCollection(
+          editingCollectionId,
+          {
+            title: colTitle,
+            description: colDesc,
+            category: colCategory || undefined,
+            tags: parsedTags,
+            featured: colFeatured,
+          },
+          token,
+        );
+      } else {
+        await adminCreateGalleryCollection(
+          {
+            title: colTitle,
+            description: colDesc,
+            category: colCategory || undefined,
+            tags: parsedTags,
+            featured: colFeatured,
+            rotationFrequency: "semanal",
+          },
+          token,
+        );
+      }
       setIsCollectionModalOpen(false);
       await loadData();
     } catch (err: any) {
-      setColError(err.message || 'Error al crear la colección');
+      setColError(err.message || "Error al guardar la colección");
     } finally {
       setColSaving(false);
     }
   };
 
-  const handleOpenAdd = (colId: string) => {
+  const handleDeleteCollection = async (col: GalleryCollection) => {
+    if (!token) return;
+    if (
+      !confirm(
+        `¿Eliminar la colección "${col.title}"?\nSus fotografías no se borrarán: pasarán automáticamente a la bandeja de "Pendientes de vincular".`,
+      )
+    ) {
+      return;
+    }
+
+    try {
+      await adminDeleteGalleryCollection(col.id, token);
+      await loadData();
+    } catch (err: any) {
+      alert(err.message || "Error al eliminar la colección");
+    }
+  };
+
+  // ── Acciones de Imágenes ──
+
+  const handleOpenAddImage = (colId: string) => {
+    setEditingImageId(null);
     setCollectionId(colId);
-    setAlt('');
-    setCaption('');
-    setUrl('');
+    setAlt("");
+    setCaption("");
+    setUrl("");
     setFeatured(false);
-    setErrorMsg('');
-    setIsModalOpen(true);
+    setPhotographer("");
+    setTelescope("");
+    setCamera("");
+    setExposureTime("");
+    setLocation("");
+    setCreditUrl("");
+    setErrorMsg("");
+    setIsImageModalOpen(true);
+  };
+
+  const handleOpenEditImage = (img: GalleryImage) => {
+    setEditingImageId(img.id);
+    setCollectionId(img.collectionId || "");
+    setAlt(img.alt || "");
+    setCaption(img.caption || "");
+    setUrl(img.url || "");
+    setFeatured(Boolean(img.featured));
+    setPhotographer(img.photographer || "");
+    setTelescope(img.telescope || "");
+    setCamera(img.camera || "");
+    setExposureTime(img.exposureTime || "");
+    setLocation(img.location || "");
+    setCreditUrl(img.creditUrl || "");
+    setErrorMsg("");
+    setIsImageModalOpen(true);
   };
 
   const handleSaveImage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!token || !collectionId || !alt) {
-      setErrorMsg('Por favor completa los campos requeridos (Título/Alt).');
+    if (!token || !alt.trim()) {
+      setErrorMsg("Por favor completa el título/alt de la fotografía.");
       return;
     }
 
     setSaving(true);
-    setErrorMsg('');
+    setErrorMsg("");
+
+    const payload = {
+      collectionId: collectionId || null,
+      alt: alt.trim(),
+      caption: caption.trim() || undefined,
+      url: url.trim() || "/assets/gallery-1.svg",
+      featured,
+      photographer: photographer.trim() || undefined,
+      telescope: telescope.trim() || undefined,
+      camera: camera.trim() || undefined,
+      exposureTime: exposureTime.trim() || undefined,
+      location: location.trim() || undefined,
+      creditUrl: creditUrl.trim() || undefined,
+    };
 
     try {
-      await adminAddGalleryImage(
-        {
-          collectionId,
-          alt,
-          caption,
-          url: url || '/assets/gallery-1.svg',
-          featured,
-        },
-        token,
-      );
-      setIsModalOpen(false);
+      if (editingImageId) {
+        await adminUpdateGalleryImage(editingImageId, payload, token);
+      } else {
+        await adminAddGalleryImage(payload, token);
+      }
+      setIsImageModalOpen(false);
       await loadData();
     } catch (err: any) {
-      setErrorMsg(err.message || 'Error al agregar fotografía');
+      setErrorMsg(err.message || "Error al guardar fotografía");
     } finally {
       setSaving(false);
     }
   };
 
+  const handleAssignPending = async (imgId: string) => {
+    if (!token) return;
+    const targetColId = assignTargets[imgId];
+    if (!targetColId) {
+      alert("Selecciona una colección destino antes de vincular.");
+      return;
+    }
+
+    setAssigningId(imgId);
+    try {
+      await adminAssignGalleryImage(imgId, targetColId, token);
+      await loadData();
+    } catch (err: any) {
+      alert(err.message || "Error al vincular la fotografía");
+    } finally {
+      setAssigningId(null);
+    }
+  };
+
+  const handleIgnorePending = async (imgId: string) => {
+    if (!token) return;
+    setAssigningId(imgId);
+    try {
+      await adminUpdateGalleryImage(imgId, { status: "IGNORED" }, token);
+      await loadData();
+    } catch (err: any) {
+      alert(err.message || "Error al descartar la fotografía");
+    } finally {
+      setAssigningId(null);
+    }
+  };
+
   const handleDeleteImage = async (imgId: string, imgAlt: string) => {
     if (!token) return;
-    if (!confirm(`¿Eliminar la fotografía "${imgAlt}"?`)) return;
+    if (!confirm(`¿Eliminar permanentemente la fotografía "${imgAlt}"?`))
+      return;
 
     try {
       await adminDeleteGalleryImage(imgId, token);
       await loadData();
     } catch (err: any) {
-      alert(err.message || 'Error al eliminar');
+      alert(err.message || "Error al eliminar");
     }
   };
 
   return (
-    <div className="space-y-8 max-w-6xl mx-auto">
+    <div className="space-y-6 max-w-6xl mx-auto">
+      {/* Header Principal */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#0d162a] p-6 rounded-3xl border border-white/10">
         <div>
           <h1 className="text-2xl font-bold text-white font-[var(--font-montserrat)]">
-            Gestión de Fragmentos de Memoria (Galería)
+            Gestión de Galería de Fotos Astronómicas
           </h1>
           <p className="text-xs text-slate-400 mt-1">
-            Administra los álbumes de astrofotografía y agrega nuevas tomas en alta resolución.
+            Administra colecciones, metadatos astrofotográficos y vincula
+            imágenes pendientes provenientes de Noticias o del sitio.
           </p>
         </div>
 
-        <div className="flex items-center gap-3 flex-wrap">
+        <div className="flex items-center gap-2.5 flex-wrap">
           <button
-            onClick={() => {
-              setColTitle('Fragmentos de Memoria');
-              setColDesc('Galería oficial de astrofotografía y momentos cósmicos de Jóvenes en Órbita.');
-              setColError('');
-              setIsCollectionModalOpen(true);
-            }}
+            type="button"
+            onClick={handleSyncSiteAssets}
+            disabled={isSyncing}
+            className="flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 font-[var(--font-montserrat)] font-bold text-xs uppercase px-4 py-3 rounded-xl transition-all cursor-pointer disabled:opacity-50"
+          >
+            <FiRefreshCw
+              className={`w-4 h-4 text-[#e8c648] ${isSyncing ? "animate-spin" : ""}`}
+            />
+            <span>Sincronizar sitio</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={handleOpenCreateCollection}
             className="flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-[var(--font-montserrat)] font-bold text-xs uppercase px-4 py-3 rounded-xl transition-all cursor-pointer"
           >
-            <FiFolderPlus className="w-4 h-4 text-[var(--color-yellow)]" />
+            <FiFolderPlus className="w-4 h-4 text-[#e8c648]" />
             <span>Nueva Colección</span>
           </button>
 
           {collections.length > 0 && (
             <button
-              onClick={() => handleOpenAdd(collections[0].id)}
+              type="button"
+              onClick={() => handleOpenAddImage(collections[0].id)}
               className="flex items-center gap-2 bg-[var(--color-red)] hover:bg-red-700 text-white font-[var(--font-montserrat)] font-bold text-xs uppercase px-5 py-3 rounded-xl transition-all shadow-lg hover:shadow-red-500/25 cursor-pointer flex-shrink-0"
             >
               <FiPlus className="w-4 h-4" />
@@ -182,106 +424,314 @@ export default function AdminGaleriaPage() {
         </div>
       </div>
 
+      {syncMessage && (
+        <div className="bg-[#0d162a] border border-[#e8c648]/40 text-slate-200 px-4 py-3 rounded-2xl text-xs flex items-center justify-between gap-3">
+          <span>{syncMessage}</span>
+          <button
+            type="button"
+            onClick={() => setSyncMessage("")}
+            className="text-slate-400 hover:text-white cursor-pointer"
+          >
+            <FiX className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+
+      {/* Pestañas: Colecciones vs Imágenes Pendientes de Vincular */}
+      <div className="flex items-center gap-2 border-b border-white/10 pb-3">
+        <button
+          type="button"
+          onClick={() => setActiveTab("collections")}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
+            activeTab === "collections"
+              ? "bg-[#e8c648] text-[#050811]"
+              : "bg-white/5 text-slate-300 hover:bg-white/10"
+          }`}
+        >
+          <FiImage className="w-4 h-4" />
+          <span>Colecciones ({collections.length})</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab("pending")}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
+            activeTab === "pending"
+              ? "bg-[#e8c648] text-[#050811]"
+              : "bg-white/5 text-slate-300 hover:bg-white/10"
+          }`}
+        >
+          <FiInbox className="w-4 h-4" />
+          <span>Pendientes de vincular</span>
+          {pendingTotal > 0 && (
+            <span
+              className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${
+                activeTab === "pending"
+                  ? "bg-[#050811] text-[#e8c648]"
+                  : "bg-[#d83933] text-white"
+              }`}
+            >
+              {pendingTotal}
+            </span>
+          )}
+        </button>
+      </div>
+
+      {/* Contenido Principal */}
       {isLoading ? (
         <div className="flex items-center justify-center py-16">
-          <FiLoader className="w-8 h-8 text-[var(--color-yellow)] animate-spin" />
+          <FiLoader className="w-8 h-8 text-[#e8c648] animate-spin" />
+        </div>
+      ) : activeTab === "pending" ? (
+        /* ── BANDEJA DE IMÁGENES PENDIENTES DE VINCULAR ── */
+        <div className="space-y-4">
+          {pendingImages.length === 0 ? (
+            <div className="bg-[#0d162a] border border-white/10 rounded-3xl p-12 text-center text-slate-300 space-y-2">
+              <FiCheck className="w-10 h-10 text-emerald-400 mx-auto" />
+              <h3 className="text-base font-bold text-white">
+                No hay imágenes pendientes de vincular
+              </h3>
+              <p className="text-xs text-slate-400 max-w-md mx-auto">
+                Cuando publiques nuevas noticias con imagen o elimines una
+                colección, sus fotografías aparecerán aquí para asignarlas a un
+                álbum.
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              {pendingImages.map((img) => (
+                <div
+                  key={img.id}
+                  className="bg-[#0d162a] border border-white/10 rounded-2xl overflow-hidden flex flex-col"
+                >
+                  <div className="relative h-44 bg-[#060a17]">
+                    <Image
+                      src={img.url || "/assets/gallery-1.svg"}
+                      alt={img.alt}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 33vw"
+                      className="object-cover"
+                    />
+                    <span className="absolute top-3 left-3 bg-[#050811]/85 border border-[#e8c648]/50 text-[#e8c648] text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md">
+                      Origen:{" "}
+                      {SOURCE_LABELS[img.sourceType || "MANUAL"] ||
+                        img.sourceType}
+                    </span>
+                  </div>
+
+                  <div className="p-4 flex-1 flex flex-col justify-between gap-3">
+                    <div>
+                      <h4 className="text-sm font-bold text-white line-clamp-2">
+                        {img.alt}
+                      </h4>
+                      {img.caption && (
+                        <p className="text-xs text-slate-400 mt-1 line-clamp-2">
+                          {img.caption}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="space-y-2 pt-2 border-t border-white/10">
+                      <label className="block text-[10px] uppercase tracking-wider text-slate-400 font-bold">
+                        Colección destino
+                      </label>
+                      <select
+                        value={assignTargets[img.id] || ""}
+                        onChange={(e) =>
+                          setAssignTargets((prev) => ({
+                            ...prev,
+                            [img.id]: e.target.value,
+                          }))
+                        }
+                        className="w-full bg-[#060a17] border border-white/15 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-[#e8c648]"
+                      >
+                        {collections.length === 0 ? (
+                          <option value="">Crea una colección primero</option>
+                        ) : (
+                          collections.map((c) => (
+                            <option key={c.id} value={c.id}>
+                              {c.title}
+                            </option>
+                          ))
+                        )}
+                      </select>
+
+                      <div className="flex items-center gap-2 pt-1">
+                        <button
+                          type="button"
+                          disabled={
+                            collections.length === 0 || assigningId === img.id
+                          }
+                          onClick={() => handleAssignPending(img.id)}
+                          className="flex-1 inline-flex items-center justify-center gap-1.5 bg-[#e8c648] hover:bg-[#f5db76] text-[#050811] font-bold text-xs py-2 px-3 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
+                        >
+                          <FiLink className="w-3.5 h-3.5" />
+                          <span>Vincular</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          disabled={assigningId === img.id}
+                          onClick={() => handleIgnorePending(img.id)}
+                          title="Descartar de pendientes"
+                          className="px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 text-xs font-semibold cursor-pointer"
+                        >
+                          Ignorar
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteImage(img.id, img.alt)}
+                          title="Eliminar imagen"
+                          className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 cursor-pointer"
+                        >
+                          <FiTrash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       ) : collections.length === 0 ? (
         <div className="bg-[#0d162a] border border-white/10 rounded-3xl p-12 text-center text-slate-300 space-y-4">
-          <FiCamera className="w-12 h-12 text-[var(--color-yellow)] mx-auto opacity-80" />
+          <FiCamera className="w-12 h-12 text-[#e8c648] mx-auto opacity-80" />
           <div>
-            <h3 className="text-lg font-bold text-white mb-1">No hay colecciones fotográficas registradas</h3>
+            <h3 className="text-lg font-bold text-white mb-1">
+              No hay colecciones fotográficas registradas
+            </h3>
             <p className="text-xs text-slate-400 max-w-md mx-auto">
-              Crea la colección principal "Fragmentos de Memoria" para comenzar a subir fotos a la plataforma.
+              Crea tu primera colección o sincroniza las imágenes existentes del
+              sitio para empezar.
             </p>
           </div>
-
           <div className="pt-2 flex justify-center gap-3">
             <button
-              onClick={() => handleCreateCollection()}
-              className="flex items-center gap-2 bg-[var(--color-red)] hover:bg-red-700 text-white font-[var(--font-montserrat)] font-bold text-xs uppercase px-6 py-3 rounded-xl transition-all shadow-lg cursor-pointer"
+              type="button"
+              onClick={handleOpenCreateCollection}
+              className="inline-flex items-center gap-2 bg-[#e8c648] text-[#050811] font-bold text-xs uppercase px-5 py-3 rounded-xl cursor-pointer"
             >
-              <FiPlus className="w-4 h-4" />
-              <span>Inicializar Colección "Fragmentos de Memoria"</span>
+              <FiFolderPlus className="w-4 h-4" />
+              <span>Crear Colección</span>
             </button>
           </div>
         </div>
       ) : (
-        <div className="space-y-10">
+        /* ── LISTADO DE COLECCIONES Y SUS FOTOS ── */
+        <div className="space-y-8">
           {collections.map((col) => (
-            <div key={col.id} className="bg-[#0d162a] border border-white/10 p-6 md:p-8 rounded-3xl space-y-6">
+            <div
+              key={col.id}
+              className="bg-[#0d162a] border border-white/10 rounded-3xl p-6 space-y-5"
+            >
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-4">
                 <div>
-                  <span className="text-xs uppercase tracking-widest text-[var(--color-yellow)] font-bold block mb-1">
-                    Colección Activa
-                  </span>
-                  <h2 className="text-xl font-bold text-white font-[var(--font-montserrat)]">
-                    {col.title}
-                  </h2>
-                  <p className="text-xs text-slate-400 mt-0.5">{col.description}</p>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h2 className="text-lg font-bold text-white font-[var(--font-montserrat)]">
+                      {col.title}
+                    </h2>
+                    {col.featured && (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#e8c648]/15 border border-[#e8c648]/40 text-[#e8c648] text-[10px] font-bold uppercase">
+                        <FiStar className="w-3 h-3" /> Destacada
+                      </span>
+                    )}
+                    {col.category && (
+                      <span className="px-2 py-0.5 rounded-md bg-white/5 text-slate-300 text-[10px] font-semibold uppercase">
+                        {col.category}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs text-slate-400 mt-1">
+                    {col.description}
+                  </p>
                 </div>
 
-                <button
-                  onClick={() => handleOpenAdd(col.id)}
-                  className="flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold px-4 py-2.5 rounded-xl text-slate-200 cursor-pointer"
-                >
-                  <FiPlus className="text-[var(--color-yellow)]" />
-                  <span>Subir foto a este álbum</span>
-                </button>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <button
+                    type="button"
+                    onClick={() => handleOpenAddImage(col.id)}
+                    className="inline-flex items-center gap-1.5 bg-white/10 hover:bg-white/15 text-white text-xs font-bold px-3.5 py-2 rounded-xl cursor-pointer"
+                  >
+                    <FiPlus className="w-3.5 h-3.5" />
+                    <span>Agregar foto</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleOpenEditCollection(col)}
+                    className="inline-flex items-center gap-1.5 bg-white/5 hover:bg-white/10 text-slate-200 text-xs font-semibold px-3 py-2 rounded-xl cursor-pointer"
+                  >
+                    <FiEdit2 className="w-3.5 h-3.5" />
+                    <span>Editar</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteCollection(col)}
+                    className="inline-flex items-center gap-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-semibold px-3 py-2 rounded-xl cursor-pointer"
+                  >
+                    <FiTrash2 className="w-3.5 h-3.5" />
+                    <span>Eliminar</span>
+                  </button>
+                </div>
               </div>
 
-              {/* Grid of Images */}
               {col.images.length === 0 ? (
-                <div className="py-8 text-center text-xs text-slate-400 border border-dashed border-white/10 rounded-2xl">
-                  Esta colección aún no tiene fotografías. Haz clic en "Subir foto a este álbum" para agregar la primera.
-                </div>
+                <p className="text-xs text-slate-500 py-4 text-center">
+                  Esta colección aún no tiene fotografías.
+                </p>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                  {col.images.map((img, idx) => {
-                    const imageSrc =
-                      img.url && img.url.trim() !== ''
-                        ? img.url
-                        : `/assets/gallery-${(idx % 6) + 1}.svg`;
-
-                    return (
-                      <div
-                        key={img.id || idx}
-                        className="group relative h-48 rounded-none overflow-hidden bg-[#060a17] border border-white/10 flex flex-col justify-between p-3"
-                      >
+                  {col.images.map((img) => (
+                    <div
+                      key={img.id}
+                      className="group relative bg-[#060a17] border border-white/10 rounded-xl overflow-hidden flex flex-col"
+                    >
+                      <div className="relative aspect-[4/3] w-full">
                         <Image
-                          src={imageSrc}
-                          alt={img.alt || 'Fotografía de galería'}
+                          src={img.url || "/assets/gallery-1.svg"}
+                          alt={img.alt}
                           fill
-                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 33vw, 25vw"
+                          sizes="(max-width: 768px) 50vw, 25vw"
                           className="object-cover"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/40" />
-
-                        <div className="relative z-10 flex justify-between items-start">
-                          {img.featured ? (
-                            <span className="bg-[var(--color-yellow)] text-[#060a17] text-[10px] font-bold uppercase px-2 py-0.5 rounded-full">
-                              Destacada
-                            </span>
-                          ) : <span />}
-
+                      </div>
+                      <div className="p-3 flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <p className="text-xs font-bold text-white truncate">
+                            {img.alt}
+                          </p>
+                          {(img.photographer || img.telescope) && (
+                            <p className="text-[10px] text-slate-400 truncate mt-0.5">
+                              {[img.photographer, img.telescope]
+                                .filter(Boolean)
+                                .join(" · ")}
+                            </p>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-1 shrink-0">
                           <button
+                            type="button"
+                            onClick={() => handleOpenEditImage(img)}
+                            title="Editar fotografía y metadatos"
+                            className="p-1.5 rounded-lg bg-white/5 hover:bg-white/15 text-slate-300 cursor-pointer"
+                          >
+                            <FiEdit2 className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            type="button"
                             onClick={() => handleDeleteImage(img.id, img.alt)}
-                            className="p-1.5 rounded-lg bg-red-500/80 hover:bg-red-600 text-white transition-colors cursor-pointer"
-                            title="Eliminar foto"
+                            title="Eliminar fotografía"
+                            className="p-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 cursor-pointer"
                           >
                             <FiTrash2 className="w-3.5 h-3.5" />
                           </button>
                         </div>
-
-                        <div className="relative z-10">
-                          <span className="text-xs font-bold text-white block truncate">{img.alt}</span>
-                          {img.caption && (
-                            <span className="text-[10px] text-slate-300 block truncate">{img.caption}</span>
-                          )}
-                        </div>
                       </div>
-                    );
-                  })}
+                    </div>
+                  ))}
                 </div>
               )}
             </div>
@@ -289,69 +739,110 @@ export default function AdminGaleriaPage() {
         </div>
       )}
 
-      {/* Create Collection Modal */}
+      {/* Modal: Crear / Editar Colección */}
       {isCollectionModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-[#0b1120] border border-white/20 rounded-3xl max-w-md w-full p-6 md:p-8 relative shadow-2xl animate-fade-in-up">
-            <button
-              onClick={() => setIsCollectionModalOpen(false)}
-              className="absolute top-6 right-6 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
-            >
-              <FiX className="w-5 h-5" />
-            </button>
-
-            <h2 className="text-2xl font-bold text-white mb-1 font-[var(--font-montserrat)]">
-              Nueva Colección Fotográfica
-            </h2>
-            <p className="text-xs text-slate-400 mb-6">
-              Crea un nuevo álbum para organizar capturas y astrofotografías.
-            </p>
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-[#0d162a] border border-white/15 rounded-3xl w-full max-w-lg p-6 space-y-5">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-bold text-white">
+                {editingCollectionId ? "Editar Colección" : "Nueva Colección"}
+              </h2>
+              <button
+                type="button"
+                onClick={() => setIsCollectionModalOpen(false)}
+                className="text-slate-400 hover:text-white cursor-pointer"
+              >
+                <FiX className="w-5 h-5" />
+              </button>
+            </div>
 
             {colError && (
-              <div className="mb-4 text-xs text-red-300 bg-red-500/10 p-3 rounded-xl border border-red-500/20">
-                {colError}
+              <div className="flex items-center gap-2 bg-red-500/15 border border-red-500/40 text-red-300 text-xs p-3 rounded-xl">
+                <FiAlertCircle className="w-4 h-4 shrink-0" />
+                <span>{colError}</span>
               </div>
             )}
 
-            <form onSubmit={handleCreateCollection} className="space-y-4 text-xs">
+            <form onSubmit={handleSaveCollection} className="space-y-4">
               <div>
-                <label className="block text-slate-300 font-semibold mb-1">Título del Álbum *</label>
+                <label className="block text-xs font-bold text-slate-300 mb-1">
+                  Título *
+                </label>
                 <input
                   type="text"
+                  required
                   value={colTitle}
                   onChange={(e) => setColTitle(e.target.value)}
-                  placeholder="Ej. Fragmentos de Memoria"
-                  className="w-full bg-[#060a17] border border-white/15 px-3.5 py-2.5 rounded-xl text-white outline-none focus:border-[var(--color-yellow)]"
-                  required
+                  placeholder="Ej. Grandes Exploradores: El Apollo 11"
+                  className="w-full bg-[#060a17] border border-white/15 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none focus:border-[#e8c648]"
                 />
               </div>
 
               <div>
-                <label className="block text-slate-300 font-semibold mb-1">Descripción</label>
+                <label className="block text-xs font-bold text-slate-300 mb-1">
+                  Descripción *
+                </label>
                 <textarea
                   rows={3}
+                  required
                   value={colDesc}
                   onChange={(e) => setColDesc(e.target.value)}
-                  placeholder="Descripción de las capturas fotográficas..."
-                  className="w-full bg-[#060a17] border border-white/15 px-3.5 py-2.5 rounded-xl text-white outline-none focus:border-[var(--color-yellow)] resize-none"
+                  placeholder="Descripción breve del álbum fotográfico..."
+                  className="w-full bg-[#060a17] border border-white/15 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none focus:border-[#e8c648]"
                 />
               </div>
 
-              <div className="pt-4 border-t border-white/10 flex items-center justify-end gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 mb-1">
+                    Categoría
+                  </label>
+                  <input
+                    type="text"
+                    value={colCategory}
+                    onChange={(e) => setColCategory(e.target.value)}
+                    placeholder="Misiones Espaciales"
+                    className="w-full bg-[#060a17] border border-white/15 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none focus:border-[#e8c648]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 mb-1">
+                    Tags (separados por coma)
+                  </label>
+                  <input
+                    type="text"
+                    value={colTagsStr}
+                    onChange={(e) => setColTagsStr(e.target.value)}
+                    placeholder="Apollo, Luna, NASA"
+                    className="w-full bg-[#060a17] border border-white/15 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none focus:border-[#e8c648]"
+                  />
+                </div>
+              </div>
+
+              <label className="flex items-center gap-2.5 text-xs text-slate-200 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={colFeatured}
+                  onChange={(e) => setColFeatured(e.target.checked)}
+                  className="accent-[#e8c648]"
+                />
+                <span>Destacar esta colección en la página principal</span>
+              </label>
+
+              <div className="flex justify-end gap-2 pt-2">
                 <button
                   type="button"
                   onClick={() => setIsCollectionModalOpen(false)}
-                  className="px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 font-semibold"
+                  className="px-4 py-2.5 rounded-xl bg-white/5 text-slate-300 text-xs font-bold cursor-pointer"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
                   disabled={colSaving}
-                  className="flex items-center gap-2 bg-[var(--color-red)] hover:bg-red-700 text-white font-[var(--font-montserrat)] font-bold text-xs uppercase px-6 py-2.5 rounded-xl transition-all shadow-lg hover:shadow-red-500/25 disabled:opacity-50 cursor-pointer"
+                  className="px-5 py-2.5 rounded-xl bg-[#e8c648] text-[#050811] text-xs font-bold uppercase cursor-pointer disabled:opacity-50"
                 >
-                  {colSaving ? <FiLoader className="w-4 h-4 animate-spin" /> : <FiCheck className="w-4 h-4" />}
-                  <span>Crear Colección</span>
+                  {colSaving ? "Guardando..." : "Guardar Colección"}
                 </button>
               </div>
             </form>
@@ -359,102 +850,164 @@ export default function AdminGaleriaPage() {
         </div>
       )}
 
-      {/* Add Image Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-[#0b1120] border border-white/20 rounded-3xl max-w-lg w-full p-6 md:p-8 relative shadow-2xl animate-fade-in-up">
-            <button
-              onClick={() => setIsModalOpen(false)}
-              className="absolute top-6 right-6 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
-            >
-              <FiX className="w-5 h-5" />
-            </button>
-
-            <h2 className="text-2xl font-bold text-white mb-1 font-[var(--font-montserrat)]">
-              Añadir Fotografía
-            </h2>
-            <p className="text-xs text-slate-400 mb-6">
-              Ingresa la descripción y la imagen de la captura astronómica.
-            </p>
+      {/* Modal: Agregar / Editar Fotografía con Metadatos Astrofotográficos */}
+      {isImageModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-[#0d162a] border border-white/15 rounded-3xl w-full max-w-xl p-6 space-y-5 my-8">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-bold text-white">
+                {editingImageId ? "Editar Fotografía" : "Añadir Fotografía"}
+              </h2>
+              <button
+                type="button"
+                onClick={() => setIsImageModalOpen(false)}
+                className="text-slate-400 hover:text-white cursor-pointer"
+              >
+                <FiX className="w-5 h-5" />
+              </button>
+            </div>
 
             {errorMsg && (
-              <div className="mb-4 text-xs text-red-300 bg-red-500/10 p-3 rounded-xl border border-red-500/20">
-                {errorMsg}
+              <div className="flex items-center gap-2 bg-red-500/15 border border-red-500/40 text-red-300 text-xs p-3 rounded-xl">
+                <FiAlertCircle className="w-4 h-4 shrink-0" />
+                <span>{errorMsg}</span>
               </div>
             )}
 
-            <form onSubmit={handleSaveImage} className="space-y-4 text-xs">
+            <form onSubmit={handleSaveImage} className="space-y-4">
               <div>
-                <label className="block text-slate-300 font-semibold mb-1">Título / Nombre *</label>
-                <input
-                  type="text"
-                  value={alt}
-                  onChange={(e) => setAlt(e.target.value)}
-                  placeholder="Ej. Salida de la Tierra sobre el limbo lunar"
-                  className="w-full bg-[#060a17] border border-white/15 px-3.5 py-2.5 rounded-xl text-white outline-none focus:border-[var(--color-yellow)]"
-                  required
-                />
+                <label className="block text-xs font-bold text-slate-300 mb-1">
+                  Colección (dejar vacío para bandeja de pendientes)
+                </label>
+                <select
+                  value={collectionId}
+                  onChange={(e) => setCollectionId(e.target.value)}
+                  className="w-full bg-[#060a17] border border-white/15 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none focus:border-[#e8c648]"
+                >
+                  <option value="">
+                    — Sin colección (Pendiente de vincular) —
+                  </option>
+                  {collections.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.title}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div>
-                <label className="block text-slate-300 font-semibold mb-1">Descripción / Pie de foto</label>
+                <label className="block text-xs font-bold text-slate-300 mb-1">
+                  Título / Nombre de la foto *
+                </label>
                 <input
                   type="text"
-                  value={caption}
-                  onChange={(e) => setCaption(e.target.value)}
-                  placeholder="Capturada por el telescopio durante la misión..."
-                  className="w-full bg-[#060a17] border border-white/15 px-3.5 py-2.5 rounded-xl text-white outline-none focus:border-[var(--color-yellow)]"
+                  required
+                  value={alt}
+                  onChange={(e) => setAlt(e.target.value)}
+                  placeholder="Ej. Nebulosa de Carina"
+                  className="w-full bg-[#060a17] border border-white/15 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none focus:border-[#e8c648]"
                 />
               </div>
 
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <label className="text-slate-300 font-semibold">URL de la Imagen</label>
+                  <label className="text-xs font-bold text-slate-300">
+                    URL de la imagen
+                  </label>
                   <button
                     type="button"
                     onClick={() => setIsFreePickerOpen(true)}
-                    className="text-[11px] text-cyan-400 hover:text-cyan-300 font-medium underline flex items-center gap-1 cursor-pointer"
+                    className="text-[11px] font-bold text-[#e8c648] hover:underline cursor-pointer"
                   >
-                    🚀 Buscar Foto Gratis (NASA/Unsplash)
+                    Buscar en NASA / Unsplash
                   </button>
                 </div>
                 <input
                   type="text"
                   value={url}
                   onChange={(e) => setUrl(e.target.value)}
-                  placeholder="/assets/gallery-1.svg o https://..."
-                  className="w-full bg-[#060a17] border border-white/15 px-3.5 py-2.5 rounded-xl text-white outline-none focus:border-[var(--color-yellow)]"
+                  placeholder="https://..."
+                  className="w-full bg-[#060a17] border border-white/15 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none focus:border-[#e8c648]"
                 />
               </div>
 
-              <div className="flex items-center gap-2 pt-2">
-                <input
-                  type="checkbox"
-                  id="feat"
-                  checked={featured}
-                  onChange={(e) => setFeatured(e.target.checked)}
-                  className="rounded bg-[#060a17] border-white/20 text-[var(--color-yellow)] cursor-pointer"
-                />
-                <label htmlFor="feat" className="text-slate-300 font-semibold cursor-pointer">
-                  Marcar como imagen destacada
+              <div>
+                <label className="block text-xs font-bold text-slate-300 mb-1">
+                  Descripción / Pie de foto
                 </label>
+                <input
+                  type="text"
+                  value={caption}
+                  onChange={(e) => setCaption(e.target.value)}
+                  className="w-full bg-[#060a17] border border-white/15 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none focus:border-[#e8c648]"
+                />
               </div>
 
-              <div className="pt-4 border-t border-white/10 flex items-center justify-end gap-3">
+              {/* Metadatos astrofotográficos */}
+              <div className="pt-2 border-t border-white/10 space-y-3">
+                <p className="text-[11px] font-bold uppercase tracking-wider text-[#e8c648]">
+                  Metadatos Astrofotográficos (Opcionales)
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <input
+                    type="text"
+                    value={photographer}
+                    onChange={(e) => setPhotographer(e.target.value)}
+                    placeholder="Fotógrafo / Agencia"
+                    className="w-full bg-[#060a17] border border-white/15 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-[#e8c648]"
+                  />
+                  <input
+                    type="text"
+                    value={telescope}
+                    onChange={(e) => setTelescope(e.target.value)}
+                    placeholder="Telescopio / Instrumento"
+                    className="w-full bg-[#060a17] border border-white/15 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-[#e8c648]"
+                  />
+                  <input
+                    type="text"
+                    value={camera}
+                    onChange={(e) => setCamera(e.target.value)}
+                    placeholder="Cámara / Sensor"
+                    className="w-full bg-[#060a17] border border-white/15 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-[#e8c648]"
+                  />
+                  <input
+                    type="text"
+                    value={exposureTime}
+                    onChange={(e) => setExposureTime(e.target.value)}
+                    placeholder="Exposición (ej. 120s x 30)"
+                    className="w-full bg-[#060a17] border border-white/15 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-[#e8c648]"
+                  />
+                  <input
+                    type="text"
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                    placeholder="Ubicación / Órbita"
+                    className="w-full bg-[#060a17] border border-white/15 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-[#e8c648]"
+                  />
+                  <input
+                    type="url"
+                    value={creditUrl}
+                    onChange={(e) => setCreditUrl(e.target.value)}
+                    placeholder="URL de crédito (https://...)"
+                    className="w-full bg-[#060a17] border border-white/15 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-[#e8c648]"
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2">
                 <button
                   type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 font-semibold cursor-pointer"
+                  onClick={() => setIsImageModalOpen(false)}
+                  className="px-4 py-2.5 rounded-xl bg-white/5 text-slate-300 text-xs font-bold cursor-pointer"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
                   disabled={saving}
-                  className="flex items-center gap-2 bg-[var(--color-red)] hover:bg-red-700 text-white font-[var(--font-montserrat)] font-bold text-xs uppercase px-6 py-2.5 rounded-xl transition-all shadow-lg hover:shadow-red-500/25 disabled:opacity-50 cursor-pointer"
+                  className="px-5 py-2.5 rounded-xl bg-[#e8c648] text-[#050811] text-xs font-bold uppercase cursor-pointer disabled:opacity-50"
                 >
-                  {saving ? <FiLoader className="w-4 h-4 animate-spin" /> : <FiCheck className="w-4 h-4" />}
-                  <span>Guardar Foto</span>
+                  {saving ? "Guardando..." : "Guardar Fotografía"}
                 </button>
               </div>
             </form>
@@ -462,20 +1015,18 @@ export default function AdminGaleriaPage() {
         </div>
       )}
 
-      {/* Free Image Picker Modal */}
-      {token && (
+      {isFreePickerOpen && token && (
         <FreeImagePicker
           isOpen={isFreePickerOpen}
-          onClose={() => setIsFreePickerOpen(false)}
           token={token}
-          defaultQuery="astronomia"
+          onClose={() => setIsFreePickerOpen(false)}
           onSelectImage={(selectedUrl, selectedCaption) => {
             setUrl(selectedUrl);
-            if (selectedCaption && !caption) setCaption(selectedCaption);
+            if (!alt && selectedCaption) setAlt(selectedCaption);
+            setIsFreePickerOpen(false);
           }}
         />
       )}
     </div>
   );
 }
-
