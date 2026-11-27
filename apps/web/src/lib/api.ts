@@ -2,6 +2,10 @@ import type {
   ApiResponse,
   StatItem,
   NewsArticle,
+  NewsCategory,
+  NewsSearchFilterParams,
+  PaginatedNewsResponse,
+  CreateCategoryDto,
   UniverseSection,
   SolarSystemSection,
   ConstellationsSection,
@@ -36,6 +40,7 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api";
 
 /**
  * Envoltorio principal para llamadas a la API de NestJS.
+ * Usa `cache: "no-store"` para reflejar instantáneamente los cambios del panel admin.
  */
 async function fetchApi<T>(
   endpoint: string,
@@ -43,7 +48,7 @@ async function fetchApi<T>(
 ): Promise<T> {
   try {
     const res = await fetch(`${API_BASE}${endpoint}`, {
-      next: { revalidate: 30 },
+      cache: "no-store",
       ...options,
     });
 
@@ -121,10 +126,77 @@ export async function getNews(
 
 export async function getNewsBySlug(slug: string): Promise<NewsArticle | null> {
   try {
-    return await fetchApi<NewsArticle>(`/news/${slug}`);
+    return await fetchApi<NewsArticle>(
+      `/news/${encodeURIComponent(slug)}?include=all`,
+    );
   } catch (err) {
     console.error(`Error fetching /news/${slug}:`, err);
     return null;
+  }
+}
+
+export async function searchNews(
+  params: NewsSearchFilterParams = {},
+): Promise<PaginatedNewsResponse> {
+  const qs = new URLSearchParams();
+  if (params.search && params.search.trim())
+    qs.set("search", params.search.trim());
+  if (params.title && params.title.trim()) qs.set("title", params.title.trim());
+  if (params.category && params.category.trim())
+    qs.set("category", params.category.trim());
+  if (params.tag && params.tag.trim()) qs.set("tag", params.tag.trim());
+  if (params.status) {
+    qs.set(
+      "status",
+      Array.isArray(params.status) ? params.status.join(",") : params.status,
+    );
+  }
+  if (params.sortBy) qs.set("sortBy", params.sortBy);
+  if (params.sortOrder) qs.set("sortOrder", params.sortOrder);
+  if (params.page) qs.set("page", String(params.page));
+  if (params.limit) qs.set("limit", String(params.limit));
+  qs.set("include", params.include ?? "categories");
+
+  const query = qs.toString() ? `?${qs.toString()}` : "";
+  try {
+    const res = await fetchApi<PaginatedNewsResponse>(`/news/search${query}`);
+    const data = res.data ?? res.items ?? [];
+    return {
+      data,
+      items: data,
+      total: res.total ?? data.length,
+      page: res.page ?? params.page ?? 1,
+      limit: res.limit ?? params.limit ?? 6,
+      totalPages: res.totalPages ?? 1,
+    };
+  } catch (err) {
+    console.error("Error fetching /news/search:", err);
+    return {
+      data: [],
+      items: [],
+      total: 0,
+      page: params.page ?? 1,
+      limit: params.limit ?? 6,
+      totalPages: 1,
+    };
+  }
+}
+
+export async function getNewsCategories(): Promise<NewsCategory[]> {
+  try {
+    return await fetchApi<NewsCategory[]>("/news/categories");
+  } catch (err) {
+    console.error("Error fetching /news/categories:", err);
+    return [];
+  }
+}
+
+export async function getNewsTags(): Promise<string[]> {
+  try {
+    return await fetchApi<string[]>("/news/tags");
+  } catch (err) {
+    console.error("Error fetching /news/tags:", err);
+    return [];
   }
 }
 
@@ -369,6 +441,16 @@ export async function adminDeleteNews(
       method: "DELETE",
     },
   );
+}
+
+export async function adminCreateNewsCategory(
+  dto: CreateCategoryDto,
+  token: string,
+): Promise<NewsCategory> {
+  return fetchAuthApi<NewsCategory>("/news/categories", token, {
+    method: "POST",
+    body: JSON.stringify(dto),
+  });
 }
 
 // ── Constelaciones (Admin) ──

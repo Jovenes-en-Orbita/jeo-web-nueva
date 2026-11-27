@@ -2,10 +2,9 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import type { PaginatedGalleryCollectionsResponse } from "@jeo/shared";
-import { FiSearch, FiX, FiLoader } from "react-icons/fi";
 import { searchGalleryCollections } from "@/lib/api";
 import { GalleryCollectionCard } from "./GalleryCollectionCard";
-import { PaginationControls } from "@/components/ui/PaginationControls";
+import { SearchableCatalog } from "@/components/ui/SearchableCatalog";
 
 interface GalleryCollectionsCatalogProps {
   initialResponse: PaginatedGalleryCollectionsResponse;
@@ -14,9 +13,7 @@ interface GalleryCollectionsCatalogProps {
 const COLLECTIONS_PER_PAGE = 6; // Grid de 2 columnas x 3 filas
 
 /**
- * Diseño 2: Catálogo completo de colecciones de galería.
- * Incluye buscador de colecciones, grilla de 2 columnas x 3 filas con la tarjeta estándar
- * y navegación horizontal por paginación con botones.
+ * Catálogo completo de colecciones de galería usando el componente compartido SearchableCatalog.
  */
 export function GalleryCollectionsCatalog({
   initialResponse,
@@ -74,79 +71,35 @@ export function GalleryCollectionsCatalog({
     setPage(1);
   };
 
-  const handlePageChange = (nextPage: number) => {
-    setPage(nextPage);
-    if (typeof window !== "undefined") {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-  };
+  const resultSummary =
+    debouncedSearch && !isLoading
+      ? total === 1
+        ? `1 colección encontrada para "${debouncedSearch}"`
+        : `${total} colecciones encontradas para "${debouncedSearch}"`
+      : null;
 
   return (
-    <div className="w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-      {/* Buscador de colecciones */}
-      <div className="max-w-xl mx-auto mb-10 sm:mb-12">
-        <div className="relative">
-          <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
-          <input
-            type="text"
-            value={searchInput}
-            onChange={(e) => handleSearchChange(e.target.value)}
-            placeholder="Buscar colecciones por título, categoría o temática..."
-            aria-label="Buscar colecciones fotográficas"
-            className="w-full bg-[#090e1d] border border-white/15 pl-11 pr-10 py-3 text-sm text-white placeholder:text-slate-500 outline-none focus:border-[#e8c648] transition-colors font-inter"
-          />
-          {searchInput && (
-            <button
-              type="button"
-              onClick={() => handleSearchChange("")}
-              aria-label="Limpiar búsqueda"
-              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-white transition-colors cursor-pointer"
-            >
-              <FiX className="w-4 h-4" />
-            </button>
-          )}
-        </div>
-        {debouncedSearch && !isLoading && (
-          <p className="text-xs text-slate-400 mt-2 text-center font-inter">
-            {total === 1
-              ? `1 colección encontrada para "${debouncedSearch}"`
-              : `${total} colecciones encontradas para "${debouncedSearch}"`}
-          </p>
-        )}
-      </div>
-
-      {/* Grilla de 2 columnas x 3 filas */}
-      {isLoading ? (
-        <div className="py-20 flex items-center justify-center">
-          <FiLoader className="w-8 h-8 text-[#e8c648] animate-spin" />
-        </div>
-      ) : data.length === 0 ? (
-        <div className="py-16 text-center border border-white/10 bg-[#080d1a]">
-          <p className="text-sm text-slate-400 font-inter">
-            {debouncedSearch
-              ? "No se encontraron colecciones que coincidan con tu búsqueda."
-              : "Aún no hay colecciones fotográficas disponibles."}
-          </p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-12">
-          {data.map((collection) => (
-            <GalleryCollectionCard
-              key={collection.id}
-              collection={collection}
-            />
-          ))}
-        </div>
+    <SearchableCatalog
+      items={data}
+      getKey={(collection) => collection.id}
+      renderItem={(collection) => (
+        <GalleryCollectionCard collection={collection} />
       )}
-
-      {/* Paginación horizontal por botones */}
-      <PaginationControls
-        currentPage={page}
-        totalPages={totalPages}
-        onPageChange={handlePageChange}
-        isLoading={isLoading}
-        ariaLabel="Paginación de colecciones fotográficas"
-      />
-    </div>
+      searchValue={searchInput}
+      onSearchChange={handleSearchChange}
+      searchPlaceholder="Buscar colecciones por título, categoría o temática..."
+      searchAriaLabel="Buscar colecciones fotográficas"
+      resultSummary={resultSummary}
+      isLoading={isLoading}
+      hasActiveFilters={Boolean(debouncedSearch)}
+      emptyMessage="Aún no hay colecciones fotográficas disponibles."
+      emptySearchMessage="No se encontraron colecciones que coincidan con tu búsqueda."
+      currentPage={page}
+      totalPages={totalPages}
+      onPageChange={setPage}
+      paginationAriaLabel="Paginación de colecciones fotográficas"
+      containerClassName="w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8"
+      gridClassName="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-12"
+    />
   );
 }
