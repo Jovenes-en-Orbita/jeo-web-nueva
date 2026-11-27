@@ -1,10 +1,23 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import { useAdminAuth } from '@/context/AdminAuthContext';
-import { getNews, adminCreateNews, adminUpdateNews, adminDeleteNews } from '@/lib/api';
-import { FreeImagePicker } from '@/components/ui/FreeImagePicker';
-import type { NewsArticle } from '@jeo/shared';
+import React, { useState, useEffect, useCallback } from "react";
+import { useAdminAuth } from "@/context/AdminAuthContext";
+import {
+  searchNews,
+  getNewsCategories,
+  adminCreateNews,
+  adminUpdateNews,
+  adminDeleteNews,
+  adminCreateNewsCategory,
+} from "@/lib/api";
+import { FreeImagePicker } from "@/components/ui/FreeImagePicker";
+import { RichTextEditor } from "@/components/ui/RichTextEditor";
+import type {
+  ArticleStatus,
+  CreateArticleReferenceDto,
+  NewsArticle,
+  NewsCategory,
+} from "@jeo/shared";
 import {
   FiPlus,
   FiEdit2,
@@ -14,13 +27,45 @@ import {
   FiLoader,
   FiCheck,
   FiAlertCircle,
-  FiEye,
-} from 'react-icons/fi';
+  FiBookOpen,
+} from "react-icons/fi";
+
+interface ReferenceFormItem {
+  title: string;
+  author: string;
+  publisher: string;
+  url: string;
+  publishedAt: string;
+}
+
+const EMPTY_REFERENCE: ReferenceFormItem = {
+  title: "",
+  author: "",
+  publisher: "",
+  url: "",
+  publishedAt: "",
+};
+
+const STATUS_LABELS: Record<string, { label: string; className: string }> = {
+  PUBLISHED: {
+    label: "Publicado",
+    className: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30",
+  },
+  DRAFT: {
+    label: "Borrador",
+    className: "bg-amber-500/15 text-amber-300 border-amber-500/30",
+  },
+  ARCHIVED: {
+    label: "Archivado",
+    className: "bg-slate-500/15 text-slate-300 border-slate-500/30",
+  },
+};
 
 export default function AdminNoticiasPage() {
   const { token } = useAdminAuth();
   const [articles, setArticles] = useState<NewsArticle[]>([]);
-  const [search, setSearch] = useState('');
+  const [categories, setCategories] = useState<NewsCategory[]>([]);
+  const [search, setSearch] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
   // Modal State
@@ -30,51 +75,66 @@ export default function AdminNoticiasPage() {
   const [isFreePickerOpen, setIsFreePickerOpen] = useState(false);
 
   // Form Fields
-  const [title, setTitle] = useState('');
-  const [slug, setSlug] = useState('');
-  const [summary, setSummary] = useState('');
-  const [author, setAuthor] = useState('Equipo JEO');
-  const [tagsStr, setTagsStr] = useState('Misiones Espaciales, NASA');
+  const [title, setTitle] = useState("");
+  const [slug, setSlug] = useState("");
+  const [summary, setSummary] = useState("");
+  const [author, setAuthor] = useState("Equipo JEO");
+  const [tagsStr, setTagsStr] = useState("Misiones Espaciales, NASA");
   const [readTimeMinutes, setReadTimeMinutes] = useState(5);
-  const [imageUrl, setImageUrl] = useState('/assets/artemis.svg');
-  const [coverImageCaption, setCoverImageCaption] = useState('');
-  const [content, setContent] = useState('');
-  const [previewTab, setPreviewTab] = useState<'write' | 'preview'>('write');
+  const [status, setStatus] = useState<ArticleStatus>("PUBLISHED");
+  const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>([]);
+  const [newCategoryName, setNewCategoryName] = useState("");
+  const [creatingCategory, setCreatingCategory] = useState(false);
+  const [imageUrl, setImageUrl] = useState("/assets/artemis.svg");
+  const [coverImageCaption, setCoverImageCaption] = useState("");
+  const [content, setContent] = useState("");
+  const [references, setReferences] = useState<ReferenceFormItem[]>([]);
 
   const [formLoading, setFormLoading] = useState(false);
-  const [formError, setFormError] = useState('');
+  const [formError, setFormError] = useState("");
 
-
-  const loadArticles = async () => {
+  const loadData = useCallback(async () => {
     setIsLoading(true);
     try {
-      const data = await getNews();
-      setArticles(data);
+      const [newsRes, cats] = await Promise.all([
+        searchNews({
+          page: 1,
+          limit: 100,
+          include: "all",
+          sortBy: "date",
+          sortOrder: "desc",
+        }),
+        getNewsCategories(),
+      ]);
+      setArticles(newsRes.data);
+      setCategories(cats);
     } catch (err) {
-      console.error('Error fetching news:', err);
+      console.error("Error fetching news:", err);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
-    loadArticles();
-  }, []);
+    loadData();
+  }, [loadData]);
 
   const handleOpenCreate = () => {
     setIsEditing(false);
     setCurrentId(null);
-    setTitle('');
-    setSlug('');
-    setSummary('');
-    setAuthor('Equipo JEO');
-    setTagsStr('Misiones Espaciales, Cosmos');
+    setTitle("");
+    setSlug("");
+    setSummary("");
+    setAuthor("Equipo JEO");
+    setTagsStr("Misiones Espaciales, Cosmos");
     setReadTimeMinutes(4);
-    setImageUrl('');
-    setCoverImageCaption('');
-    setContent('# Título de la noticia\n\nEscribe aquí el contenido...');
-    setFormError('');
-    setPreviewTab('write');
+    setStatus("PUBLISHED");
+    setSelectedCategoryIds([]);
+    setImageUrl("");
+    setCoverImageCaption("");
+    setContent("");
+    setReferences([]);
+    setFormError("");
     setIsModalOpen(true);
   };
 
@@ -84,29 +144,86 @@ export default function AdminNoticiasPage() {
     setTitle(article.title);
     setSlug(article.slug);
     setSummary(article.summary);
-    setAuthor(article.author || 'Equipo JEO');
-    setTagsStr(article.tags?.join(', ') || '');
+    setAuthor(article.author || "Equipo JEO");
+    setTagsStr(article.tags?.join(", ") || "");
     setReadTimeMinutes(article.readTimeMinutes);
-    setImageUrl(article.imageUrl || '/assets/artemis.svg');
-    setCoverImageCaption(article.coverImageCaption || '');
-    setContent(article.content || '');
-    setFormError('');
-    setPreviewTab('write');
+    setStatus((article.status as ArticleStatus) || "PUBLISHED");
+    setSelectedCategoryIds((article.categories ?? []).map((c) => c.id));
+    setImageUrl(article.imageUrl || "/assets/artemis.svg");
+    setCoverImageCaption(article.coverImageCaption || "");
+    setContent(article.content || "");
+    setReferences(
+      (article.references ?? []).map((r) => ({
+        title: r.title || "",
+        author: r.author || "",
+        publisher: r.publisher || "",
+        url: r.url || "",
+        publishedAt: r.publishedAt ? r.publishedAt.slice(0, 10) : "",
+      })),
+    );
+    setFormError("");
     setIsModalOpen(true);
   };
 
   const handleTitleChange = (val: string) => {
     setTitle(val);
     if (!isEditing) {
-      // Generate slug automatically from title
       const autoSlug = val
         .toLowerCase()
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/(^-|-$)/g, '');
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)/g, "");
       setSlug(autoSlug);
     }
+  };
+
+  const handleToggleCategory = (catId: string) => {
+    setSelectedCategoryIds((prev) =>
+      prev.includes(catId)
+        ? prev.filter((id) => id !== catId)
+        : [...prev, catId],
+    );
+  };
+
+  const handleCreateCategory = async () => {
+    if (!token || !newCategoryName.trim()) return;
+    setCreatingCategory(true);
+    try {
+      const created = await adminCreateNewsCategory(
+        { name: newCategoryName.trim() },
+        token,
+      );
+      setCategories((prev) => [...prev, created]);
+      setSelectedCategoryIds((prev) => [...prev, created.id]);
+      setNewCategoryName("");
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : "Error al crear la categoría";
+      setFormError(message);
+    } finally {
+      setCreatingCategory(false);
+    }
+  };
+
+  const handleAddReference = () => {
+    setReferences((prev) => [...prev, { ...EMPTY_REFERENCE }]);
+  };
+
+  const handleUpdateReference = (
+    index: number,
+    field: keyof ReferenceFormItem,
+    value: string,
+  ) => {
+    setReferences((prev) =>
+      prev.map((ref, idx) =>
+        idx === index ? { ...ref, [field]: value } : ref,
+      ),
+    );
+  };
+
+  const handleRemoveReference = (index: number) => {
+    setReferences((prev) => prev.filter((_, idx) => idx !== index));
   };
 
   const handleSave = async (e: React.FormEvent) => {
@@ -114,17 +231,33 @@ export default function AdminNoticiasPage() {
     if (!token) return;
 
     if (!title || !slug || !summary) {
-      setFormError('Por favor completa todos los campos requeridos (Título, Slug, Resumen).');
+      setFormError(
+        "Por favor completa todos los campos requeridos (Título, Slug, Resumen).",
+      );
       return;
     }
 
     setFormLoading(true);
-    setFormError('');
+    setFormError("");
 
     const tags = tagsStr
-      .split(',')
+      .split(",")
       .map((t) => t.trim())
       .filter((t) => t.length > 0);
+
+    const preparedReferences: CreateArticleReferenceDto[] = references
+      .filter((r) => r.title.trim() !== "")
+      .map((r) => ({
+        title: r.title.trim(),
+        ...(r.author.trim() && { author: r.author.trim() }),
+        ...(r.publisher.trim() && { publisher: r.publisher.trim() }),
+        ...(r.url.trim() && { url: r.url.trim() }),
+        ...(r.publishedAt.trim() && {
+          publishedAt: new Date(
+            `${r.publishedAt.trim()}T00:00:00.000Z`,
+          ).toISOString(),
+        }),
+      }));
 
     const payload = {
       title,
@@ -133,9 +266,12 @@ export default function AdminNoticiasPage() {
       author,
       tags,
       readTimeMinutes: Number(readTimeMinutes),
+      status,
+      categoryIds: selectedCategoryIds,
       imageUrl,
       coverImageCaption,
       content,
+      references: preparedReferences,
     };
 
     try {
@@ -145,9 +281,11 @@ export default function AdminNoticiasPage() {
         await adminCreateNews(payload, token);
       }
       setIsModalOpen(false);
-      await loadArticles();
-    } catch (err: any) {
-      setFormError(err.message || 'Error al guardar la noticia');
+      await loadData();
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : "Error al guardar la noticia";
+      setFormError(message);
     } finally {
       setFormLoading(false);
     }
@@ -155,36 +293,40 @@ export default function AdminNoticiasPage() {
 
   const handleDelete = async (id: string, articleTitle: string) => {
     if (!token) return;
-    if (!confirm(`¿Estás seguro de eliminar la noticia "${articleTitle}"?`)) return;
+    if (!confirm(`¿Estás seguro de eliminar la noticia "${articleTitle}"?`))
+      return;
 
     try {
       await adminDeleteNews(id, token);
-      await loadArticles();
-    } catch (err: any) {
-      alert(err.message || 'Error al eliminar la noticia');
+      await loadData();
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : "Error al eliminar la noticia";
+      alert(message);
     }
   };
 
-  const filtered = articles.filter((a) => {
-    if (!search.trim()) return true;
-    const q = search.toLowerCase();
-    return (
-      a.title.toLowerCase().includes(q) ||
-      a.summary.toLowerCase().includes(q) ||
-      (a.author?.toLowerCase().includes(q) ?? false)
-    );
-  });
+  const filtered = articles.filter(
+    (a) =>
+      a.title.toLowerCase().includes(search.toLowerCase()) ||
+      a.author?.toLowerCase().includes(search.toLowerCase()) ||
+      a.tags?.some((t) => t.toLowerCase().includes(search.toLowerCase())) ||
+      a.categories?.some((c) =>
+        c.name.toLowerCase().includes(search.toLowerCase()),
+      ),
+  );
 
   return (
     <div className="space-y-6 max-w-6xl mx-auto">
-      {/* Header Bar */}
+      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#0d162a] p-6 rounded-3xl border border-white/10">
         <div>
           <h1 className="text-2xl font-bold text-white font-[var(--font-montserrat)]">
-            Gestión de Noticias
+            Gestión de Noticias y Artículos
           </h1>
           <p className="text-xs text-slate-400 mt-1">
-            Crea, edita o elimina artículos de actualidad astronómica publicados en el portal.
+            Redacta, edita con formato enriquecido, clasifica por categorías y
+            agrega bibliografía a los artículos de JEO.
           </p>
         </div>
 
@@ -197,102 +339,138 @@ export default function AdminNoticiasPage() {
         </button>
       </div>
 
-      {/* Search Filter */}
-      <div className="relative max-w-md">
-        <FiSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 w-4 h-4" />
+      {/* Filter Bar */}
+      <div className="relative">
+        <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
         <input
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Buscar por título, autor o contenido..."
-          className="w-full bg-[#0d162a] border border-white/10 pl-10 pr-4 py-2.5 rounded-xl text-xs text-white placeholder:text-slate-500 outline-none focus:border-[var(--color-yellow)] transition-colors"
+          placeholder="Buscar artículos por título, autor, categoría o tag..."
+          className="w-full bg-[#0d162a] border border-white/10 pl-11 pr-4 py-3 rounded-2xl text-sm text-white placeholder:text-slate-500 outline-none focus:border-[var(--color-yellow)] transition-colors"
         />
       </div>
 
-      {/* Table */}
-      {isLoading ? (
-        <div className="flex items-center justify-center py-16">
-          <FiLoader className="w-8 h-8 text-[var(--color-yellow)] animate-spin" />
-        </div>
-      ) : filtered.length === 0 ? (
-        <div className="bg-[#0d162a] border border-white/10 rounded-2xl p-12 text-center text-slate-400 text-xs">
-          No se encontraron noticias. Haz clic en "Nueva Noticia" para crear la primera.
-        </div>
-      ) : (
-        <div className="bg-[#0d162a] border border-white/10 rounded-2xl overflow-hidden shadow-xl">
+      {/* Articles Table */}
+      <div className="bg-[#0d162a] border border-white/10 rounded-3xl overflow-hidden shadow-xl">
+        {isLoading ? (
+          <div className="flex items-center justify-center py-20">
+            <FiLoader className="w-8 h-8 text-[var(--color-yellow)] animate-spin" />
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="text-center py-16 text-slate-400 text-sm">
+            No se encontraron noticias registradas.
+          </div>
+        ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead className="bg-white/5 border-b border-white/10 text-slate-400 uppercase tracking-wider font-semibold">
-                <tr>
-                  <th className="p-4">Título</th>
-                  <th className="p-4">Autor</th>
-                  <th className="p-4">Tags</th>
-                  <th className="p-4">Lectura</th>
-                  <th className="p-4 text-right">Acciones</th>
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="border-b border-white/10 bg-white/[0.02] text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                  <th className="py-4 px-6">Artículo</th>
+                  <th className="py-4 px-4">Estado</th>
+                  <th className="py-4 px-4">Autor</th>
+                  <th className="py-4 px-4">Categorías / Tags</th>
+                  <th className="py-4 px-4">Fecha</th>
+                  <th className="py-4 px-6 text-right">Acciones</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/5">
-                {filtered.map((article) => (
-                  <tr key={article.id} className="hover:bg-white/[0.02] transition-colors">
-                    <td className="p-4 font-semibold text-white max-w-xs truncate">
-                      {article.title}
-                    </td>
-                    <td className="p-4 text-slate-300">{article.author || 'Equipo JEO'}</td>
-                    <td className="p-4">
-                      <div className="flex flex-wrap gap-1">
-                        {article.tags?.slice(0, 2).map((t) => (
-                          <span
-                            key={t}
-                            className="bg-[var(--color-yellow)]/10 text-[var(--color-yellow)] px-2 py-0.5 rounded text-[10px]"
+              <tbody className="divide-y divide-white/5 text-xs">
+                {filtered.map((article) => {
+                  const statusInfo =
+                    STATUS_LABELS[article.status || "PUBLISHED"] ||
+                    STATUS_LABELS.PUBLISHED;
+                  return (
+                    <tr
+                      key={article.id}
+                      className="hover:bg-white/[0.02] transition-colors"
+                    >
+                      <td className="py-4 px-6 max-w-xs">
+                        <div className="font-bold text-white line-clamp-1">
+                          {article.title}
+                        </div>
+                        <div className="text-[11px] text-slate-400 line-clamp-1 mt-0.5">
+                          /{article.slug}
+                        </div>
+                      </td>
+                      <td className="py-4 px-4">
+                        <span
+                          className={`inline-block border px-2 py-0.5 text-[10px] font-bold uppercase ${statusInfo.className}`}
+                        >
+                          {statusInfo.label}
+                        </span>
+                      </td>
+                      <td className="py-4 px-4 text-slate-300 font-medium">
+                        {article.author || "Equipo JEO"}
+                      </td>
+                      <td className="py-4 px-4">
+                        <div className="flex flex-wrap gap-1">
+                          {article.categories?.map((cat) => (
+                            <span
+                              key={cat.id}
+                              className="bg-[#e8c648]/15 border border-[#e8c648]/40 text-[#e8c648] text-[10px] px-2 py-0.5 font-semibold"
+                            >
+                              {cat.name}
+                            </span>
+                          ))}
+                          {article.tags?.slice(0, 2).map((t) => (
+                            <span
+                              key={t}
+                              className="bg-white/5 border border-white/10 text-slate-300 text-[10px] px-2 py-0.5"
+                            >
+                              #{t}
+                            </span>
+                          ))}
+                        </div>
+                      </td>
+                      <td className="py-4 px-4 text-slate-400">
+                        {new Date(article.date).toLocaleDateString("es-AR")}
+                      </td>
+                      <td className="py-4 px-6 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={() => handleOpenEdit(article)}
+                            title="Editar"
+                            className="p-2 bg-white/5 hover:bg-[var(--color-yellow)] hover:text-[#060a17] text-slate-300 rounded-lg transition-colors cursor-pointer"
                           >
-                            {t}
-                          </span>
-                        ))}
-                      </div>
-                    </td>
-                    <td className="p-4 text-slate-400">{article.readTimeMinutes} min</td>
-                    <td className="p-4 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <button
-                          onClick={() => handleOpenEdit(article)}
-                          className="p-2 rounded-lg bg-white/5 hover:bg-[var(--color-yellow)] hover:text-[#060a17] text-slate-300 transition-colors"
-                          title="Editar"
-                        >
-                          <FiEdit2 className="w-3.5 h-3.5" />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(article.id, article.title)}
-                          className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500 hover:text-white text-red-400 transition-colors"
-                          title="Eliminar"
-                        >
-                          <FiTrash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                            <FiEdit2 className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={() =>
+                              handleDelete(article.id, article.title)
+                            }
+                            title="Eliminar"
+                            className="p-2 bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white rounded-lg transition-colors cursor-pointer"
+                          >
+                            <FiTrash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       {/* Create / Edit Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-[#0b1120] border border-white/20 rounded-3xl max-w-3xl w-full p-6 md:p-8 relative shadow-2xl animate-fade-in-up max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-[#0d162a] border border-white/15 rounded-3xl max-w-4xl w-full p-6 sm:p-8 shadow-2xl relative my-8 max-h-[90vh] overflow-y-auto">
             <button
               onClick={() => setIsModalOpen(false)}
-              className="absolute top-6 right-6 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+              className="absolute top-6 right-6 p-2 bg-white/5 hover:bg-white/10 rounded-full text-slate-400 hover:text-white transition-colors cursor-pointer"
             >
               <FiX className="w-5 h-5" />
             </button>
 
             <h2 className="text-2xl font-bold text-white mb-1 font-[var(--font-montserrat)]">
-              {isEditing ? 'Editar Noticia' : 'Redactar Nueva Noticia'}
+              {isEditing ? "Editar Noticia" : "Redactar Nueva Noticia"}
             </h2>
             <p className="text-xs text-slate-400 mb-6">
-              Completa los datos editoriales y el contenido en Markdown.
+              Escribe o pega contenido con formato automático (TipTap), o cambia
+              a modo manual para editar HTML/Markdown.
             </p>
 
             {formError && (
@@ -302,10 +480,13 @@ export default function AdminNoticiasPage() {
               </div>
             )}
 
-            <form onSubmit={handleSave} className="space-y-4 text-xs">
+            <form onSubmit={handleSave} className="space-y-5 text-xs">
+              {/* Título y Slug */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-slate-300 font-semibold mb-1">Título *</label>
+                  <label className="block text-slate-300 font-semibold mb-1">
+                    Título *
+                  </label>
                   <input
                     type="text"
                     value={title}
@@ -317,7 +498,9 @@ export default function AdminNoticiasPage() {
                 </div>
 
                 <div>
-                  <label className="block text-slate-300 font-semibold mb-1">Slug URL *</label>
+                  <label className="block text-slate-300 font-semibold mb-1">
+                    Slug URL *
+                  </label>
                   <input
                     type="text"
                     value={slug}
@@ -329,8 +512,11 @@ export default function AdminNoticiasPage() {
                 </div>
               </div>
 
+              {/* Bajada / Resumen */}
               <div>
-                <label className="block text-slate-300 font-semibold mb-1">Resumen (Lead) *</label>
+                <label className="block text-slate-300 font-semibold mb-1">
+                  Resumen / Bajada (Subtítulo) *
+                </label>
                 <textarea
                   rows={2}
                   value={summary}
@@ -341,9 +527,12 @@ export default function AdminNoticiasPage() {
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Autor, Tags, Tiempo de lectura y Estado */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                 <div>
-                  <label className="block text-slate-300 font-semibold mb-1">Autor</label>
+                  <label className="block text-slate-300 font-semibold mb-1">
+                    Autor
+                  </label>
                   <input
                     type="text"
                     value={author}
@@ -354,7 +543,9 @@ export default function AdminNoticiasPage() {
                 </div>
 
                 <div>
-                  <label className="block text-slate-300 font-semibold mb-1">Tags (separados por coma)</label>
+                  <label className="block text-slate-300 font-semibold mb-1">
+                    Tags (separados por coma)
+                  </label>
                   <input
                     type="text"
                     value={tagsStr}
@@ -365,7 +556,9 @@ export default function AdminNoticiasPage() {
                 </div>
 
                 <div>
-                  <label className="block text-slate-300 font-semibold mb-1">Tiempo de lectura (minutos)</label>
+                  <label className="block text-slate-300 font-semibold mb-1">
+                    Tiempo lectura (min)
+                  </label>
                   <input
                     type="number"
                     min={1}
@@ -374,18 +567,87 @@ export default function AdminNoticiasPage() {
                     className="w-full bg-[#060a17] border border-white/15 px-3.5 py-2.5 rounded-xl text-white outline-none focus:border-[var(--color-yellow)]"
                   />
                 </div>
+
+                <div>
+                  <label className="block text-slate-300 font-semibold mb-1">
+                    Estado
+                  </label>
+                  <select
+                    value={status}
+                    onChange={(e) => setStatus(e.target.value as ArticleStatus)}
+                    className="w-full bg-[#060a17] border border-white/15 px-3.5 py-2.5 rounded-xl text-white outline-none focus:border-[var(--color-yellow)]"
+                  >
+                    <option value="PUBLISHED">Publicado</option>
+                    <option value="DRAFT">Borrador</option>
+                    <option value="ARCHIVED">Archivado</option>
+                  </select>
+                </div>
               </div>
 
+              {/* Categorías */}
+              <div className="bg-[#081022] border border-white/10 p-4 space-y-3">
+                <label className="block text-slate-300 font-semibold">
+                  Categorías de la noticia
+                </label>
+
+                <div className="flex flex-wrap gap-2">
+                  {categories.map((cat) => {
+                    const selected = selectedCategoryIds.includes(cat.id);
+                    return (
+                      <button
+                        key={cat.id}
+                        type="button"
+                        onClick={() => handleToggleCategory(cat.id)}
+                        className={`px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider border transition-colors cursor-pointer ${
+                          selected
+                            ? "bg-[#e8c648] text-[#060a17] border-[#e8c648]"
+                            : "bg-[#060a17] text-slate-300 border-white/15 hover:border-[#e8c648]/60"
+                        }`}
+                      >
+                        {selected ? "✓ " : "+ "}
+                        {cat.name}
+                      </button>
+                    );
+                  })}
+                  {categories.length === 0 && (
+                    <span className="text-slate-500 text-[11px]">
+                      Aún no hay categorías creadas. Crea la primera abajo.
+                    </span>
+                  )}
+                </div>
+
+                <div className="flex gap-2 pt-1">
+                  <input
+                    type="text"
+                    value={newCategoryName}
+                    onChange={(e) => setNewCategoryName(e.target.value)}
+                    placeholder="Nueva categoría (ej. Ciencia, Astronomía, Misiones)..."
+                    className="flex-1 bg-[#060a17] border border-white/15 px-3 py-2 text-xs text-white outline-none focus:border-[#e8c648]"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleCreateCategory}
+                    disabled={creatingCategory || !newCategoryName.trim()}
+                    className="px-4 py-2 bg-white/10 hover:bg-[#e8c648] hover:text-[#060a17] text-white font-bold text-[11px] uppercase transition-colors cursor-pointer disabled:opacity-40"
+                  >
+                    {creatingCategory ? "Creando..." : "+ Crear categoría"}
+                  </button>
+                </div>
+              </div>
+
+              {/* Imagen Principal y Créditos */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <div className="flex items-center justify-between mb-1">
-                    <label className="text-slate-300 font-semibold">URL de Imagen Principal</label>
+                    <label className="text-slate-300 font-semibold">
+                      URL de Imagen Principal
+                    </label>
                     <button
                       type="button"
                       onClick={() => setIsFreePickerOpen(true)}
-                      className="text-[11px] text-cyan-400 hover:text-cyan-300 font-medium underline flex items-center gap-1"
+                      className="text-[11px] text-cyan-400 hover:text-cyan-300 font-medium underline flex items-center gap-1 cursor-pointer"
                     >
-                      🚀 Buscar Foto Gratis (NASA/Unsplash)
+                      Buscar Foto Gratis (NASA/Unsplash)
                     </button>
                   </div>
                   <input
@@ -398,7 +660,9 @@ export default function AdminNoticiasPage() {
                 </div>
 
                 <div>
-                  <label className="block text-slate-300 font-semibold mb-1">Pie de foto / Créditos</label>
+                  <label className="block text-slate-300 font-semibold mb-1">
+                    Pie de foto / Créditos
+                  </label>
                   <input
                     type="text"
                     value={coverImageCaption}
@@ -409,55 +673,135 @@ export default function AdminNoticiasPage() {
                 </div>
               </div>
 
-
-              {/* Content Tabs */}
+              {/* Editor Enriquecido TipTap (Visual + Manual) */}
               <div>
-                <div className="flex items-center justify-between mb-2">
-                  <label className="text-slate-300 font-semibold">Cuerpo del artículo (Markdown)</label>
-                  <div className="flex items-center gap-1 bg-white/5 p-1 rounded-lg">
-                    <button
-                      type="button"
-                      onClick={() => setPreviewTab('write')}
-                      className={`px-3 py-1 rounded-md text-[11px] font-semibold transition-colors ${
-                        previewTab === 'write' ? 'bg-[var(--color-yellow)] text-[#060a17]' : 'text-slate-300'
-                      }`}
-                    >
-                      Editor
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setPreviewTab('preview')}
-                      className={`px-3 py-1 rounded-md text-[11px] font-semibold transition-colors ${
-                        previewTab === 'preview' ? 'bg-[var(--color-yellow)] text-[#060a17]' : 'text-slate-300'
-                      }`}
-                    >
-                      Vista Previa
-                    </button>
-                  </div>
+                <label className="block text-slate-300 font-semibold mb-2">
+                  Cuerpo del artículo (Editor Visual TipTap / Manual
+                  HTML-Markdown)
+                </label>
+                <RichTextEditor
+                  value={content}
+                  onChange={setContent}
+                  placeholder="Escribe o pega el texto del artículo aquí. El formato se aplica instantáneamente..."
+                />
+              </div>
+
+              {/* Bibliografía / Referencias */}
+              <div className="bg-[#081022] border border-white/10 p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <label className="text-slate-300 font-semibold flex items-center gap-2">
+                    <FiBookOpen className="w-4 h-4 text-[#e8c648]" />
+                    <span>
+                      Bibliografía / Referencias ({references.length})
+                    </span>
+                  </label>
+                  <button
+                    type="button"
+                    onClick={handleAddReference}
+                    className="px-3 py-1.5 bg-white/10 hover:bg-[#e8c648] hover:text-[#060a17] text-white font-bold text-[11px] uppercase transition-colors cursor-pointer"
+                  >
+                    + Agregar referencia
+                  </button>
                 </div>
 
-                {previewTab === 'write' ? (
-                  <textarea
-                    rows={8}
-                    value={content}
-                    onChange={(e) => setContent(e.target.value)}
-                    placeholder="# Título de sección&#10;&#10;Párrafo explicativo..."
-                    className="w-full bg-[#060a17] border border-white/15 p-3.5 rounded-xl text-white font-mono text-xs outline-none focus:border-[var(--color-yellow)]"
-                  />
+                {references.length === 0 ? (
+                  <p className="text-[11px] text-slate-500">
+                    Opcional: agrega fuentes bibliográficas que aparecerán al
+                    pie del artículo en formato editorial.
+                  </p>
                 ) : (
-                  <div className="bg-[#060a17] border border-white/15 p-4 rounded-xl max-h-60 overflow-y-auto prose prose-invert text-xs space-y-2">
-                    {content.split('\n\n').map((p, i) => (
-                      <p key={i}>{p}</p>
+                  <div className="space-y-3">
+                    {references.map((ref, idx) => (
+                      <div
+                        key={idx}
+                        className="p-3 bg-[#060a17] border border-white/10 space-y-2.5 relative"
+                      >
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveReference(idx)}
+                          title="Quitar referencia"
+                          className="absolute top-2.5 right-2.5 text-slate-400 hover:text-red-400 cursor-pointer"
+                        >
+                          <FiX className="w-4 h-4" />
+                        </button>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 pr-6">
+                          <input
+                            type="text"
+                            value={ref.title}
+                            onChange={(e) =>
+                              handleUpdateReference(
+                                idx,
+                                "title",
+                                e.target.value,
+                              )
+                            }
+                            placeholder="Título de la fuente *"
+                            className="bg-[#0b1224] border border-white/10 px-3 py-2 text-xs text-white outline-none focus:border-[#e8c648]"
+                          />
+                          <input
+                            type="text"
+                            value={ref.author}
+                            onChange={(e) =>
+                              handleUpdateReference(
+                                idx,
+                                "author",
+                                e.target.value,
+                              )
+                            }
+                            placeholder="Autor (ej. Low, L. / NASA)"
+                            className="bg-[#0b1224] border border-white/10 px-3 py-2 text-xs text-white outline-none focus:border-[#e8c648]"
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5">
+                          <input
+                            type="text"
+                            value={ref.publisher}
+                            onChange={(e) =>
+                              handleUpdateReference(
+                                idx,
+                                "publisher",
+                                e.target.value,
+                              )
+                            }
+                            placeholder="Fuente / Editorial (ej. NASA, Space.com)"
+                            className="bg-[#0b1224] border border-white/10 px-3 py-2 text-xs text-white outline-none focus:border-[#e8c648]"
+                          />
+                          <input
+                            type="url"
+                            value={ref.url}
+                            onChange={(e) =>
+                              handleUpdateReference(idx, "url", e.target.value)
+                            }
+                            placeholder="https://..."
+                            className="bg-[#0b1224] border border-white/10 px-3 py-2 text-xs text-white outline-none focus:border-[#e8c648]"
+                          />
+                          <input
+                            type="date"
+                            value={ref.publishedAt}
+                            onChange={(e) =>
+                              handleUpdateReference(
+                                idx,
+                                "publishedAt",
+                                e.target.value,
+                              )
+                            }
+                            className="bg-[#0b1224] border border-white/10 px-3 py-2 text-xs text-white outline-none focus:border-[#e8c648]"
+                          />
+                        </div>
+                      </div>
                     ))}
                   </div>
                 )}
               </div>
 
+              {/* Botones de acción */}
               <div className="pt-4 border-t border-white/10 flex items-center justify-end gap-3">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 font-semibold"
+                  className="px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 font-semibold cursor-pointer"
                 >
                   Cancelar
                 </button>
@@ -474,12 +818,13 @@ export default function AdminNoticiasPage() {
                   ) : (
                     <>
                       <FiCheck className="w-4 h-4" />
-                      <span>{isEditing ? 'Actualizar Noticia' : 'Publicar Noticia'}</span>
+                      <span>
+                        {isEditing ? "Actualizar Noticia" : "Publicar Noticia"}
+                      </span>
                     </>
                   )}
                 </button>
               </div>
-
             </form>
           </div>
         </div>
@@ -500,5 +845,4 @@ export default function AdminNoticiasPage() {
       )}
     </div>
   );
-
 }
