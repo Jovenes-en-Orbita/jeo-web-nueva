@@ -14,7 +14,7 @@
     "db:seed": "pnpm --filter @jeo/api exec prisma db seed",
     "db:studio": "pnpm --filter @jeo/api exec prisma studio",
     "test": "turbo run test",
-    "prepare": "husky"
+    "prepare": "husky || true"
   },
   "devDependencies": {
     "@commitlint/cli": "^21.2.3",

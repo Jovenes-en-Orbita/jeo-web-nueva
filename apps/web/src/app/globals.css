@@ -168,3 +168,179 @@ section.block.alt {
     padding: 0 20px;
   }
 }
+
+/* ── Editorial Newspaper Sheet (/noticias/[slug]) ── */
+.editorial-sheet h1,
+.editorial-sheet h2,
+.editorial-sheet h3,
+.editorial-sheet h4 {
+  text-transform: none;
+  letter-spacing: -0.015em;
+}
+
+.article-prose {
+  color: #1f2937;
+  font-family: var(--font-inter);
+  font-size: 0.92rem;
+  line-height: 1.8;
+}
+
+.article-prose h1 {
+  font-family: var(--font-montserrat);
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #111827;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+  line-height: 1.25;
+}
+
+.article-prose h2 {
+  font-family: var(--font-montserrat);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #111827;
+  margin-top: 1.85rem;
+  margin-bottom: 0.65rem;
+  line-height: 1.3;
+}
+
+.article-prose h3 {
+  font-family: var(--font-montserrat);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+  line-height: 1.35;
+}
+
+.article-prose p {
+  margin-top: 0;
+  margin-bottom: 1.15rem;
+  text-align: justify;
+}
+
+.article-prose strong,
+.article-prose b {
+  font-weight: 700;
+  color: #111827;
+}
+
+.article-prose em,
+.article-prose i {
+  font-style: italic;
+}
+
+.article-prose ul {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.article-prose ol {
+  list-style-type: decimal;
+  padding-left: 1.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.article-prose li {
+  margin-bottom: 0.4rem;
+}
+
+.article-prose blockquote {
+  border-left: 3px solid #111827;
+  padding-left: 1rem;
+  margin: 1.5rem 0;
+  font-style: italic;
+  color: #4b5563;
+}
+
+.article-prose a {
+  color: #1d4ed8;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  word-break: break-word;
+}
+
+.article-prose a:hover {
+  color: #1e40af;
+}
+
+.article-prose hr {
+  border: 0;
+  border-top: 1px solid #d1d5db;
+  margin: 2rem 0;
+}
+
+/* ── TipTap Rich Text Editor (Admin Dark Theme) ── */
+.tiptap-editor-content .ProseMirror {
+  min-height: 240px;
+  outline: none;
+  color: #e2e8f0;
+  font-family: var(--font-inter);
+  font-size: 0.8rem;
+  line-height: 1.7;
+}
+
+.tiptap-editor-content .ProseMirror h1,
+.tiptap-editor-content .ProseMirror h2,
+.tiptap-editor-content .ProseMirror h3 {
+  text-transform: none;
+  color: #ffffff;
+  font-family: var(--font-montserrat);
+  margin-top: 1rem;
+  margin-bottom: 0.45rem;
+}
+
+.tiptap-editor-content .ProseMirror h1 {
+  font-size: 1.35rem;
+  font-weight: 800;
+}
+
+.tiptap-editor-content .ProseMirror h2 {
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.tiptap-editor-content .ProseMirror h3 {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.tiptap-editor-content .ProseMirror p {
+  margin-bottom: 0.75rem;
+}
+
+.tiptap-editor-content .ProseMirror ul {
+  list-style-type: disc;
+  padding-left: 1.4rem;
+  margin-bottom: 0.75rem;
+}
+
+.tiptap-editor-content .ProseMirror ol {
+  list-style-type: decimal;
+  padding-left: 1.4rem;
+  margin-bottom: 0.75rem;
+}
+
+.tiptap-editor-content .ProseMirror blockquote {
+  border-left: 3px solid #e8c648;
+  padding-left: 0.9rem;
+  margin: 0.9rem 0;
+  color: #cbd5e1;
+  font-style: italic;
+}
+
+.tiptap-editor-content .ProseMirror a {
+  color: #60a5fa;
+  text-decoration: underline;
+}
+
+.tiptap-editor-content .ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  color: #64748b;
+  float: left;
+  height: 0;
+  pointer-events: none;
+}

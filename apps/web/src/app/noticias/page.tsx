@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
 import { Navbar } from "@/components/features/Navbar";
 import { Footer } from "@/components/features/Footer";
-import { NewsCard } from "@/components/features/NewsCard";
-import { getNews } from "@/lib/api";
+import { NewsCatalog } from "@/components/features/NewsCatalog";
+import { CatalogPageHeader } from "@/components/ui/CatalogPageHeader";
+import { getNewsCategories, getNewsTags, searchNews } from "@/lib/api";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Noticias Espaciales — JEO (Jóvenes en Órbita)",
@@ -11,36 +14,36 @@ export const metadata: Metadata = {
 };
 
 export default async function NoticiasPage() {
-  const articles = await getNews();
+  const [initialResponse, categories, tags] = await Promise.all([
+    searchNews({
+      status: "PUBLISHED",
+      sortBy: "date",
+      sortOrder: "desc",
+      page: 1,
+      limit: 6,
+      include: "categories",
+    }),
+    getNewsCategories(),
+    getNewsTags(),
+  ]);
 
   return (
     <div className="min-h-screen flex flex-col bg-[#050811] text-white">
       <Navbar />
 
       <main className="flex-1 py-12 md:py-16">
-        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Header strip */}
-          <div className="mb-10 md:mb-12">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold uppercase tracking-tight text-white font-[var(--font-chakra)]">
-              NOTICIAS ESPACIALES
-            </h1>
-          </div>
+        <CatalogPageHeader
+          titlePrefix="NOTICIAS"
+          titleHighlight="ESPACIALES"
+          subtitle="Artículos, informes y novedades del ecosistema espacial argentino e internacional."
+          maxWidthClass="max-w-6xl"
+        />
 
-          {/* Grid of All News (Design 2: 3 columns grid) */}
-          {articles.length === 0 ? (
-            <div className="py-20 text-center border border-white/10 bg-[#080d1a]">
-              <p className="text-base text-slate-400 font-[var(--font-inter)]">
-                No hay noticias disponibles en la plataforma.
-              </p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 items-stretch">
-              {articles.map((article) => (
-                <NewsCard key={article.id || article.slug} article={article} />
-              ))}
-            </div>
-          )}
-        </div>
+        <NewsCatalog
+          initialResponse={initialResponse}
+          categories={categories}
+          tags={tags}
+        />
       </main>
 
       <Footer />
