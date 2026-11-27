@@ -1,34 +1,39 @@
-'use client';
+"use client";
 
-import React from 'react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { AdminAuthProvider, useAdminAuth } from '@/context/AdminAuthContext';
-import { Logo } from '@/components/ui/Logo';
+import React from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { AdminAuthProvider, useAdminAuth } from "@/context/AdminAuthContext";
+import { Logo } from "@/components/ui/Logo";
 import {
   FiGrid,
   FiFileText,
-  FiCompass,
-  FiSun,
+  // TODO: Re-habilitar iconos cuando se activen las secciones correspondientes del panel
+  // FiCompass,
+  // FiSun,
   FiImage,
-  FiMail,
-  FiUsers,
-  FiTrendingUp,
+  // FiMail,
+  // FiUsers,
+  // FiTrendingUp,
   FiLogOut,
   FiExternalLink,
   FiShield,
   FiLoader,
-} from 'react-icons/fi';
+} from "react-icons/fi";
 
 const NAV_ITEMS = [
-  { label: 'Dashboard', href: '/admin', icon: FiGrid },
-  { label: 'Noticias', href: '/admin/noticias', icon: FiFileText },
-  // TODO: Secciones en desarrollo
+  { label: "Dashboard", href: "/admin", icon: FiGrid },
+  { label: "Noticias", href: "/admin/noticias", icon: FiFileText },
+  { label: "Galería", href: "/admin/galeria", icon: FiImage },
+  // TODO: Habilitar Constelaciones una vez finalizado su desarrollo
   // { label: 'Constelaciones', href: '/admin/constelaciones', icon: FiCompass },
+  // TODO: Habilitar Sistema Solar una vez finalizado su desarrollo
   // { label: 'Sistema Solar', href: '/admin/sistema-solar', icon: FiSun },
-  { label: 'Galería', href: '/admin/galeria', icon: FiImage },
-  { label: 'Newsletter', href: '/admin/newsletter', icon: FiMail },
-  { label: 'Postulaciones', href: '/admin/postulaciones', icon: FiUsers },
+  // TODO: Habilitar Newsletter una vez finalizado su desarrollo
+  // { label: 'Newsletter', href: '/admin/newsletter', icon: FiMail },
+  // TODO: Habilitar Postulaciones una vez finalizado su desarrollo
+  // { label: 'Postulaciones', href: '/admin/postulaciones', icon: FiUsers },
+  // TODO: Habilitar Estadísticas una vez finalizado su desarrollo
   // { label: 'Estadísticas', href: '/admin/estadisticas', icon: FiTrendingUp },
 ];
 
@@ -36,7 +41,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { user, logout, isLoading } = useAdminAuth();
 
-  if (pathname === '/admin/login') {
+  if (pathname === "/admin/login") {
     return <>{children}</>;
   }
 
@@ -44,7 +49,9 @@ function AdminShell({ children }: { children: React.ReactNode }) {
     return (
       <div className="min-h-screen bg-[#030611] flex flex-col items-center justify-center text-white">
         <FiLoader className="w-8 h-8 text-[var(--color-yellow)] animate-spin mb-4" />
-        <p className="text-sm font-semibold text-slate-300">Verificando sesión segura...</p>
+        <p className="text-sm font-semibold text-slate-300">
+          Verificando sesión segura...
+        </p>
       </div>
     );
   }
@@ -84,11 +91,13 @@ function AdminShell({ children }: { children: React.ReactNode }) {
                   href={item.href}
                   className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold transition-all ${
                     isActive
-                      ? 'bg-[var(--color-yellow)] text-[#060a17] shadow-lg shadow-amber-500/20 font-bold'
-                      : 'text-slate-300 hover:bg-white/5 hover:text-white'
+                      ? "bg-[var(--color-yellow)] text-[#060a17] shadow-lg shadow-amber-500/20 font-bold"
+                      : "text-slate-300 hover:bg-white/5 hover:text-white"
                   }`}
                 >
-                  <Icon className={`w-4 h-4 ${isActive ? 'text-[#060a17]' : 'text-[var(--color-yellow)]'}`} />
+                  <Icon
+                    className={`w-4 h-4 ${isActive ? "text-[#060a17]" : "text-[var(--color-yellow)]"}`}
+                  />
                   <span>{item.label}</span>
                 </Link>
               );
@@ -100,7 +109,9 @@ function AdminShell({ children }: { children: React.ReactNode }) {
         <div className="p-4 border-t border-white/10 bg-white/[0.02]">
           <div className="flex items-center justify-between mb-3 px-2">
             <div className="overflow-hidden">
-              <span className="text-xs font-bold text-white block truncate">{user.name}</span>
+              <span className="text-xs font-bold text-white block truncate">
+                {user.name}
+              </span>
               <span className="text-[10px] text-slate-400 block truncate flex items-center gap-1">
                 <FiShield className="text-[var(--color-yellow)] w-3 h-3" />
                 {user.role}
@@ -136,7 +147,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
             <span>Intranet</span>
             <span>/</span>
             <span className="text-[var(--color-yellow)] font-semibold uppercase">
-              {NAV_ITEMS.find((n) => n.href === pathname)?.label || 'Panel'}
+              {NAV_ITEMS.find((n) => n.href === pathname)?.label || "Panel"}
             </span>
           </div>
 
@@ -148,15 +159,17 @@ function AdminShell({ children }: { children: React.ReactNode }) {
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto p-6 md:p-8">
-          {children}
-        </main>
+        <main className="flex-1 overflow-y-auto p-6 md:p-8">{children}</main>
       </div>
     </div>
   );
 }
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+export default function AdminLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <AdminAuthProvider>
       <AdminShell>{children}</AdminShell>
