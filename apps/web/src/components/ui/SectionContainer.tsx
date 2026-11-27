@@ -5,7 +5,6 @@ interface SectionContainerProps {
   id?: string;
   /** Alternancia visual de secciones en el Home: fondo oscuro o blanco */
   surface?: "dark" | "white";
-  eyebrow?: string;
   title?: string;
   titleHighlight?: string;
   actionHref?: string;
@@ -22,7 +21,6 @@ interface SectionContainerProps {
 export function SectionContainer({
   id,
   surface = "dark",
-  eyebrow,
   title,
   titleHighlight,
   actionHref,
@@ -41,18 +39,9 @@ export function SectionContainer({
       } ${className}`}
     >
       <div className={`w-full ${maxWidthClass} mx-auto px-4 sm:px-6 lg:px-8`}>
-        {(eyebrow || title || actionHref) && (
+        {(title || actionHref) && (
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8 sm:mb-10">
             <div>
-              {eyebrow && (
-                <span
-                  className={`block text-xs uppercase tracking-widest mb-1 font-inter font-semibold ${
-                    isDark ? "text-slate-400" : "text-neutral-500"
-                  }`}
-                >
-                  {eyebrow}
-                </span>
-              )}
               {title && (
                 <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold uppercase tracking-tight font-chakra">
                   <span className={isDark ? "text-white" : "text-blue-950"}>
@@ -71,12 +60,6 @@ export function SectionContainer({
                 className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold tracking-wider text-[#e8c648] hover:text-[#f5db76] transition-colors uppercase font-inter group self-start sm:self-auto"
               >
                 <span>{actionLabel}</span>
-                <span
-                  aria-hidden="true"
-                  className="text-[#d83933] transition-transform duration-200 group-hover:translate-x-1"
-                >
-                  →
-                </span>
               </Link>
             )}
           </div>

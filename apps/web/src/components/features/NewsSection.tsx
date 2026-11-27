@@ -14,7 +14,6 @@ export async function NewsSection() {
     <SectionContainer
       id="news"
       surface="dark"
-      eyebrow="Noticias recientes"
       title="NOTICIAS"
       titleHighlight="ESPACIALES"
       actionHref="/noticias"
