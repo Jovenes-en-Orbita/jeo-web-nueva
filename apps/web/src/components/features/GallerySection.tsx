@@ -32,11 +32,10 @@ export async function GallerySection() {
     <SectionContainer
       id="frag"
       surface="dark"
-      eyebrow="Archivo fotográfico"
       title="GALERÍA DE"
       titleHighlight="FOTOS ASTRONÓMICAS"
       actionHref="/galeria"
-      actionLabel={`Ver galería completa (${countLabel})`}
+      actionLabel={`Ver galería completa`}
     >
       {highlightedCollections.length === 0 ? (
         <EmptyState message="Aún no hay colecciones fotográficas publicadas en la galería." />

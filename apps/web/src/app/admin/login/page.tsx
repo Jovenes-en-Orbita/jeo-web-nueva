@@ -1,33 +1,36 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import Link from 'next/link';
-import { Logo } from '@/components/ui/Logo';
-import { PasswordInput } from '@/components/ui/PasswordInput';
-import { useAdminAuth } from '@/context/AdminAuthContext';
-import { FiMail, FiLoader, FiAlertCircle, FiArrowLeft } from 'react-icons/fi';
+import React, { useState } from "react";
+import Link from "next/link";
+import { Logo } from "@/components/ui/Logo";
+import { PasswordInput } from "@/components/ui/PasswordInput";
+import { useAdminAuth } from "@/context/AdminAuthContext";
+import { FiMail, FiLoader, FiAlertCircle, FiArrowLeft } from "react-icons/fi";
 
 export default function AdminLoginPage() {
   const { login } = useAdminAuth();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [errorMsg, setErrorMsg] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) {
-      setErrorMsg('Por favor completa todos los campos.');
+      setErrorMsg("Por favor completa todos los campos.");
       return;
     }
 
-    setErrorMsg('');
+    setErrorMsg("");
     setIsSubmitting(true);
 
     try {
       await login(email, password);
     } catch (err: any) {
-      setErrorMsg(err.message || 'Credenciales inválidas. Verifica tu correo y contraseña.');
+      setErrorMsg(
+        err.message ||
+          "Credenciales inválidas. Verifica tu correo y contraseña.",
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -41,13 +44,13 @@ export default function AdminLoginPage() {
 
       {/* Top Header */}
       <header className="p-6 flex items-center justify-between z-10">
-        <Link href="/" className="flex items-center gap-2 text-xs font-semibold text-slate-400 hover:text-[var(--color-yellow)] transition-colors">
+        <Link
+          href="/"
+          className="flex items-center gap-2 text-xs font-semibold text-slate-400 hover:text-[var(--color-yellow)] transition-colors"
+        >
           <FiArrowLeft className="w-4 h-4" />
           <span>Volver al portal público</span>
         </Link>
-        <div className="text-xs uppercase tracking-widest text-[var(--color-yellow)] font-bold">
-          Intranet JEO
-        </div>
       </header>
 
       {/* Login Card */}
@@ -57,9 +60,6 @@ export default function AdminLoginPage() {
             <div className="mb-4">
               <Logo size={56} showText={false} />
             </div>
-            <h1 className="text-2xl font-bold text-white font-[var(--font-montserrat)] uppercase tracking-wider">
-              Acceso a la Intranet
-            </h1>
             <p className="text-xs text-slate-400 mt-1">
               Panel de Administración y Control Editorial de JEO
             </p>
@@ -113,18 +113,12 @@ export default function AdminLoginPage() {
                   <span>Iniciando sesión...</span>
                 </>
               ) : (
-                <span>Ingresar al Panel →</span>
+                <span>Ingresar al Panel</span>
               )}
             </button>
           </form>
-
         </div>
       </main>
-
-      {/* Footer */}
-      <footer className="p-6 text-center text-xs text-slate-600 z-10">
-        © {new Date().getFullYear()} Jóvenes en Órbita (JEO) — Plataforma Segura
-      </footer>
     </div>
   );
 }
