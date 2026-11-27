@@ -3,6 +3,7 @@
 import React from "react";
 import { FiLoader } from "react-icons/fi";
 import { CatalogSearchBar } from "./CatalogSearchBar";
+import { EmptyState } from "./EmptyState";
 import { PaginationControls } from "./PaginationControls";
 
 interface SearchableCatalogProps<T> {
@@ -25,6 +26,7 @@ interface SearchableCatalogProps<T> {
   paginationAriaLabel: string;
   containerClassName?: string;
   gridClassName?: string;
+  surface?: "dark" | "white";
 }
 
 /**
@@ -52,6 +54,7 @@ export function SearchableCatalog<T>({
   paginationAriaLabel,
   containerClassName = "w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8",
   gridClassName = "grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-12",
+  surface = "dark",
 }: SearchableCatalogProps<T>) {
   const handlePageChange = (nextPage: number) => {
     onPageChange(nextPage);
@@ -69,18 +72,22 @@ export function SearchableCatalog<T>({
         ariaLabel={searchAriaLabel}
         resultSummary={resultSummary}
         filtersSlot={filtersSlot}
+        surface={surface}
       />
 
       {isLoading ? (
         <div className="py-20 flex items-center justify-center">
-          <FiLoader className="w-8 h-8 text-[#e8c648] animate-spin" />
+          <FiLoader
+            className={`w-8 h-8 animate-spin ${
+              surface === "white" ? "text-neutral-900" : "text-[#e8c648]"
+            }`}
+          />
         </div>
       ) : items.length === 0 ? (
-        <div className="py-16 text-center border border-white/10 bg-[#080d1a]">
-          <p className="text-sm text-slate-400 font-inter">
-            {hasActiveFilters ? emptySearchMessage : emptyMessage}
-          </p>
-        </div>
+        <EmptyState
+          message={hasActiveFilters ? emptySearchMessage : emptyMessage}
+          surface={surface === "white" ? "light" : "dark"}
+        />
       ) : (
         <div className={gridClassName}>
           {items.map((item) => (
@@ -97,6 +104,7 @@ export function SearchableCatalog<T>({
         onPageChange={handlePageChange}
         isLoading={isLoading}
         ariaLabel={paginationAriaLabel}
+        surface={surface}
       />
     </div>
   );

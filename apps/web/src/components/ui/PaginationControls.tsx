@@ -9,6 +9,7 @@ interface PaginationControlsProps {
   onPageChange: (page: number) => void;
   isLoading?: boolean;
   ariaLabel?: string;
+  surface?: "dark" | "white";
 }
 
 /**
@@ -20,8 +21,11 @@ export function PaginationControls({
   onPageChange,
   isLoading = false,
   ariaLabel = "Navegación de páginas",
+  surface = "dark",
 }: PaginationControlsProps) {
   if (totalPages <= 1) return null;
+
+  const isWhite = surface === "white";
 
   const getVisiblePages = (): Array<number | "ellipsis"> => {
     if (totalPages <= 7) {
@@ -44,6 +48,10 @@ export function PaginationControls({
 
   const visiblePages = getVisiblePages();
 
+  const navBtnClass = isWhite
+    ? "border-neutral-300 bg-white text-neutral-800 hover:border-neutral-900 hover:bg-neutral-900 hover:text-white"
+    : "border-white/15 bg-[#090e1d] text-slate-200 hover:border-[#e8c648] hover:text-[#e8c648]";
+
   return (
     <nav
       aria-label={ariaLabel}
@@ -53,7 +61,7 @@ export function PaginationControls({
         type="button"
         disabled={currentPage <= 1 || isLoading}
         onClick={() => onPageChange(currentPage - 1)}
-        className="inline-flex items-center gap-1.5 px-3.5 py-2 border border-white/15 bg-[#090e1d] text-xs font-bold uppercase tracking-wider text-slate-200 hover:border-[#e8c648] hover:text-[#e8c648] disabled:opacity-40 disabled:pointer-events-none transition-colors cursor-pointer font-inter"
+        className={`inline-flex items-center gap-1.5 px-3.5 py-2 border text-xs font-bold uppercase tracking-wider disabled:opacity-40 disabled:pointer-events-none transition-colors cursor-pointer font-inter ${navBtnClass}`}
       >
         <FiChevronLeft className="w-4 h-4" />
         <span>Anterior</span>
@@ -64,7 +72,9 @@ export function PaginationControls({
           item === "ellipsis" ? (
             <span
               key={`ellipsis-${idx}`}
-              className="px-2 text-xs text-slate-500 select-none"
+              className={`px-2 text-xs select-none ${
+                isWhite ? "text-neutral-400" : "text-slate-500"
+              }`}
             >
               …
             </span>
@@ -77,8 +87,12 @@ export function PaginationControls({
               onClick={() => onPageChange(item)}
               className={`min-w-[38px] h-[38px] px-2.5 border text-xs font-bold font-chakra transition-colors cursor-pointer ${
                 item === currentPage
-                  ? "bg-[#e8c648] border-[#e8c648] text-[#050811]"
-                  : "bg-[#090e1d] border-white/15 text-slate-300 hover:border-[#e8c648]/60 hover:text-white"
+                  ? isWhite
+                    ? "bg-neutral-900 border-neutral-900 text-white"
+                    : "bg-[#e8c648] border-[#e8c648] text-[#050811]"
+                  : isWhite
+                    ? "bg-white border-neutral-300 text-neutral-700 hover:border-neutral-900 hover:text-neutral-950"
+                    : "bg-[#090e1d] border-white/15 text-slate-300 hover:border-[#e8c648]/60 hover:text-white"
               }`}
             >
               {item}
@@ -91,7 +105,7 @@ export function PaginationControls({
         type="button"
         disabled={currentPage >= totalPages || isLoading}
         onClick={() => onPageChange(currentPage + 1)}
-        className="inline-flex items-center gap-1.5 px-3.5 py-2 border border-white/15 bg-[#090e1d] text-xs font-bold uppercase tracking-wider text-slate-200 hover:border-[#e8c648] hover:text-[#e8c648] disabled:opacity-40 disabled:pointer-events-none transition-colors cursor-pointer font-inter"
+        className={`inline-flex items-center gap-1.5 px-3.5 py-2 border text-xs font-bold uppercase tracking-wider disabled:opacity-40 disabled:pointer-events-none transition-colors cursor-pointer font-inter ${navBtnClass}`}
       >
         <span>Siguiente</span>
         <FiChevronRight className="w-4 h-4" />

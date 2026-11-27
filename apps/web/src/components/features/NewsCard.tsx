@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import type { NewsArticle } from "@jeo/shared";
+import { Badge } from "@/components/ui";
 
 interface NewsCardProps {
   article: NewsArticle;
@@ -49,9 +50,9 @@ export function NewsCard({ article }: NewsCardProps) {
           className="object-cover group-hover:scale-105 transition-transform duration-500"
         />
         {primaryCategory && (
-          <span className="absolute top-3 left-3 bg-[#050811]/85 border border-[#e8c648]/50 text-[#e8c648] text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 font-inter">
+          <Badge variant="gold" className="absolute top-3 left-3 py-1">
             {primaryCategory}
-          </span>
+          </Badge>
         )}
       </div>
 

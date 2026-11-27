@@ -77,16 +77,16 @@ export function GalleryCollectionPhotosGrid({
       <div className="mb-6">
         <Link
           href="/galeria"
-          className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-[#e8c648] transition-colors font-inter"
+          className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-neutral-600 hover:text-neutral-950 transition-colors font-inter"
         >
           <FiArrowLeft className="w-4 h-4" />
           <span>Volver a colecciones</span>
         </Link>
       </div>
 
-      {/* Título centrado de la colección (Diseño 3) */}
+      {/* Título centrado de la colección */}
       <div className="text-center mb-10 sm:mb-12">
-        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold uppercase tracking-wider text-white font-chakra">
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold uppercase tracking-wider text-neutral-950 font-chakra">
           {initialDetail.collection.title}
         </h1>
       </div>
@@ -94,11 +94,11 @@ export function GalleryCollectionPhotosGrid({
       {/* Grilla 4 columnas x 3 filas (12 fotos por página) */}
       {isLoading ? (
         <div className="py-20 flex items-center justify-center">
-          <FiLoader className="w-8 h-8 text-[#e8c648] animate-spin" />
+          <FiLoader className="w-8 h-8 text-neutral-900 animate-spin" />
         </div>
       ) : images.length === 0 ? (
-        <div className="py-16 text-center border border-white/10 bg-[#080d1a]">
-          <p className="text-sm text-slate-400 font-inter">
+        <div className="py-16 text-center border border-neutral-200 bg-neutral-50">
+          <p className="text-sm text-neutral-600 font-inter">
             Esta colección aún no tiene fotografías publicadas.
           </p>
         </div>
@@ -108,14 +108,14 @@ export function GalleryCollectionPhotosGrid({
             const imageSrc =
               img.url && img.url.trim() !== ""
                 ? img.url
-                : `/assets/gallery-${(idx % 6) + 1}.svg`;
+                : "/assets/hero-cosmos.svg";
 
             return (
               <button
                 key={img.id || idx}
                 type="button"
                 onClick={() => setActiveImageIndex(idx)}
-                className="group relative aspect-[4/3] w-full overflow-hidden bg-[#090e1d] border border-white/10 hover:border-[#e8c648]/60 transition-all duration-300 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e8c648]"
+                className="group relative aspect-[4/3] w-full overflow-hidden bg-neutral-100 border border-neutral-200 hover:border-neutral-900/60 transition-all duration-300 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900"
               >
                 <Image
                   src={imageSrc}
@@ -137,6 +137,7 @@ export function GalleryCollectionPhotosGrid({
         onPageChange={handlePageChange}
         isLoading={isLoading}
         ariaLabel="Paginación de fotografías de la colección"
+        surface="white"
       />
 
       {/* Diseño 4: Visor Lightbox minimalista con navegación lateral */}

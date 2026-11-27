@@ -8,6 +8,7 @@ import { SearchableCatalog } from "@/components/ui/SearchableCatalog";
 
 interface GalleryCollectionsCatalogProps {
   initialResponse: PaginatedGalleryCollectionsResponse;
+  surface?: "dark" | "white";
 }
 
 const COLLECTIONS_PER_PAGE = 6; // Grid de 2 columnas x 3 filas
@@ -17,6 +18,7 @@ const COLLECTIONS_PER_PAGE = 6; // Grid de 2 columnas x 3 filas
  */
 export function GalleryCollectionsCatalog({
   initialResponse,
+  surface = "white",
 }: GalleryCollectionsCatalogProps) {
   const [data, setData] = useState(initialResponse.data);
   const [page, setPage] = useState(initialResponse.page);
@@ -83,7 +85,7 @@ export function GalleryCollectionsCatalog({
       items={data}
       getKey={(collection) => collection.id}
       renderItem={(collection) => (
-        <GalleryCollectionCard collection={collection} />
+        <GalleryCollectionCard collection={collection} surface={surface} />
       )}
       searchValue={searchInput}
       onSearchChange={handleSearchChange}
@@ -100,6 +102,7 @@ export function GalleryCollectionsCatalog({
       paginationAriaLabel="Paginación de colecciones fotográficas"
       containerClassName="w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8"
       gridClassName="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-12"
+      surface={surface}
     />
   );
 }
