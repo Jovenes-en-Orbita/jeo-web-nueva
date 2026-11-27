@@ -5,6 +5,8 @@ import { Footer } from "@/components/features/Footer";
 import { GalleryCollectionPhotosGrid } from "@/components/features/GalleryCollectionPhotosGrid";
 import { getGalleryCollectionDetail } from "@/lib/api";
 
+export const dynamic = "force-dynamic";
+
 interface CollectionPageProps {
   params: Promise<{ slug: string }>;
 }

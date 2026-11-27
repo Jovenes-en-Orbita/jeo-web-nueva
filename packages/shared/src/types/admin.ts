@@ -1,3 +1,9 @@
+import type {
+  ArticleStatus,
+  CreateArticleReferenceDto,
+  UpdateArticleReferenceDto,
+} from "./news";
+
 /**
  * Métricas generales para el dashboard de la intranet.
  */
@@ -25,6 +31,15 @@ export interface UpdateNewsDto {
   author?: string;
   tags?: string[];
   coverImageCaption?: string;
+  status?: ArticleStatus;
+  categoryIds?: string[];
+  categories?: string[];
+  addCategoryIds?: string[];
+  removeCategoryIds?: string[];
+  references?: UpdateArticleReferenceDto[];
+  addReferences?: CreateArticleReferenceDto[];
+  updateReferences?: UpdateArticleReferenceDto[];
+  removeReferenceIds?: string[];
 }
 
 /**
