@@ -93,7 +93,6 @@ export class NewsService {
   ): Promise<NewsArticle> {
     const resolvedIncludes = NewsQueryBuilder.resolveIncludes(includeOptions);
     const include = NewsQueryBuilder.buildPrismaInclude(resolvedIncludes);
-
     const article = await this.prisma.newsArticle.findUnique({
       where: { slug },
       ...(include ? { include } : {}),
@@ -175,7 +174,7 @@ export class NewsService {
       ...(dto.categories ?? []),
     ];
 
-    return this.runInTransaction(async (tx) => {
+    const created = await this.runInTransaction(async (tx) => {
       const resolvedCategories = await this.resolveCategoriesOrFail(
         tx,
         rawCategoryInputs,
@@ -186,7 +185,7 @@ export class NewsService {
         references: true,
       });
 
-      const article = await tx.newsArticle.create({
+      return tx.newsArticle.create({
         data: {
           title: dto.title.trim(),
           summary: dto.summary.trim(),
@@ -212,13 +211,15 @@ export class NewsService {
         },
         ...(include ? { include } : {}),
       });
-
-      return this.mapToDto(article);
     });
+
+    await this.syncArticleImageToGallery(created);
+
+    return this.mapToDto(created);
   }
 
   async update(id: string, dto: UpdateNewsDto): Promise<NewsArticle> {
-    return this.runInTransaction(async (tx) => {
+    const updated = await this.runInTransaction(async (tx) => {
       const existing = await tx.newsArticle.findUnique({
         where: { id },
         include: {
@@ -464,8 +465,12 @@ export class NewsService {
         ...(include ? { include } : {}),
       });
 
-      return this.mapToDto(updated);
+      return updated;
     });
+
+    await this.syncArticleImageToGallery(updated);
+
+    return this.mapToDto(updated);
   }
 
   async delete(id: string): Promise<{ success: boolean; message: string }> {
@@ -488,6 +493,17 @@ export class NewsService {
       await tx.newsArticle.delete({
         where: { id },
       });
+
+      // Limpiar imagen pendiente si aún no fue vinculada a una colección
+      if (tx.galleryImage?.deleteMany) {
+        await tx.galleryImage.deleteMany({
+          where: {
+            sourceType: "NEWS",
+            sourceId: id,
+            status: "PENDING",
+          },
+        });
+      }
 
       return {
         success: true,
@@ -1032,5 +1048,61 @@ export class NewsService {
             : ref.updatedAt,
       }),
     };
+  }
+
+  private async syncArticleImageToGallery(article: {
+    id: string;
+    title: string;
+    imageUrl?: string | null;
+    coverImageCaption?: string | null;
+    summary?: string | null;
+    author?: string | null;
+    tags?: string[];
+  }): Promise<void> {
+    if (!this.prisma.galleryImage?.findFirst) return;
+
+    const url = article.imageUrl?.trim();
+    const placeholders = new Set([
+      "/assets/hero-cosmos.svg",
+      "/assets/artemis.svg",
+      "/assets/exoplanet.svg",
+      "/assets/starship.svg",
+    ]);
+    if (!url || placeholders.has(url)) return;
+
+    const existing = await this.prisma.galleryImage.findFirst({
+      where: {
+        sourceType: "NEWS",
+        sourceId: article.id,
+      },
+    });
+
+    if (existing) {
+      await this.prisma.galleryImage.update({
+        where: { id: existing.id },
+        data: {
+          url,
+          alt: article.title,
+          caption: article.coverImageCaption ?? article.summary ?? null,
+          photographer: article.author ?? "Equipo JEO",
+          tags: article.tags ?? [],
+        },
+      });
+      return;
+    }
+
+    await this.prisma.galleryImage.create({
+      data: {
+        url,
+        alt: article.title,
+        caption: article.coverImageCaption ?? article.summary ?? null,
+        photographer: article.author ?? "Equipo JEO",
+        tags: article.tags ?? [],
+        collectionId: null,
+        status: "PENDING",
+        sourceType: "NEWS",
+        sourceId: article.id,
+      },
+    });
   }
 }

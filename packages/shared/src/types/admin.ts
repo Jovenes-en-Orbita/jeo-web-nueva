@@ -91,7 +91,24 @@ export interface UpdateMoonDto {
 export interface CreateGalleryCollectionDto {
   id?: string;
   title: string;
+  slug?: string;
   description: string;
+  category?: string;
+  tags?: string[];
+  featured?: boolean;
+  rotationFrequency?: string;
+}
+
+/**
+ * DTO para actualizar una colección de galería.
+ */
+export interface UpdateGalleryCollectionDto {
+  title?: string;
+  slug?: string;
+  description?: string;
+  category?: string;
+  tags?: string[];
+  featured?: boolean;
   rotationFrequency?: string;
 }
 
@@ -99,12 +116,41 @@ export interface CreateGalleryCollectionDto {
  * DTO para agregar una imagen a la galería.
  */
 export interface CreateGalleryImageDto {
-  collectionId: string;
+  collectionId?: string | null;
   alt: string;
   caption?: string;
   url?: string;
   featured?: boolean;
   order?: number;
+  tags?: string[];
+  photographer?: string;
+  telescope?: string;
+  camera?: string;
+  exposureTime?: string;
+  location?: string;
+  capturedAt?: string;
+  creditUrl?: string;
+}
+
+/**
+ * DTO para actualizar una imagen de la galería.
+ */
+export interface UpdateGalleryImageDto {
+  collectionId?: string | null;
+  alt?: string;
+  caption?: string;
+  url?: string;
+  featured?: boolean;
+  order?: number;
+  status?: "LINKED" | "PENDING" | "IGNORED";
+  tags?: string[];
+  photographer?: string;
+  telescope?: string;
+  camera?: string;
+  exposureTime?: string;
+  location?: string;
+  capturedAt?: string;
+  creditUrl?: string;
 }
 
 /**

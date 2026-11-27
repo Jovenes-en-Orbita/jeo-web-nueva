@@ -149,33 +149,58 @@ model Constellation {
 }
 
 model GalleryImage {
-  id       String  @id @default(uuid())
-  url      String?
-  alt      String
-  caption  String?
-  featured Boolean @default(false)
-  order    Int     @default(0)
+  id           String    @id @default(uuid())
+  url          String?
+  alt          String
+  caption      String?
+  featured     Boolean   @default(false)
+  order        Int       @default(0)
 
-  collection   GalleryCollection @relation(fields: [collectionId], references: [id])
-  collectionId String            @map("collection_id")
+  status       String    @default("LINKED") // LINKED, PENDING, IGNORED
+  sourceType   String    @default("MANUAL") @map("source_type") // MANUAL, NEWS, UNIVERSE, SOLAR_SYSTEM, CONSTELLATION, SITE_ASSET
+  sourceId     String?   @map("source_id")
+  tags         String[]  @default([])
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  photographer String?
+  telescope    String?
+  camera       String?
+  exposureTime String?   @map("exposure_time")
+  location     String?
+  capturedAt   DateTime? @map("captured_at")
+  creditUrl    String?   @map("credit_url")
 
+  collection   GalleryCollection? @relation(fields: [collectionId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  collectionId String?            @map("collection_id")
+
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([collectionId, order])
+  @@index([status])
+  @@index([sourceType, sourceId])
+  @@index([tags], type: Gin)
   @@map("gallery_images")
 }
 
 model GalleryCollection {
-  id                 String  @id @default(uuid())
-  title              String
-  description        String
-  rotationFrequency  String  @default("semanal") @map("rotation_frequency")
+  id                String   @id @default(uuid())
+  title             String
+  slug              String?  @unique
+  description       String
+  category          String?
+  tags              String[] @default([])
+  featured          Boolean  @default(false)
+  rotationFrequency String   @default("semanal") @map("rotation_frequency")
 
-  images GalleryImage[]
+  images            GalleryImage[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 
+  @@index([title])
+  @@index([featured])
+  @@index([category])
+  @@index([tags], type: Gin)
   @@map("gallery_collections")
 }
 
