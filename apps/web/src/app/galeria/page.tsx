@@ -20,7 +20,7 @@ export default async function GaleriaPage() {
   });
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#050811] text-white">
+    <div className="min-h-screen flex flex-col bg-white text-neutral-900">
       <Navbar />
 
       <main className="flex-1 py-12 md:py-16">
@@ -28,9 +28,13 @@ export default async function GaleriaPage() {
           titlePrefix="GALERÍA DE"
           titleHighlight="FOTOS ASTRONÓMICAS"
           maxWidthClass="max-w-5xl"
+          surface="white"
         />
 
-        <GalleryCollectionsCatalog initialResponse={initialResponse} />
+        <GalleryCollectionsCatalog
+          initialResponse={initialResponse}
+          surface="white"
+        />
       </main>
 
       <Footer />

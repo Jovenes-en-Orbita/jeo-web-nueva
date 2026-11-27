@@ -40,7 +40,7 @@ export default async function GaleriaCollectionPage({
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#050811] text-white">
+    <div className="min-h-screen flex flex-col bg-white text-neutral-900">
       <Navbar />
 
       <main className="flex-1 py-12 md:py-16">

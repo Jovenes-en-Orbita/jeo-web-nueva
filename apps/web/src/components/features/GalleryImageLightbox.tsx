@@ -60,7 +60,7 @@ export function GalleryImageLightbox({
   const imageSrc =
     currentImage.url && currentImage.url.trim() !== ""
       ? currentImage.url
-      : `/assets/gallery-${((activeIndex ?? 0) % 6) + 1}.svg`;
+      : "/assets/hero-cosmos.svg";
 
   return (
     <div
@@ -68,7 +68,7 @@ export function GalleryImageLightbox({
       aria-modal="true"
       aria-label={currentImage.alt || "Vista ampliada de fotografía"}
       onClick={onClose}
-      className="fixed inset-0 z-50 bg-[#050811]/80 backdrop-blur-md flex items-center justify-center p-4 sm:p-8"
+      className="fixed inset-0 z-50 bg-white/85 backdrop-blur-md flex items-center justify-center p-4 sm:p-8"
     >
       {/* Botón cerrar discreto en esquina superior derecha */}
       <button
@@ -78,7 +78,7 @@ export function GalleryImageLightbox({
           onClose();
         }}
         aria-label="Cerrar imagen"
-        className="fixed top-5 right-5 z-50 p-2.5 bg-black/50 hover:bg-black/80 border border-white/20 text-white transition-colors cursor-pointer"
+        className="fixed top-5 right-5 z-50 p-2.5 bg-white hover:bg-neutral-900 border border-neutral-900 text-neutral-900 hover:text-white transition-colors cursor-pointer shadow-md"
       >
         <FiX className="w-5 h-5" />
       </button>
@@ -94,14 +94,14 @@ export function GalleryImageLightbox({
             type="button"
             onClick={handlePrev}
             aria-label="Foto anterior"
-            className="shrink-0 p-3 sm:p-3.5 bg-black/60 hover:bg-[#e8c648] hover:text-[#050811] border border-white/20 text-white transition-colors cursor-pointer"
+            className="shrink-0 p-3 sm:p-3.5 bg-white hover:bg-neutral-900 border border-neutral-900 text-neutral-900 hover:text-white transition-colors cursor-pointer shadow-md"
           >
             <FiChevronLeft className="w-6 h-6" />
           </button>
         )}
 
         {/* Imagen con título superpuesto únicamente */}
-        <div className="relative w-full aspect-[16/10] max-h-[82vh] overflow-hidden bg-[#090e1d] border border-white/15 shadow-2xl">
+        <div className="relative w-full aspect-[16/10] max-h-[82vh] overflow-hidden bg-neutral-100 border border-neutral-200 shadow-2xl">
           <Image
             src={imageSrc}
             alt={currentImage.alt || "Fotografía astronómica"}
@@ -128,7 +128,7 @@ export function GalleryImageLightbox({
             type="button"
             onClick={handleNext}
             aria-label="Foto siguiente"
-            className="shrink-0 p-3 sm:p-3.5 bg-black/60 hover:bg-[#e8c648] hover:text-[#050811] border border-white/20 text-white transition-colors cursor-pointer"
+            className="shrink-0 p-3 sm:p-3.5 bg-white hover:bg-neutral-900 border border-neutral-900 text-neutral-900 hover:text-white transition-colors cursor-pointer shadow-md"
           >
             <FiChevronRight className="w-6 h-6" />
           </button>

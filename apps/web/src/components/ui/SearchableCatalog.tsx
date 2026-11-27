@@ -26,6 +26,7 @@ interface SearchableCatalogProps<T> {
   paginationAriaLabel: string;
   containerClassName?: string;
   gridClassName?: string;
+  surface?: "dark" | "white";
 }
 
 /**
@@ -53,6 +54,7 @@ export function SearchableCatalog<T>({
   paginationAriaLabel,
   containerClassName = "w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8",
   gridClassName = "grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-12",
+  surface = "dark",
 }: SearchableCatalogProps<T>) {
   const handlePageChange = (nextPage: number) => {
     onPageChange(nextPage);
@@ -70,15 +72,21 @@ export function SearchableCatalog<T>({
         ariaLabel={searchAriaLabel}
         resultSummary={resultSummary}
         filtersSlot={filtersSlot}
+        surface={surface}
       />
 
       {isLoading ? (
         <div className="py-20 flex items-center justify-center">
-          <FiLoader className="w-8 h-8 text-[#e8c648] animate-spin" />
+          <FiLoader
+            className={`w-8 h-8 animate-spin ${
+              surface === "white" ? "text-neutral-900" : "text-[#e8c648]"
+            }`}
+          />
         </div>
       ) : items.length === 0 ? (
         <EmptyState
           message={hasActiveFilters ? emptySearchMessage : emptyMessage}
+          surface={surface === "white" ? "light" : "dark"}
         />
       ) : (
         <div className={gridClassName}>
@@ -96,6 +104,7 @@ export function SearchableCatalog<T>({
         onPageChange={handlePageChange}
         isLoading={isLoading}
         ariaLabel={paginationAriaLabel}
+        surface={surface}
       />
     </div>
   );
