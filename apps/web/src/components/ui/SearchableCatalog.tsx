@@ -3,6 +3,7 @@
 import React from "react";
 import { FiLoader } from "react-icons/fi";
 import { CatalogSearchBar } from "./CatalogSearchBar";
+import { EmptyState } from "./EmptyState";
 import { PaginationControls } from "./PaginationControls";
 
 interface SearchableCatalogProps<T> {
@@ -76,11 +77,9 @@ export function SearchableCatalog<T>({
           <FiLoader className="w-8 h-8 text-[#e8c648] animate-spin" />
         </div>
       ) : items.length === 0 ? (
-        <div className="py-16 text-center border border-white/10 bg-[#080d1a]">
-          <p className="text-sm text-slate-400 font-inter">
-            {hasActiveFilters ? emptySearchMessage : emptyMessage}
-          </p>
-        </div>
+        <EmptyState
+          message={hasActiveFilters ? emptySearchMessage : emptyMessage}
+        />
       ) : (
         <div className={gridClassName}>
           {items.map((item) => (
